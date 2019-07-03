@@ -1,0 +1,2 @@
+*.private filter=git-crypt diff=git-crypt
+duply/.duply/*/conf filter=git-crypt diff=git-crypt
