@@ -116,6 +116,18 @@ Use =evil= with Org agendas.
     (evil-org-agenda-set-keys))
 #+END_SRC
 
+* JIRA Stuff
+Link Abbreviations for jira:
+#+BEGIN_SRC emacs-lisp
+(setq org-link-abbrev-alist
+      '(("jira"  . "https://pubnativegmbh.atlassian.net/secure/QuickSearch.jspa?searchString=%h")
+))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+(setq jiralib-url "https://pubnativegmbh.atlassian.net")
+
+#+END_SRC
+
 * Utility functions
 
 Define a big ol' bunch of handy utility functions.
@@ -1278,16 +1290,6 @@ of every exported HTML document.
   (setq org-html-postamble nil)
 #+END_SRC
 
-Exporting to HTML and opening the results triggers =/usr/bin/sensible-browser=,
-which checks the =$BROWSER= environment variable to choose the right browser.
-I'd like to always use Firefox, so:
-
-#+BEGIN_SRC emacs-lisp
-  (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "firefox")
-
-  (setenv "BROWSER" "firefox")
-#+END_SRC
 
 **** Exporting to PDF
 
@@ -1944,6 +1946,10 @@ Enable [[https://github.com/hrs/engine-mode][engine-mode]] and define a few usef
 
   (defengine youtube
     "https://www.youtube.com/results?search_query=%s")
+
+  (defengine jira
+    "https://pubnativegmbh.atlassian.net/secure/QuickSearch.jspa?searchString=%s"
+    :keybinding "j")
 
   (engine-mode t)
 #+END_SRC
