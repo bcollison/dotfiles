@@ -14,3 +14,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 GIT_PROMPT_ONLY_IN_REPO=1
 source $DIR/.bash-git-prompt/gitprompt.sh
+
+/usr/local/bin/disable-middle-mouse-click
+
+alias ts2date="date -u --date=\"@$1\""
+
