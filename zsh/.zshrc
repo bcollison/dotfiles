@@ -2,7 +2,11 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/briancollison/.oh-my-zsh"
+export ZSH="/home/brian/.oh-my-zsh"
+if [ "$(uname 2> /dev/null)" != "Linux" ]; then
+   export ZSH="/Users/briancollison/.oh-my-zsh"
+fi
+
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -105,8 +109,12 @@ source $ZSH/oh-my-zsh.sh
     compinit
   fi
 
-  source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
+if [ "$(uname 2> /dev/null)" != "Linux" ]; then
+   source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+else   
+   source ~/.zshrc.d/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+  
 source ~/.zshrc.d/work.zsh.private
 export SBT_HOME=/usr/local/sbt
 export PATH=$SBT_HOME/bin:$PATH
