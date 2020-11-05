@@ -318,6 +318,10 @@ Note that this overrides the default font-related keybindings from
 =sensible-defaults=.
 
 #+BEGIN_SRC emacs-lisp
+(custom-theme-set-faces
+ 'user
+ '(variable-pitch ((t (:family "Libre Baskerville" :height 70 :weight thin))))
+ '(fixed-pitch ((t ( :family "Inconsolata" :height 70)))))
   (setq hrs/default-font "Inconsolata")
   (setq hrs/default-font-size 16)
   (setq hrs/current-font-size hrs/default-font-size)
