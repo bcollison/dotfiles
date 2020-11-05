@@ -36,7 +36,6 @@ Use [[https://github.com/hrs/sensible-defaults.el][sensible-defaults.el]] for so
   (load-file "~/Personal/projects/sensible-defaults.el/sensible-defaults.el")
   (sensible-defaults/use-all-settings)
   (sensible-defaults/use-all-keybindings)
-  (sensible-defaults/backup-to-temp-directory)
 #+END_SRC
 
 * Set personal information
@@ -1165,7 +1164,7 @@ Define a few common tasks as capture templates. Specifically, I frequently:
   (setq org-capture-templates
         '(("b" "Blog idea"
            entry
-           (file "~/documents/notes/blog-ideas.org")
+           (file "~/Dropbox/Apps/MobileOrg/notes/blog-ideas.org")
            "* %?\n")
 
           ("e" "Email" entry
@@ -1173,7 +1172,7 @@ Define a few common tasks as capture templates. Specifically, I frequently:
            "* TODO %?\n\n%a\n\n")
 
           ("f" "Finished book"
-           table-line (file "~/documents/notes/books-read.org")
+           table-line (file "~/Dropbox/Apps/MobileOrg/notes/books-read.org")
            "| %^{Title} | %^{Author} | %u |")
 
           ("r" "Reading"
@@ -1182,7 +1181,7 @@ Define a few common tasks as capture templates. Specifically, I frequently:
 
           ("s" "Subscribe to an RSS feed"
            plain
-           (file "~/documents/rss/urls")
+           (file "~/Dropbox/Apps/MobileOrg/rss/urls")
            "%^{Feed URL} \"~%^{Feed name}\"")
 
           ("t" "Todo"
@@ -1386,7 +1385,7 @@ and creates a new post (with a timestamped and slugged file name) in the blog's
 =_posts/= directory. The new post includes appropriate YAML header information.
 
 #+BEGIN_SRC emacs-lisp
-  (defvar hrs/jekyll-posts-directory "~/documents/blog/_posts/")
+  (defvar hrs/jekyll-posts-directory "~/Dropbox/Apps/MobileOrg/blog/_posts/")
   (defvar hrs/jekyll-post-extension ".md")
 
   (defun hrs/replace-whitespace-with-hyphens (s)
@@ -1451,7 +1450,7 @@ This selects and inserts a tag:
 #+BEGIN_SRC emacs-lisp
   (defun hrs/existing-blog-tags ()
     "Return a list of all the tags currently used in my blog."
-    (split-string (shell-command-to-string "cd ~/documents/blog && rake tags")))
+    (split-string (shell-command-to-string "cd ~/Dropbox/Apps/MobileOrg/blog && rake tags")))
 
   (defun hrs/insert-blog-tag ()
     "Select one of the current tags and insert it at point."
@@ -1475,7 +1474,7 @@ it.
 
   (defun hrs/today-checklist-filename ()
     "The filename of today's checklist."
-    (concat "/home/hrs/documents/checklists/daily-checklist-" (format-time-string "%Y-%m-%d") ".org"))
+    (concat "/home/brian/Dropbox/Apps/MobileOrg/checklists/daily-checklist-" (format-time-string "%Y-%m-%d") ".org"))
 
   (defun hrs/today ()
     "Take a look at today's checklist."
@@ -1659,7 +1658,7 @@ Use flycheck in the appropriate buffers:
     :commands (deft)
     :config
 
-    (setq deft-directory "~/documents/notes"
+    (setq deft-directory "~/Dropbox/Apps/MobileOrg/notes"
           deft-recursive t
           deft-use-filename-as-title t)
 
