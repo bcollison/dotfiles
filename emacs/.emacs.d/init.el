@@ -21,7 +21,33 @@
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
    (quote
-    ("~/Dropbox/Apps/MobileOrg/vgi.org" "~/Dropbox/Apps/MobileOrg/index.org")))
+    ("~/Dropbox/Apps/MobileOrg/standups.org" "~/Dropbox/Apps/MobileOrg/home.org" "~/Dropbox/Apps/MobileOrg/vgi.org" "~/Dropbox/Apps/MobileOrg/index.org")))
+ '(org-capture-templates
+   (quote
+    (("b" "Blog idea" entry
+      (file "~/documents/notes/blog-ideas.org")
+      "* %?
+")
+     ("e" "Email" entry
+      (file+headline org-index-file "Inbox")
+      "* TODO %?
+
+%a
+
+")
+     ("f" "Finished book" table-line
+      (file "~/documents/notes/books-read.org")
+      "| %^{Title} | %^{Author} | %u |")
+     ("r" "Reading" checkitem
+      (file
+       (org-file-path "to-read.org")))
+     ("s" "Subscribe to an RSS feed" plain
+      (file "~/documents/rss/urls")
+      "%^{Feed URL} \"~%^{Feed name}\"")
+     ("t" "Todo" entry
+      (file+headline org-index-file "Inbox")
+      "* TODO %?
+"))) t)
  '(package-selected-packages
    (quote
     (org-jira org-journal yard-mode yaml-mode which-key wgrep web-mode use-package synosaurus solarized-theme smex slim-mode scss-mode scala-mode sbt-mode ruby-end rspec-mode rainbow-delimiters python-mode py-autopep8 proof-general projectile-rails paredit org-bullets multi-term minions less-css-mode instapaper helpful haskell-mode haml-mode graphviz-dot-mode go-errcheck gnuplot forge flycheck-package flx evil-surround evil-org evil-mu4e evil-magit engine-mode elpy dumb-jump dired-open dired-hide-dotfiles diff-hl deft counsel company-jedi company-go company-coq coffee-mode chruby auto-compile ag))))
