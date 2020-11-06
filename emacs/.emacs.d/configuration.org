@@ -610,7 +610,7 @@ Install =go-mode= and related packages:
 Define my =$GOPATH= and tell Emacs where to find the Go binaries.
 
 #+BEGIN_SRC emacs-lisp
-  (setenv "GOPATH" "/home/hrs/code/go")
+  (setenv "GOPATH" "/usr/local/go/go")
   (hrs/append-to-path (concat (getenv "GOPATH") "/bin"))
 #+END_SRC
 
@@ -1474,7 +1474,7 @@ it.
 
   (defun hrs/today-checklist-filename ()
     "The filename of today's checklist."
-    (concat "/home/brian/Dropbox/Apps/MobileOrg/checklists/daily-checklist-" (format-time-string "%Y-%m-%d") ".org"))
+    (concat "~/Dropbox/Apps/MobileOrg/checklists/daily-checklist-" (format-time-string "%Y-%m-%d") ".org"))
 
   (defun hrs/today ()
     "Take a look at today's checklist."
