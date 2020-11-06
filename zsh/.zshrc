@@ -72,6 +72,8 @@ ZSH_THEME="mira"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+#
+# git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 plugins=(z git jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
