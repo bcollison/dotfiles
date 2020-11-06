@@ -72,7 +72,7 @@ ZSH_THEME="mira"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git jenv docker docker-compose mvn golang gcloud)
+plugins=(z git jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -127,4 +127,14 @@ export PATH="$JENV_HOME/bin:$PATH"
 eval "$(jenv init -)"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
+export PATH="$HOME/.rvm/bin:$PATH"
+
+# overriding mira theme-- they should probably use prefix/suffix like others
+local jenv_java='%{$fg[blue]%}‹java:$(jenv_prompt_info)›%{$reset_color%}'
+
+# using mira theme-- adding in date/time
+# provided:
+#  PROMPT="╭─${user_host} ${current_dir} ${nvm_node} ${rvm_ruby} ${jenv_java} ${git_branch}
+#  ╰─%B$%b "
+export PROMPT="╭─${user_host} ${current_dir} ${rvm_ruby} ${jenv_java} ${git_branch}
+╰─ %D{%H:%M} %B$%b "
