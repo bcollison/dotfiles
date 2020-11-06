@@ -2,17 +2,17 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/brian/.oh-my-zsh"
-if [ "$(uname 2> /dev/null)" != "Linux" ]; then
-   export ZSH="/Users/briancollison/.oh-my-zsh"
-fi
+export ZSH="$HOME/.oh-my-zsh"
+#if [ "$(uname 2> /dev/null)" != "Linux" ]; then
+#   export ZSH="/Users/briancollison/.oh-my-zsh"
+#fi
 
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+ZSH_THEME="mira"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -72,7 +72,7 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git docker docker-compose mvn golang gcloud)
+plugins=(git jenv docker docker-compose mvn golang gcloud)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -119,6 +119,12 @@ source ~/.zshrc.d/work.zsh.private
 export SBT_HOME=/usr/local/sbt
 export PATH=$SBT_HOME/bin:$PATH
 
+
+export JENV_HOME="$HOME/.jenv"
+export PATH="$JENV_HOME/bin:$PATH"
+
+
+eval "$(jenv init -)"
+
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
-
