@@ -74,7 +74,7 @@ ZSH_THEME="mira"
 # Add wisely, as too many plugins slow down shell startup.
 #
 # git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-plugins=(z git jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
+plugins=(z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -138,5 +138,8 @@ local jenv_java='%{$fg[blue]%}‹java:$(jenv_prompt_info)›%{$reset_color%}'
 # provided:
 #  PROMPT="╭─${user_host} ${current_dir} ${nvm_node} ${rvm_ruby} ${jenv_java} ${git_branch}
 #  ╰─%B$%b "
-export PROMPT="╭─${user_host} ${current_dir} ${rvm_ruby} ${jenv_java} ${git_branch}
+export PROMPT="╭─${user_host} ${current_dir} ${rvm_ruby} ${jenv_java} 
 ╰─ %D{%H:%M} %B$%b "
+
+export RPROMPT='$(git_super_status)'
+
