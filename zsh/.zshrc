@@ -143,3 +143,5 @@ export PROMPT="╭─${user_host} ${current_dir} ${rvm_ruby} ${jenv_java}
 
 export RPROMPT='$(git_super_status)'
 
+export ZSH_HIGHLIGHT_STYLES[comment]='none'
+
