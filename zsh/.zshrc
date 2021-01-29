@@ -145,3 +145,4 @@ export RPROMPT='$(git_super_status)'
 
 export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
+. $HOME/.asdf/asdf.sh
