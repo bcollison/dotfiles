@@ -1,7 +1,7 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Brian Collison
 #+EMAIL: brian@briancollison.com
-#+OPTIONS: toc:nil num:nil
+#+OPTIONS: num:nil
 
 * Configure =use-package=
 
@@ -33,6 +33,26 @@ Disable TLS 1.3; ELPA has higher standards. That'll be the default in Emacs
 
 #+begin_src emacs-lisp
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+#+end_src
+
+* Some shortcuts to help tweaking this configuration
+This was repurposed from: https://github.com/mrvdb/emacs-config
+#+begin_src emacs-lisp
+  (defun mrb/compile-config ()
+    (interactive)
+    (org-babel-load-file config-file)
+    (byte-recompile-directory user-emacs-directory 0)
+  )
+#+end_src
+
+The config file =mrb.org= gets openened *a lot* because I tend to fiddle with this config at least once a day. So, it warrants it's own keybinding.
+
+#+begin_src emacs-lisp
+  (defun mrb/open-config ()
+    (interactive)
+    (find-file config-file))
+  ;; I wanted something with '~'
+  (global-set-key (kbd "C-~") 'mrb/open-config)
 #+end_src
 
 * Use =sensible-defaults.el=
@@ -181,25 +201,46 @@ Why not?
 #+end_src
 
 ** Load up a theme
+I'm currently using the "solarized-light" theme. I've got a scenic wallpaper, so
+just a hint of transparency looks lovely and isn't distracting or hard to read.
 
-I'm currently trying out the "modus-operandi" theme. I've got a scenic
-wallpaper, so just a hint of transparency looks lovely and isn't distracting or
-hard to read.
+#+BEGIN_SRC emacs-lisp
+(setq zenburn-scale-org-headlines t)
+(setq zenburn-use-variable-pitch t)
+(setq zenburn-scale-outline-headlines t)
 
-#+begin_src emacs-lisp
-  (use-package modus-operandi-theme)
+  (use-package zenburn-theme
+    :config
+    (load-theme `zenburn t))
+   ;; (use-package solarized-theme
+   ;;   :config
+   ;;   (load-theme 'solarized-dark t)
 
-  (defun transparency (value)
-    "Sets the transparency of the frame window. 0=transparent/100=opaque."
-    (interactive "nTransparency Value 0 - 100 opaque:")
-    (set-frame-parameter (selected-frame) 'alpha value))
+   ;;   (setq solarized-use-variable-pitch nil
+   ;;         solarized-height-plus-1 1.0
+   ;;         solarized-height-plus-2 1.0
+   ;;         solarized-height-plus-3 1.0
+   ;;         solarized-height-plus-4 1.0)
 
-  (defun hrs/apply-theme ()
-    "Apply my chosen theme and make frames just slightly transparent."
-    (interactive)
-    (load-theme 'modus-operandi t)
-    (transparency 100))
-#+end_src
+   ;;   (let ((line (face-attribute 'mode-line :underline)))
+   ;;     (set-face-attribute 'mode-line          nil :overline   line)
+   ;;     (set-face-attribute 'mode-line-inactive nil :overline   line)
+   ;;     (set-face-attribute 'mode-line-inactive nil :underline  line)
+   ;;     (set-face-attribute 'mode-line          nil :box        nil)
+   ;;     (set-face-attribute 'mode-line-inactive nil :box        nil)
+   ;;     (set-face-attribute 'mode-line-inactive nil :background "#f9f2d9")))
+
+ (defun transparency (value)
+   "Sets the transparency of the frame window. 0=transparent/100=opaque."
+   (interactive "nTransparency Value 0 - 100 opaque:")
+   (set-frame-parameter (selected-frame) 'alpha value))
+
+ (defun hrs/apply-theme ()
+   "Apply the `zenburn' theme and make frames just slightly transparent."
+   (interactive)
+   (load-theme 'zenburn t)
+   (transparency 100))
+#+END_SRC
 
 If this code is being evaluated by =emacs --daemon=, ensure that each subsequent
 frame is themed appropriately.
@@ -212,7 +253,7 @@ frame is themed appropriately.
     (hrs/apply-theme))
 #+end_src
 
-** Use =minions= to hide all minor modes (Disabled until I understand)
+** Use =minions= to hide all minor modes
 
 I never want to see a minor mode, and manually adding =:diminish= to every
 use-package declaration is a hassle. This uses =minions= to hide all the minor
@@ -222,11 +263,11 @@ By default there's a =;-)= after the major mode; that's an adorable default, but
 I'd rather skip it.
 
 #+begin_src emacs-lisp
-;;   (use-package minions
-;;     :config
-;;     (setq minions-mode-line-lighter ""
-;;           minions-mode-line-delimiters '("" . ""))
-;;     (minions-mode 1))
+   (use-package minions
+     :config
+     (setq minions-mode-line-lighter ""
+           minions-mode-line-delimiters '("" . ""))
+     (minions-mode 1))
 #+end_src
 
 ** Disable visual bell (Disabled)
@@ -369,7 +410,7 @@ Install =avy= to skip around the screen quickly.
 #+begin_src emacs-lisp
   (use-package avy
     :bind*
-    ("C-;" . evil-avy-goto-char-2))
+    ("C-;" . avy-goto-char-2))
 #+end_src
 
 ** =company=
@@ -702,3 +743,636 @@ checklist items. This is handy for organizing "blocking" tasks hierarchically.
   (setq org-enforce-todo-dependencies t)
   (setq org-enforce-todo-checkbox-dependencies t)
 #+end_src
+
+*** Capturing tasks
+
+Define a few common tasks as capture templates. Specifically, I frequently:
+
+- Record ideas for future blog posts in =~/documents/notes/blog-ideas.org=,
+- Maintain a todo list in =~/documents/org/index.org=.
+- Convert emails into todos to maintain an empty inbox.
+
+#+begin_src emacs-lisp
+  (setq org-capture-templates
+        '(("b" "Blog idea"
+           entry
+           (file "~/documents/org/notes/blog-ideas.org")
+           "* %?\n")
+
+          ("c" "Contact"
+           entry
+           (file "~/documents/org/contacts.org")
+           "* %(org-contacts-template-name)
+  :PROPERTIES:
+  :ADDRESS: %^{123 Fake St., City, ST 12345}
+  :PHONE: %^{555-555-5555}
+  :EMAIL: %(org-contacts-template-email)
+  :NOTE: %^{note}
+  :END:")
+
+          ("d" "Delivery" entry
+           (file+headline "~/documents/org/events.org" "Deliveries")
+           "** %?\n   SCHEDULED: %t\n")
+
+          ("e" "Email" entry
+           (file+headline org-index-file "Inbox")
+           "* TODO %?\n\n%a\n\n")
+
+          ("f" "Finished book"
+           table-line (file "~/documents/org/notes/books-read.org")
+           "| %^{Title} | %^{Author} | %u |")
+
+          ("j" "Work task"
+           entry
+           (file+headline "~/documents/org/work.org" "Tasks")
+           "* TODO %?\n")
+
+          ("k" "Kookaburra ingest"
+           entry
+           (file+headline "~/documents/org/kookaburra-ingest.org" "Queue")
+           "* TODO %?\n")
+
+          ("s" "Subscribe to an RSS feed"
+           plain
+           (file "~/documents/org/rss-feeds.org")
+           "*** [[%^{Feed URL}][%^{Feed name}]]")
+
+          ("t" "Todo"
+           entry
+           (file+headline org-index-file "Inbox")
+           "* TODO %?\n")))
+#+end_src
+
+When I'm starting an Org capture template I'd like to begin in insert mode. I'm
+opening it up in order to start typing something, so this skips a step. (Disabled)
+
+#+begin_src emacs-lisp
+;;  (add-hook 'org-capture-mode-hook 'evil-insert-state)
+#+end_src
+
+Refiling according to the document's hierarchy.
+
+#+begin_src emacs-lisp
+  (setq org-refile-use-outline-path t)
+  (setq org-outline-path-complete-in-steps nil)
+#+end_src
+
+*** Keybindings
+
+Bind a few handy keys.
+
+#+begin_src emacs-lisp
+  (define-key global-map "\C-cl" 'org-store-link)
+  (define-key global-map "\C-ca" 'org-agenda)
+  (define-key global-map "\C-cc" 'org-capture)
+#+end_src
+
+Hit =C-c i= to quickly open up my todo list.
+
+#+begin_src emacs-lisp
+  (defun hrs/open-index-file ()
+    "Open the master org TODO list."
+    (interactive)
+    (find-file org-index-file)
+    (flycheck-mode -1)
+    (end-of-buffer))
+
+  (global-set-key (kbd "C-c i") 'hrs/open-index-file)
+#+end_src
+
+Hit =M-n= to quickly open up a capture template for a new todo.
+
+#+begin_src emacs-lisp
+  (defun org-capture-todo ()
+    (interactive)
+    (org-capture :keys "t"))
+
+  (global-set-key (kbd "M-n") 'org-capture-todo)
+  (add-hook 'gfm-mode-hook
+            (lambda () (local-set-key (kbd "M-n") 'org-capture-todo)))
+  (add-hook 'haskell-mode-hook
+            (lambda () (local-set-key (kbd "M-n") 'org-capture-todo)))
+#+end_src
+
+Hit =C-c w= to quickly open up my work todo list.
+
+#+begin_src emacs-lisp
+  (defun hrs/open-work-file ()
+    "Open the work TODO list."
+    (interactive)
+    (find-file (org-file-path "work.org"))
+    (flycheck-mode -1)
+    (end-of-buffer))
+
+  (global-set-key (kbd "C-c w") 'hrs/open-work-file)
+#+end_src
+
+** Exporting
+
+Allow export to markdown and beamer (for presentations).
+
+#+begin_src emacs-lisp
+  (require 'ox-md)
+  (require 'ox-beamer)
+#+end_src
+
+Allow =babel= to evaluate Emacs lisp, Ruby, =ditaa=, Graphviz, or Gnuplot code.
+
+#+begin_src emacs-lisp
+  (use-package gnuplot)
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (ruby . t)
+     (ditaa . t)
+     (dot . t)
+     (gnuplot . t)))
+#+end_src
+
+Don't ask before evaluating code blocks.
+
+#+begin_src emacs-lisp
+  (setq org-confirm-babel-evaluate nil)
+#+end_src
+
+Use =htmlize= to ensure that exported code blocks use syntax highlighting.
+
+#+begin_src emacs-lisp
+  (use-package htmlize)
+#+end_src
+
+Associate the "dot" language with the =graphviz-dot= major mode.
+
+#+begin_src emacs-lisp
+  (use-package graphviz-dot-mode)
+  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+#+end_src
+
+Translate regular ol' straight quotes to typographically-correct curly quotes
+when exporting.
+
+#+begin_src emacs-lisp
+  (setq org-export-with-smart-quotes t)
+#+end_src
+
+**** Exporting to HTML
+
+Don't include a footer with my contact and publishing information at the bottom
+of every exported HTML document.
+
+#+begin_src emacs-lisp
+  (setq org-html-postamble nil)
+#+end_src
+
+**** Exporting to PDF
+
+I want to produce PDFs with syntax highlighting in the code. The best way to do
+that seems to be with the =minted= package, but that package shells out to
+=pygments= to do the actual work. =pdflatex= usually disallows shell commands;
+this enables that.
+
+#+begin_src emacs-lisp
+  (setq org-latex-pdf-process
+        '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+          "xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
+Include the =minted= package in all of my LaTeX exports.
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (setq org-latex-listings 'minted)
+#+end_src
+
+** TeX configuration
+
+I rarely write LaTeX directly any more, but I often export through it with
+org-mode, so I'm keeping them together.
+
+Automatically parse the file after loading it.
+
+#+begin_src emacs-lisp
+  (setq TeX-parse-self t)
+#+end_src
+
+Always use =pdflatex= when compiling LaTeX documents. I don't really have any
+use for DVIs.
+
+#+begin_src emacs-lisp
+  (setq TeX-PDF-mode t)
+#+end_src
+
+Enable a minor mode for dealing with math (it adds a few useful keybindings),
+and always treat the current file as the "main" file. That's intentional, since
+I'm usually actually in an org document.
+
+#+begin_src emacs-lisp
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+              (LaTeX-math-mode)
+              (setq TeX-master t)))
+#+end_src
+
+* Knowledge Managment
+
+** My brain isn't the best device to store information, let's play with org-brain
+
+#+begin_src emacs-lisp
+(use-package org-brain :ensure t
+  :init
+  (setq org-brain-path "~/documents/org/org-brain")
+  ;; For Evil users
+;;  (with-eval-after-load 'evil
+;;    (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
+  :config
+  (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
+  (setq org-id-track-globally t)
+  (setq org-id-locations-file "~/documents/org/.org-id-locations")
+  (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
+  (push '("b" "Brain" plain (function org-brain-goto-end)
+          "* %i%?" :empty-lines 1)
+        org-capture-templates)
+  (setq org-brain-visualize-default-choices 'all)
+  (setq org-brain-title-max-length 12)
+  (setq org-brain-include-file-entries nil
+        org-brain-file-entries-use-title nil))
+
+;; Allows you to edit entries directly from org-brain-visualize
+(use-package polymode
+  :config
+  (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
+#+end_src
+
+** Or... maybe I want to use org-roam for my PKM System?
+#+begin_src emacs-lisp
+(use-package org-roam
+      :ensure t
+      :hook
+      (after-init . org-roam-mode)
+      :custom
+      (org-roam-directory "~/documents/org/org-roam")
+      :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))
+              (("C-c n I" . org-roam-insert-immediate))))
+#+end_src
+
+*** Let's play around with dailies
+#+begin_src emacs-lisp
+(setq org-roam-dailies-directory "~/documents/org/daily/")
+(setq org-roam-dailies-capture-templates
+  '(("d" "default" entry
+    #'org-roam-capture--get-point
+    "* %?"
+    :file-name "daily/%<%Y-%m-%d>"
+    :head "#+title: %<%Y-%m-%d>\n\n")))
+#+end_src
+
+* File management with =dired=
+
+Hide dotfiles by default, but toggle their visibility with =.=.
+
+#+begin_src emacs-lisp
+  (use-package dired-hide-dotfiles
+    :config
+    (dired-hide-dotfiles-mode)
+    (define-key dired-mode-map "." 'dired-hide-dotfiles-mode))
+#+end_src
+
+Open media with the appropriate programs.
+
+#+begin_src emacs-lisp
+  (use-package dired-open
+    :config
+    (setq dired-open-extensions
+          '(("avi" . "mpv")
+            ("cbr" . "comix")
+            ("doc" . "abiword")
+            ("docx" . "abiword")
+            ("gif" . "ffplay")
+            ("gnumeric" . "gnumeric")
+            ("jpeg" . "s")
+            ("jpg" . "s")
+            ("mkv" . "mpv")
+            ("mov" . "mpv")
+            ("mp3" . "mpv")
+            ("mp4" . "mpv")
+            ("pdf" . "zathura")
+            ("png" . "s")
+            ("webm" . "mpv")
+            ("xls" . "gnumeric")
+            ("xlsx" . "gnumeric"))))
+#+end_src
+
+These are the switches that get passed to =ls= when =dired= gets a list of
+files. We're using:
+
+- =l=: Use the long listing format.
+- =h=: Use human-readable sizes.
+- =v=: Sort numbers naturally.
+- =A=: Almost all. Doesn't include "=.=" or "=..=".
+
+That said, I'd usually like to hide those extra details.
+=dired-hide-details-mode= can be toggled with =(=.
+
+#+begin_src emacs-lisp
+  (setq-default dired-listing-switches "-lhvA")
+  (add-hook 'dired-mode-hook (lambda () (dired-hide-details-mode 1)))
+#+end_src
+
+Set up DWIM ("do what I mean") for =dired=. When I've got two =dired= windows
+side-by-side, and I move or copy files in one window, this sets the default
+location to the other window.
+
+#+begin_src emacs-lisp
+  (setq dired-dwim-target t)
+#+end_src
+
+Kill buffers of files/directories that are deleted in =dired=.
+
+#+begin_src emacs-lisp
+  (setq dired-clean-up-buffers-too t)
+#+end_src
+
+Always copy directories recursively instead of asking every time.
+
+#+begin_src emacs-lisp
+  (setq dired-recursive-copies 'always)
+#+end_src
+
+Ask before recursively /deleting/ a directory, though.
+
+#+begin_src emacs-lisp
+  (setq dired-recursive-deletes 'top)
+#+end_src
+
+Files are normally moved and copied synchronously. This is fine for small or
+local files, but copying a large file or moving a file across a mounted network
+drive blocks Emacs until the process is completed. Unacceptable!
+
+This uses =emacs-async= to make =dired= perform actions asynchronously.
+
+#+begin_src emacs-lisp
+  (use-package async
+    :config
+    (dired-async-mode 1))
+#+end_src
+
+Use "j" and "k" to move around in =dired=.
+
+#+begin_src emacs-lisp
+;;  (evil-define-key 'normal dired-mode-map (kbd "j") 'dired-next-line)
+;;  (evil-define-key 'normal dired-mode-map (kbd "k") 'dired-previous-line)
+#+end_src
+
+I'm often browsing directories of photos and images, so this binds "v" to view a
+slideshow of the current directory with =s= (a custom =feh= wrapper defined
+elsewhere in this repo).
+
+#+begin_src emacs-lisp
+  (defun hrs/dired-slideshow ()
+    (interactive)
+    (start-process "dired-slideshow" nil "s" (dired-current-directory)))
+
+;;  (evil-define-key 'normal dired-mode-map (kbd "v") 'hrs/dired-slideshow)
+#+end_src
+
+* Editing settings
+
+** Quickly visit Emacs configuration
+
+I futz around with my dotfiles a lot. This binds =C-c e= to quickly open my
+Emacs configuration file.
+
+#+begin_src emacs-lisp
+  (defun hrs/visit-emacs-config ()
+    (interactive)
+    (find-file "~/.emacs.d/configuration.org"))
+
+  (global-set-key (kbd "C-c e") 'hrs/visit-emacs-config)
+#+end_src
+
+** Always kill current buffer
+
+Assume that I always want to kill the current buffer when hitting =C-x k=.
+
+#+begin_src emacs-lisp
+  (defun hrs/kill-current-buffer ()
+    "Kill the current buffer without prompting."
+    (interactive)
+    (kill-buffer (current-buffer)))
+
+  (global-set-key (kbd "C-x k") 'hrs/kill-current-buffer)
+#+end_src
+
+** Set up =helpful=
+
+The =helpful= package provides, among other things, more context in Help
+buffers.
+
+#+begin_src emacs-lisp
+  (use-package helpful)
+
+  (global-set-key (kbd "C-h f") #'helpful-callable)
+  (global-set-key (kbd "C-h v") #'helpful-variable)
+  (global-set-key (kbd "C-h k") #'helpful-key)
+;;  (evil-define-key 'normal helpful-mode-map (kbd "q") 'quit-window)
+#+end_src
+
+** Look for executables in =/usr/local/bin=
+
+#+begin_src emacs-lisp
+  (hrs/append-to-path "/usr/local/bin")
+#+end_src
+
+** Save my location within a file
+
+Using =save-place-mode= saves the location of point for every file I visit. If I
+close the file or close the editor, then later re-open it, point will be at the
+last place I visited.
+
+#+begin_src emacs-lisp
+  (save-place-mode t)
+#+end_src
+
+** Always indent with spaces
+
+Never use tabs. Tabs are the devil’s whitespace.
+
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
+
+** Install and configure =which-key=
+
+=which-key= displays the possible completions for a long keybinding. That's
+really helpful for some modes (like =projectile=, for example).
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :config (which-key-mode))
+#+end_src
+
+** Configure =yasnippet=
+
+#+begin_src emacs-lisp
+  (use-package yasnippet)
+#+end_src
+
+I keep my snippets in =~/.emacs/snippets/text-mode=, and I always want =yasnippet=
+enabled.
+
+#+begin_src emacs-lisp
+  (setq yas-snippet-dirs '("~/.emacs.d/snippets/text-mode"))
+  (yas-global-mode 1)
+#+end_src
+
+I /don’t/ want =yas= to automatically indent the snippets it inserts. Sometimes
+this looks pretty bad (when indenting org-mode, for example, or trying to guess
+at the correct indentation for Python).
+
+#+begin_src emacs-lisp
+  (setq yas-indent-line 'auto)
+#+end_src
+
+** Configure =ivy= and =counsel=
+
+I use =ivy= and =counsel= as my completion framework.
+
+This configuration:
+
+- Uses =counsel-M-x= for command completion,
+- Replaces =isearch= with =swiper=,
+- Uses =smex= to maintain history,
+- Enables fuzzy matching everywhere except swiper (where it's thoroughly
+  unhelpful), and
+- Includes recent files in the switch buffer.
+
+#+begin_src emacs-lisp
+  (use-package counsel
+    :bind
+    ("M-x" . 'counsel-M-x)
+    ("C-s" . 'swiper)
+
+    :config
+    (use-package flx)
+    (use-package smex)
+
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "(%d/%d) ")
+    (setq ivy-initial-inputs-alist nil)
+    (setq ivy-re-builders-alist
+          '((swiper . ivy--regex-plus)
+            (t . ivy--regex-fuzzy))))
+#+end_src
+
+** Switch and rebalance windows when splitting
+
+When splitting a window, I invariably want to switch to the new window. This
+makes that automatic.
+
+#+begin_src emacs-lisp
+  (defun hrs/split-window-below-and-switch ()
+    "Split the window horizontally, then switch to the new pane."
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+
+  (defun hrs/split-window-right-and-switch ()
+    "Split the window vertically, then switch to the new pane."
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+
+  (global-set-key (kbd "C-x 2") 'hrs/split-window-below-and-switch)
+  (global-set-key (kbd "C-x 3") 'hrs/split-window-right-and-switch)
+#+end_src
+
+** Mass editing of =grep= results
+
+I like the idea of mass editing =grep= results the same way I can edit filenames
+in =dired=. These keybindings allow me to use =C-x C-q= to start editing =grep=
+results and =C-c C-c= to stop, just like in =dired=.
+
+#+begin_src emacs-lisp
+  (use-package wgrep)
+
+  (eval-after-load 'grep
+    '(define-key grep-mode-map
+      (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))
+
+  (eval-after-load 'wgrep
+    '(define-key grep-mode-map
+      (kbd "C-c C-c") 'wgrep-finish-edit))
+
+  (setq wgrep-auto-save-buffer t)
+#+end_src
+
+** Use projectile everywhere
+
+#+begin_src emacs-lisp
+  (projectile-global-mode)
+#+end_src
+
+** Add a bunch of engines for =engine-mode=
+
+Enable [[https://github.com/hrs/engine-mode][engine-mode]] and define a few useful engines.
+
+#+begin_src emacs-lisp
+  (use-package engine-mode)
+  (require 'engine-mode)
+
+  (defengine duckduckgo
+    "https://duckduckgo.com/?q=%s"
+    :keybinding "d")
+
+  (defengine github
+    "https://github.com/search?ref=simplesearch&q=%s"
+    :keybinding "g")
+
+  (defengine google
+    "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s")
+
+  (defengine rfcs
+    "http://pretty-rfc.herokuapp.com/search?q=%s")
+
+  (defengine stack-overflow
+    "https://stackoverflow.com/search?q=%s"
+    :keybinding "s")
+
+  (defengine wikipedia
+    "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
+    :keybinding "w")
+
+  (defengine wiktionary
+    "https://www.wikipedia.org/search-redirect.php?family=wiktionary&language=en&go=Go&search=%s")
+
+  (defengine youtube
+    "https://www.youtube.com/results?search_query=%s")
+
+  (engine-mode t)
+#+end_src
+
+* Set custom keybindings
+
+Just a few handy functions.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-w") 'backward-kill-word)
+  (global-set-key (kbd "M-o") 'other-window)
+#+end_src
+
+Remap when working in terminal Emacs.
+
+#+begin_src emacs-lisp
+  (define-key input-decode-map "\e[1;2A" [S-up])
+#+end_src
+* Extra
