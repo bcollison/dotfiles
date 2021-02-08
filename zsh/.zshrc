@@ -147,3 +147,4 @@ export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
 source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
 source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
+. $HOME/.asdf/asdf.sh
