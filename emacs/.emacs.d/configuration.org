@@ -876,7 +876,7 @@ Allow export to markdown and beamer (for presentations).
   (require 'ox-beamer)
 #+end_src
 
-Allow =babel= to evaluate Emacs lisp, Ruby, =ditaa=, Graphviz, or Gnuplot code.
+Allow =babel= to evaluate Emacs lisp, java, Ruby, =ditaa=, Graphviz, or Gnuplot code.
 
 #+begin_src emacs-lisp
   (use-package gnuplot)
@@ -887,13 +887,28 @@ Allow =babel= to evaluate Emacs lisp, Ruby, =ditaa=, Graphviz, or Gnuplot code.
      (ruby . t)
      (ditaa . t)
      (dot . t)
+     (java . t)
      (gnuplot . t)))
+#+end_src
+
+Default behavior for ob-java differs from most babel languages in two ways:
+
+ob-java defaults to scripting mode (:results output)
+ob-java writes tempfiles to the current directory instead of the babel temporary directory
+
+Let's make it more like most
+#+begin_src emacs-lisp
+  (setq org-babel-java-command "/usr/local/java/bin/java")
+  (setq org-babel-java-compiler "/usr/local/java/bin/javac")
+    ;;(nconc org-babel-default-header-args:java
+    ;;       '((:dir . nil)
+    ;;         (:results . value)))
 #+end_src
 
 Don't ask before evaluating code blocks.
 
 #+begin_src emacs-lisp
-  (setq org-confirm-babel-evaluate nil)
+    (setq org-confirm-babel-evaluate nil)
 #+end_src
 
 Use =htmlize= to ensure that exported code blocks use syntax highlighting.
@@ -1142,6 +1157,267 @@ elsewhere in this repo).
 ;;  (evil-define-key 'normal dired-mode-map (kbd "v") 'hrs/dired-slideshow)
 #+end_src
 
+* Email
+#+BEGIN_SRC emacs-lisp
+      (use-package org-mime)
+
+    (use-package mu4e
+  ;;    :load-path "/snap/maildir-utils/current/share/emacs/site-lisp/mu4e"
+      :load-path "/home/brian/Personal/projects/third-party/mu/mu4e"
+      ;; usual configuration here...
+    )
+  ;;    (add-to-list 'load-path "/snap/maildir-utils/current/share/emacs/site-lisp/mu4e/")
+  ;;    (require 'mu4e)
+
+      ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
+
+      ; get mail
+      (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc -a"
+        ;; mu4e-html2text-command "w3m -T text/html" ;;using the default mu4e-shr2text
+        mu4e-update-interval 180
+        mu4e-headers-auto-update t
+        mu4e-compose-signature-auto-include nil
+        mu4e-compose-format-flowed t)
+
+      ;; to view selected message in the browser, no signin, just html mail
+      (add-to-list 'mu4e-view-actions
+        '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+
+      ;; enable inline images
+      (setq mu4e-view-show-images t)
+      ;; use imagemagick, if available
+      (when (fboundp 'imagemagick-register-types)
+        (imagemagick-register-types))
+
+      ;; every new email composition gets its own frame!
+      (setq mu4e-compose-in-new-frame t)
+
+      ;; don't save message to Sent Messages, IMAP takes care of this
+      (setq mu4e-sent-messages-behavior 'delete)
+
+      (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
+
+      ;; <tab> to navigate to links, <RET> to open them in browser
+      (add-hook 'mu4e-view-mode-hook
+        (lambda()
+      ;; try to emulate some of the eww key-bindings
+      (local-set-key (kbd "<RET>") 'mu4e~view-browse-url-from-binding)
+      (local-set-key (kbd "<tab>") 'shr-next-link)
+      (local-set-key (kbd "<backtab>") 'shr-previous-link)))
+
+      ;; from https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/elgoumx
+      (add-hook 'mu4e-headers-mode-hook
+            (defun my/mu4e-change-headers ()
+        (interactive)
+        (setq mu4e-headers-fields
+              `((:human-date . 25) ;; alternatively, use :date
+          (:flags . 6)
+          (:from . 22)
+          (:thread-subject . ,(- (window-body-width) 70)) ;; alternatively, use :subject
+          (:size . 7)))))
+
+      ;; if you use date instead of human-date in the above, use this setting
+      ;; give me ISO(ish) format date-time stamps in the header list
+      ;(setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
+
+      ;; spell check
+      (add-hook 'mu4e-compose-mode-hook
+          (defun my-do-compose-stuff ()
+             "My settings for message composition."
+             (visual-line-mode)
+             (org-mu4e-compose-org-mode)
+                 (use-hard-newlines -1)
+             (flyspell-mode)))
+
+      (require 'smtpmail)
+
+      ;;rename files when moving
+      ;;NEEDED FOR MBSYNC
+      (setq mu4e-change-filenames-when-moving t)
+
+      ;;set up queue for offline email
+      ;;use mu mkdir  ~/Maildir/acc/queue to set up first
+      (setq smtpmail-queue-mail nil)  ;; start in normal mode
+
+      ;;from the info manual
+      (setq mu4e-attachment-dir  "~/Downloads")
+
+      (setq message-kill-buffer-on-exit t)
+      (setq mu4e-compose-dont-reply-to-self t)
+
+      (require 'org-mu4e)
+
+      ;; convert org mode to HTML automatically
+      (setq org-mu4e-convert-to-html t)
+
+      ;;from vxlabs config
+      ;; show full addresses in view message (instead of just names)
+      ;; toggle per name with M-RET
+      (setq mu4e-view-show-addresses 't)
+
+      ;; don't ask when quitting
+      (setq mu4e-confirm-quit nil)
+
+      ;; from: https://www.reddit.com/r/emacs/comments/6ul9rz/email_html_rendering_mu4e_with_html2text_how_to/
+      (require 'mu4e-contrib)
+
+      (setq mu4e-html2text-command 'mu4e-shr2text)
+
+      (setq shr-color-visible-luminance-min 80)
+
+      (setq shr-color-visible-distance-min 5)
+
+      ;; mu4e-context
+      (setq mu4e-context-policy 'pick-first)
+      (setq mu4e-compose-context-policy 'always-ask)
+      (setq mu4e-contexts
+        (list
+         (make-mu4e-context
+          :name "verve" ;;for brian-verve-gmail
+          :enter-func (lambda () (mu4e-message "Entering context verve"))
+          :leave-func (lambda () (mu4e-message "Leaving context verve"))
+          :match-func (lambda (msg)
+                        (when msg
+                      (mu4e-message-contact-field-matches
+                       msg '(:from :to :cc :bcc) "brian@verve.com")))
+          :vars '((user-mail-address . "brian@verve.com")
+                  (user-full-name . "Brian Collison")
+                  (mu4e-sent-folder . "/brian-verve-gmail/[brian-verve].sent")
+                  (mu4e-drafts-folder . "/brian-verve-gmail/[brian-verve].drafts")
+                  (mu4e-trash-folder . "/brian-verve-gmail/[brian-verve].trash")
+                  (mu4e-refile-folder . "/brian-verve-gmail/[brian-verve].All Mail")
+                  (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 25, org-mode 9, mu4e 1.0\n"))
+                  (mu4e-compose-format-flowed . t)
+                  (smtpmail-queue-dir . "/home/brian/Maildir/brian-verve-gmail/queue/cur")
+                  (message-send-mail-function . smtpmail-send-it)
+                  (smtpmail-smtp-user . "brian@verve.com")
+                  (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+                  (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+                  (smtpmail-default-smtp-server . "smtp.gmail.com")
+                  (smtpmail-smtp-server . "smtp.gmail.com")
+                  (smtpmail-smtp-service . 587)
+                  (smtpmail-debug-info . t)
+                  (smtpmail-debug-verbose . t)
+                  (mu4e-maildir-shortcuts . ( ("/brian-verve-gmail/INBOX"            . ?i)
+                                              ("/brian-verve-gmail/[brian-verve].sent" . ?s)
+                                              ("/brian-verve-gmail/[brian-verve].trash"       . ?t)
+                                              ("/brian-verve-gmail/[brian-verve].All Mail"       . ?l)
+                                              ("/brian-verve-gmail/[brian-verve].actionable"  . ?a)
+                                              ("/brian-verve-gmail/[brian-verve].wait"   . ?w)
+                                              ("/brian-verve-gmail/[brian-verve].reference"   . ?r)
+                                              ("/brian-verve-gmail/[brian-verve].inflight"   . ?f)
+                                              ("/brian-verve-gmail/[brian-verve].drafts"    . ?d)
+                                              ))))
+
+         (make-mu4e-context
+          :name "personal" ;;for bcollison-gmail
+          :enter-func (lambda () (mu4e-message "Entering context personal"))
+          :leave-func (lambda () (mu4e-message "Leaving context personal"))
+          :match-func (lambda (msg)
+            (when msg
+          (mu4e-message-contact-field-matches
+           msg '(:from :to :cc :bcc) "bcollison@gmail.com")))
+          :vars '((user-mail-address . "bcollison@gmail.com")
+            (user-full-name . "Brian Collison")
+            (mu4e-sent-folder . "/bcollison-gmail/[bcollison].sent")
+            (mu4e-drafts-folder . "/bcollison-gmail/[bcollison].drafts")
+            (mu4e-trash-folder . "/bcollison-gmail/[bcollison].trash")
+            (mu4e-refile-folder . "/bcollison-gmail/[bcollison].All Mail")
+            (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 25, org-mode 9, mu4e 1.0\n"))
+            (mu4e-compose-format-flowed . t)
+            (smtpmail-queue-dir . "/home/brian/Maildir/bcollison-gmail/queue/cur")
+            (message-send-mail-function . smtpmail-send-it)
+            (smtpmail-smtp-user . "bcollison")
+            (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+            (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+            (smtpmail-default-smtp-server . "smtp.gmail.com")
+            (smtpmail-smtp-server . "smtp.gmail.com")
+            (smtpmail-smtp-service . 587)
+            (smtpmail-debug-info . t)
+            (smtpmail-debug-verbose . t)
+            (mu4e-maildir-shortcuts . ( ("/bcollison-gmail/INBOX"            . ?i)
+                ("/bcollison-gmail/[bcollison].sent" . ?s)
+                ("/bcollison-gmail/[bcollison].trash"       . ?t)
+                ("/bcollison-gmail/[bcollison].All Mail"       . ?l)
+                ("/bcollison-gmail/[bcollison].actionable"  . ?a)
+                ("/bcollison-gmail/[bcollison].wait"   . ?w)
+                ("/bcollison-gmail/[bcollison].reference"   . ?r)
+                ("/bcollison-gmail/[bcollison].inflight"   . ?f)
+                ("/bcollison-gmail/[bcollison].drafts"    . ?d)
+                ))))
+         )
+      )
+
+  (global-set-key (kbd "C-\"") 'mu4e)
+
+#+END_SRC
+
+* Reading things
+
+** RSS with =elfeed=
+
+Install elfeed and load up my feeds.
+
+#+begin_src emacs-lisp
+  (use-package elfeed
+    :config
+    (elfeed-set-max-connections 32))
+
+  (use-package elfeed-org
+    :config
+    (progn
+      (elfeed-org)
+      (setq rmh-elfeed-org-files (list "~/documents/org/rss-feeds.org"))))
+#+end_src
+
+Sort RSS feeds first by tag (=comics= come before =haskell=, for example), then
+by name of the feed, and finally by publication date.
+
+#+begin_src emacs-lisp
+  (defun hrs/custom-elfeed-sort (a b)
+    (let* ((a-tags (format "%s" (elfeed-entry-tags a)))
+           (b-tags (format "%s" (elfeed-entry-tags b)))
+           (a-title (elfeed-feed-title (elfeed-entry-feed a)))
+           (b-title (elfeed-feed-title (elfeed-entry-feed b))))
+      (if (string= a-tags b-tags)
+          (if (string= a-title b-title)
+              (< (elfeed-entry-date b) (elfeed-entry-date a))
+            (string< b-title a-title))
+        (string< a-tags b-tags))))
+
+  (setf elfeed-search-sort-function #'hrs/custom-elfeed-sort)
+#+end_src
+
+Open =elfeed= with =C-c r=:
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c r") 'elfeed)
+#+end_src
+
+Use =o= to browse the entry in a Web browser and open links with =C-c C-o=.
+
+#+begin_src emacs-lisp
+;;  (add-to-list 'evil-emacs-state-modes 'elfeed-show-mode)
+;;  (add-to-list 'evil-emacs-state-modes 'elfeed-search-mode)
+
+;;  (evil-add-hjkl-bindings elfeed-search-mode-map)
+;;  (evil-add-hjkl-bindings elfeed-show-mode-map)
+
+;;  (define-key elfeed-show-mode-map "o" 'elfeed-show-visit)
+;;  (define-key elfeed-search-mode-map "o" 'elfeed-search-browse-url)
+
+;;  (define-key elfeed-show-mode-map (kbd "C-c C-o") 'org-open-at-point)
+#+end_src
+
+Some external integrations need access to the current entry at point:
+
+#+begin_src emacs-lisp
+  (defun hrs/elfeed-current-entry ()
+    (cond ((eq major-mode 'elfeed-show-mode)
+           elfeed-show-entry)
+          ((eq major-mode 'elfeed-search-mode)
+           (elfeed-search-selected t))))
+#+end_src
 * Editing settings
 
 ** Quickly visit Emacs configuration
@@ -1188,6 +1464,7 @@ buffers.
 
 #+begin_src emacs-lisp
   (hrs/append-to-path "/usr/local/bin")
+  (hrs/append-to-path "/usr/local/java/bin")
 #+end_src
 
 ** Save my location within a file
@@ -1359,6 +1636,11 @@ Enable [[https://github.com/hrs/engine-mode][engine-mode]] and define a few usef
     "https://www.youtube.com/results?search_query=%s")
 
   (engine-mode t)
+#+end_src
+
+** Show my available key-bindings
+#+begin_src emacs-lisp
+  (use-package free-keys)
 #+end_src
 
 * Set custom keybindings
