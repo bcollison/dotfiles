@@ -1514,10 +1514,13 @@ And set up some keybindings
 * Email
 #+BEGIN_SRC emacs-lisp
 (require 'org-mime)
+(if (eq system-type 'darwin)
+  (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
+  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e/")
+)
 
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e/")
 (require 'mu4e)
-
+(setq mu4e-mu-binary "/usr/local/bin/mu")
 (setq mu4e-maildir (expand-file-name "~/Maildir"))
 
 ; get mail
