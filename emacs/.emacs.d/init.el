@@ -21,8 +21,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
-;; '(elfeed-feeds (quote ("https://ag91.github.io/rss.xml")))
- '(package-selected-packages (quote (auto-compile use-package-ensure-system-package))))
+ '(org-agenda-files
+   (quote
+    ("~/documents/org/gcal/personal.org" "~/documents/org/gcal/work.org" "~/documents/org/index.org" "~/documents/org/events.org" "~/documents/org/habits.org" "~/documents/org/recurring-events.org" "~/documents/org/work.org")))
+ '(package-selected-packages
+   (quote
+    (ivy-rich auto-compile use-package-ensure-system-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
