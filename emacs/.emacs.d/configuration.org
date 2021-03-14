@@ -2,11 +2,13 @@
 #+AUTHOR: Brian Collison
 #+EMAIL: brian@briancollison.com
 #+OPTIONS: num:nil
+#+PROPERTY: header-args:emacs-lisp
 
 * Introduction
 This configuration started off as a clone of https://github.com/hrs/dotfiles/blob/main/emacs/dot-emacs.d/configuration.org
 Much of the content from the original source is still present. I have made an attempt to understand the packages that I
 have in this configuration as I increase my utilization of emacs.
+I've started pulling things in from System Crafters efs.
 
 * Configure =use-package=
 
@@ -124,20 +126,6 @@ Define a big ol' bunch of handy utility functions.
             (find-file new-name)
             (message "Renamed '%s' -> '%s'" filename new-name))
         (message "Buffer '%s' isn't backed by a file!" (buffer-name)))))
-
-  (defun hrs/generate-scratch-buffer ()
-    "Create and switch to a temporary scratch buffer with a random
-         name."
-    (interactive)
-    (switch-to-buffer (make-temp-name "scratch-")))
-
-  (defun hrs/visit-last-migration ()
-    "Open the most recent Rails migration. Relies on projectile."
-    (interactive)
-    (let ((migrations
-           (directory-files
-            (expand-file-name "db/migrate" (projectile-project-root)) t)))
-      (find-file (car (last migrations)))))
 
   (defun hrs/add-auto-mode (mode &rest patterns)
     "Add entries to `auto-mode-alist' to use `MODE' for all given file `PATTERNS'."
@@ -550,12 +538,25 @@ I like tree-based undo management. I only rarely need it, but when I do, oh boy.
   (use-package undo-tree)
 #+end_src
 * Programming environments
+** Playing with lsp-mode
+#+begin_src emacs-lisp
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; (use-package lsp-mode                                  ;;
+  ;;   :commands (lsp lsp-deferred)                         ;;
+  ;;   :init                                                ;;
+  ;;   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l' ;;
+  ;;   :config                                              ;;
+  ;;   (lsp-enable-which-key-integration t))                ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+#+end_src
+
 
 I like shallow indentation, but tabs are displayed as 8 characters by default.
 This reduces that.
 
 #+begin_src emacs-lisp
-  (setq-default tab-width 2)
+    (setq-default tab-width 2)
 #+end_src
 
 Treating terms in CamelCase symbols as separate words makes editing a little
