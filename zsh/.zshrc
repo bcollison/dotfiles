@@ -145,4 +145,9 @@ export RPROMPT='$(git_super_status)'
 
 export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
+if [ "$(uname 2> /dev/null)" != "Linux" ]; then
+. /usr/local/opt/asdf/asdf.sh
+else
 . $HOME/.asdf/asdf.sh
+fi
+. /usr/local/opt/asdf/asdf.sh
