@@ -1172,15 +1172,18 @@ elsewhere in this repo).
 * Email
 #+BEGIN_SRC emacs-lisp
       (use-package org-mime)
-;; not right
-(add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e/")
 
-     (use-package mu4e
-      :load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e"
-    )
-    (setq mu4e-mu-binary "/usr/local/bin/mu")
-      ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
+    (use-package mu4e
+      :load-path ("/home/brian/Personal/projects/third-party/mu/mu4e"
+                  "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e"
+                  "/usr/local/share/emacs/site-lisp/mu4e/"))
+
+    (cond ((eq system-type 'gnu/linux)
+         (setq mu4e-mu-binary "/usr/bin/mu"))
+       ((eq system-type 'darwin)
+         (setq mu4e-mu-binary "/usr/local/bin/mu")))
+  ;  "mu4e no longer uses the mu4e-maildir and mu4e-user-mail-address-list variables; instead it uses the information it gets from mu (see the mu section above). If you have a non-default mu4e-mu-home, make sure to set it before mu4e starts."
+  ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
 
       ; get mail
       (setq mu4e-get-mail-command "mbsync -c ~/.mbsyncrc -a"
