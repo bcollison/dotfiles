@@ -1172,15 +1172,14 @@ elsewhere in this repo).
 * Email
 #+BEGIN_SRC emacs-lisp
       (use-package org-mime)
+;; not right
+(add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e/")
 
-    (use-package mu4e
-  ;;    :load-path "/snap/maildir-utils/current/share/emacs/site-lisp/mu4e"
-      :load-path "/home/brian/Personal/projects/third-party/mu/mu4e"
-      ;; usual configuration here...
+     (use-package mu4e
+      :load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e"
     )
-  ;;    (add-to-list 'load-path "/snap/maildir-utils/current/share/emacs/site-lisp/mu4e/")
-  ;;    (require 'mu4e)
-
+    (setq mu4e-mu-binary "/usr/local/bin/mu")
       ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
 
       ; get mail
