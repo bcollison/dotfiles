@@ -1173,6 +1173,8 @@ elsewhere in this repo).
 #+BEGIN_SRC emacs-lisp
       (use-package org-mime)
 
+    (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
+    (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
     (use-package mu4e
       :load-path ("/home/brian/Personal/projects/third-party/mu/mu4e"
                   "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e"
@@ -1194,8 +1196,8 @@ elsewhere in this repo).
         mu4e-compose-format-flowed t)
 
       ;; to view selected message in the browser, no signin, just html mail
-      (add-to-list 'mu4e-view-actions
-        '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+;;      (add-to-list 'mu4e-view-actions
+;;        '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
       ;; enable inline images
       (setq mu4e-view-show-images t)
@@ -1712,7 +1714,7 @@ I use sublime as a temporary place to do text modification/searching. I like how
 sublime auto-saves things. Someone else enjoyed that too. Here is his attempt
 at recreating that
 #+begin_src emacs-lisp
-  (load-file "/home/brian/Personal/projects/emacs-libraries/sublima/sublima.el")
+  (load-file "~/Personal/projects/emacs-libraries/sublima/sublima.el")
 (global-set-key (kbd "<f7>") 'sublima-scratch)
 (global-set-key (kbd "<f8>") 'previous-buffer)
 (global-set-key (kbd "<f9>") 'next-buffer)
