@@ -1319,8 +1319,8 @@ I'm usually actually in an org document.
         mu4e-compose-format-flowed t)
 
       ;; to view selected message in the browser, no signin, just html mail
-;;      (add-to-list 'mu4e-view-actions
-;;        '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+      (add-to-list 'mu4e-view-actions
+        '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
       ;; enable inline images
       (setq mu4e-view-show-images t)
