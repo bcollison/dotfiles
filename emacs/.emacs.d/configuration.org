@@ -1598,3 +1598,20 @@ at recreating that
 (global-set-key (kbd "<f8>") 'previous-buffer)
 (global-set-key (kbd "<f9>") 'next-buffer)
 #+end_src
+** Slack? let's give it a go
+#+begin_src emacs-lisp
+(use-package slack
+  :commands (slack-start)
+  :init
+  (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
+  (setq slack-prefer-current-team t)
+  :config
+  (slack-register-team
+   :name "verve"
+   :default t
+   :token (auth-source-pick-first-password
+               :host '("verve.slack.com")
+               :user "brian@verve.com" :type 'netrc :max 1)
+   :subscribed-channels '(random)
+   :full-and-display-names t))
+#+end_src
