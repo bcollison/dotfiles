@@ -6,9 +6,9 @@
 
 * Introduction
 This configuration started off as a clone of https://github.com/hrs/dotfiles/blob/main/emacs/dot-emacs.d/configuration.org
-Much of the content from the original source is still present. I have made an attempt to understand the packages that I
+Some content from the original source is still present. I have made an attempt to understand the packages that I
 have in this configuration as I increase my utilization of emacs.
-I've started pulling things in from System Crafters efs.
+I've also started pulling things in from System Crafters' [[https://github.com/daviwil/emacs-from-scratch/][Emacs From Scratch]] videos/repository
 
 * Configure =use-package=
 
