@@ -187,8 +187,7 @@ Why not?
 #+end_src
 
 ** Load up a theme
-I'm currently using the "solarized-light" theme. I've got a scenic wallpaper, so
-just a hint of transparency looks lovely and isn't distracting or hard to read.
+I'm currently using the "zenburn" theme.
 
 #+BEGIN_SRC emacs-lisp
 (setq zenburn-scale-org-headlines t)
@@ -205,7 +204,7 @@ just a hint of transparency looks lovely and isn't distracting or hard to read.
    (set-frame-parameter (selected-frame) 'alpha value))
 
  (defun hrs/apply-theme ()
-   "Apply the `zenburn' theme and make frames just slightly transparent."
+   "Apply the `zenburn' theme."
    (interactive)
    (load-theme 'zenburn t)
    (transparency 100))
@@ -232,8 +231,6 @@ pairing or presenting code.
 #+begin_src emacs-lisp
   (global-hl-line-mode)
 #+end_src
-
-
 
 ** Better Modeline
 
