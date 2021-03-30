@@ -88,6 +88,13 @@ Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-raken
+Master :bcollison-gmail-remote:"Raken"
+Slave :bcollison-gmail-local:"[bcollison].Raken"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-reference
 Master :bcollison-gmail-remote:"Reference"
 Slave :bcollison-gmail-local:"[bcollison].reference"
@@ -117,6 +124,7 @@ SyncState *
 #
 Group bcollison-gmail
 Channel bcollison-gmail-inbox
+Channel bcollison-gmail-raken
 Channel bcollison-gmail-sent
 Channel bcollison-gmail-drafts
 Channel bcollison-gmail-trash
