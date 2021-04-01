@@ -665,6 +665,12 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
 
  #+end_src
 
+** Other org UI concerns
+org-appear will show the formatting text once you get inside the block
+#+begin_src emacs-lisp
+  (use-package org-appear
+   :hook (org-mode-hook . org-appear-mode))
+#+end_src
 ** Basic Config
 
 This section contains the basic configuration for =org-mode= plus the configuration for Org agendas and capture templates.  There's a lot to unpack in here so I'd recommend watching the videos for [[https://youtu.be/VcgjTEa0kU4][Part 5]] and [[https://youtu.be/PNE-mgkZ6HM][Part 6]] for a full explanation.
