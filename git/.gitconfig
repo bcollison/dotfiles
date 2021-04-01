@@ -34,3 +34,5 @@
         myfull = format:%C(auto)%h %C(bold)%s%C(auto) %d%nAuthor: %C(blue)%an <%ae>%C(auto)%nAuthor Date: %C(green)%ad (%ar)%C(auto)%nCommitter: %C(blue)%cn <%ce>%C(auto)%nCommitter Date: %C(green)%cd (%cr)%C(auto)%n%w(76,4,4)%+b
 [pull]
 	rebase = false
+[github]
+	user = bcollison
