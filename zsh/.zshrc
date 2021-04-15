@@ -145,6 +145,10 @@ export RPROMPT='$(git_super_status)'
 
 export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
+if [ "$(uname 2> /dev/null)" != "Linux" ]; then
+. /usr/local/opt/asdf/asdf.sh
+else
 source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
 source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
 . $HOME/.asdf/asdf.sh
+fi

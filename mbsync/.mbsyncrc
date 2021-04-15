@@ -88,6 +88,13 @@ Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-raken
+Master :bcollison-gmail-remote:"Raken"
+Slave :bcollison-gmail-local:"[bcollison].Raken"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-reference
 Master :bcollison-gmail-remote:"Reference"
 Slave :bcollison-gmail-local:"[bcollison].reference"
@@ -117,6 +124,7 @@ SyncState *
 #
 Group bcollison-gmail
 Channel bcollison-gmail-inbox
+Channel bcollison-gmail-raken
 Channel bcollison-gmail-sent
 Channel bcollison-gmail-drafts
 Channel bcollison-gmail-trash
@@ -125,118 +133,3 @@ Channel bcollison-gmail-actionable
 Channel bcollison-gmail-wait
 Channel bcollison-gmail-inflight
 Channel bcollison-gmail-reference
-
-
-
-# ============================================================
-# ACCOUNT INFORMATION
-IMAPAccount brian-verve-gmail
-# Address to connect to
-Host imap.gmail.com
-User brian@verve.com
-PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.mbsyncpass-brian-verve.com.gpg"
-AuthMechs LOGIN
-SSLType IMAPS
-SSLVersions TLSv1.2
-CertificateFile /etc/ssl/certs/ca-certificates.crt
-PipelineDepth 50
-
-# THEN WE SPECIFY THE LOCAL AND REMOTE STORAGE
-# - THE REMOTE STORAGE IS WHERE WE GET THE MAIL FROM (E.G., THE
-#   SPECIFICATION OF AN IMAP ACCOUNT)
-# - THE LOCAL STORAGE IS WHERE WE STORE THE EMAIL ON OUR COMPUTER
-
-# REMOTE STORAGE (USE THE IMAP ACCOUNT SPECIFIED ABOVE)
-IMAPStore brian-verve-gmail-remote
-Account brian-verve-gmail
-
-# LOCAL STORAGE (CREATE DIRECTORIES with mkdir -p ~/Maildir/brian-verve-gmail)
-MaildirStore brian-verve-gmail-local
-Path ~/Maildir/brian-verve-gmail/
-Inbox ~/Maildir/brian-verve-gmail/INBOX
-# REQUIRED ONLY IF YOU WANT TO DOWNLOAD ALL SUBFOLDERS; SYNCING SLOWS DOWN
-# SubFolders Verbatim
-
-# CONNECTIONS SPECIFY LINKS BETWEEN REMOTE AND LOCAL FOLDERS
-#
-# CONNECTIONS ARE SPECIFIED USING PATTERNS, WHICH MATCH REMOTE MAIl
-# FOLDERS. SOME COMMONLY USED PATTERS INCLUDE:
-#
-# 1 "*" TO MATCH EVERYTHING
-# 2 "!DIR" TO EXCLUDE "DIR"
-# 3 "DIR" TO MATCH DIR
-
-Channel brian-verve-gmail-inbox
-Master :brian-verve-gmail-remote:
-Slave :brian-verve-gmail-local:
-Patterns "INBOX"
-Create Both
-Expunge Both
-SyncState *
-
-Channel brian-verve-gmail-trash
-Master :brian-verve-gmail-remote:"[Gmail]/Trash"
-Slave :brian-verve-gmail-local:"[brian-verve].trash"
-Create Both
-Expunge Both
-SyncState *
-
-Channel brian-verve-gmail-sent
-Master :brian-verve-gmail-remote:"[Gmail]/Sent Mail"
-Slave :brian-verve-gmail-local:"[brian-verve].sent"
-Create Both
-Expunge Both
-SyncState *
-
-Channel brian-verve-gmail-drafts
-Master :brian-verve-gmail-remote:"[Gmail]/Drafts"
-Slave :brian-verve-gmail-local:"[brian-verve].drafts"
-Create Both
-Expunge Both
-SyncState *
-
-Channel brian-verve-gmail-actionable
-Master :brian-verve-gmail-remote:"Actionable"
-Slave :brian-verve-gmail-local:"[brian-verve].actionable"
-Create Both
-Expunge Both
-SyncState *
-
-Channel brian-verve-gmail-wait
-Master :brian-verve-gmail-remote:"Wait"
-Slave :brian-verve-gmail-local:"[brian-verve].wait"
-Create Both
-Expunge Both
-SyncState *
-
-Channel brian-verve-gmail-inflight
-Master :brian-verve-gmail-remote:"In-Flight"
-Slave :brian-verve-gmail-local:"[brian-verve].inflight"
-Create Both
-Expunge Both
-SyncState *
-
-Channel brian-verve-gmail-reference
-Master :brian-verve-gmail-remote:"Reference"
-Slave :brian-verve-gmail-local:"[brian-verve].reference"
-Create Both
-Expunge Both
-SyncState *
-
-Channel brian-verve-gmail-all
-Master :brian-verve-gmail-remote:"[Gmail]/All Mail"
-Slave :brian-verve-gmail-local:"[brian-verve].All Mail"
-Create Both
-Expunge Both
-SyncState *
-
-Group brian-verve-gmail
-Channel brian-verve-gmail-inbox
-Channel brian-verve-gmail-sent
-Channel brian-verve-gmail-drafts
-Channel brian-verve-gmail-trash
-Channel brian-verve-gmail-all
-Channel brian-verve-gmail-actionable
-Channel brian-verve-gmail-wait
-Channel brian-verve-gmail-inflight
-Channel brian-verve-gmail-reference
