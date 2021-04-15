@@ -1388,7 +1388,7 @@ I'm usually actually in an org document.
       (add-hook 'mu4e-headers-mode-hook
             (defun my/mu4e-change-headers ()
         (interactive)
-        (setq mu4e-headers-fields
+       (setq mu4e-headers-fields
               `((:human-date . 25) ;; alternatively, use :date
           (:flags . 6)
           (:from . 22)
@@ -1508,10 +1508,11 @@ I'm usually actually in an org document.
 	    )
   :config
   (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
-  (setq mu4e-views-default-view-method "html") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "html") ;; select the default
-  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
-  (setq mu4e-views-auto-view-selected-message t)) ;; automatically open messages when moving in the headers view
+  (setq mu4e-views-default-view-method "gnus") ;; make xwidgets default
+  (mu4e-views-mu4e-use-view-msg-method "gnus") ;; select the default
+;;  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window) ;; when pressing n and p stay in the current window
+;;  (setq mu4e-views-auto-view-selected-message t) ;; automatically open messages when moving in the headers view
+  )
 #+end_src
 * Reading things
 
