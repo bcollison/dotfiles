@@ -1452,43 +1452,6 @@ I'm usually actually in an org document.
       (setq mu4e-contexts
         (list
          (make-mu4e-context
-          :name "verve" ;;for brian-verve-gmail
-          :enter-func (lambda () (mu4e-message "Entering context verve"))
-          :leave-func (lambda () (mu4e-message "Leaving context verve"))
-          :match-func (lambda (msg)
-                        (when msg
-                      (mu4e-message-contact-field-matches
-                       msg '(:from :to :cc :bcc) "brian@verve.com")))
-          :vars '((user-mail-address . "brian@verve.com")
-                  (user-full-name . "Brian Collison")
-                  (mu4e-sent-folder . "/brian-verve-gmail/[brian-verve].sent")
-                  (mu4e-drafts-folder . "/brian-verve-gmail/[brian-verve].drafts")
-                  (mu4e-trash-folder . "/brian-verve-gmail/[brian-verve].trash")
-                  (mu4e-refile-folder . "/brian-verve-gmail/[brian-verve].All Mail")
-                  (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 25, org-mode 9, mu4e 1.0\n"))
-                  (mu4e-compose-format-flowed . t)
-                  (smtpmail-queue-dir . "/home/brian/Maildir/brian-verve-gmail/queue/cur")
-                  (message-send-mail-function . smtpmail-send-it)
-                  (smtpmail-smtp-user . "brian@verve.com")
-                  (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
-                  (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
-                  (smtpmail-default-smtp-server . "smtp.gmail.com")
-                  (smtpmail-smtp-server . "smtp.gmail.com")
-                  (smtpmail-smtp-service . 587)
-                  (smtpmail-debug-info . t)
-                  (smtpmail-debug-verbose . t)
-                  (mu4e-maildir-shortcuts . ( ("/brian-verve-gmail/INBOX"            . ?i)
-                                              ("/brian-verve-gmail/[brian-verve].sent" . ?s)
-                                              ("/brian-verve-gmail/[brian-verve].trash"       . ?t)
-                                              ("/brian-verve-gmail/[brian-verve].All Mail"       . ?l)
-                                              ("/brian-verve-gmail/[brian-verve].actionable"  . ?a)
-                                              ("/brian-verve-gmail/[brian-verve].wait"   . ?w)
-                                              ("/brian-verve-gmail/[brian-verve].reference"   . ?r)
-                                              ("/brian-verve-gmail/[brian-verve].inflight"   . ?f)
-                                              ("/brian-verve-gmail/[brian-verve].drafts"    . ?d)
-                                              ))))
-
-         (make-mu4e-context
           :name "personal" ;;for bcollison-gmail
           :enter-func (lambda () (mu4e-message "Entering context personal"))
           :leave-func (lambda () (mu4e-message "Leaving context personal"))
@@ -1657,7 +1620,7 @@ at recreating that
 (global-set-key (kbd "<f8>") 'previous-buffer)
 (global-set-key (kbd "<f9>") 'next-buffer)
 #+end_src
-** Slack? let's give it a go
+** Slack? let's give it a go (removed verve team)
 #+begin_src emacs-lisp
 (use-package slack
   :commands (slack-start)
@@ -1665,12 +1628,5 @@ at recreating that
   (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
   (setq slack-prefer-current-team t)
   :config
-  (slack-register-team
-   :name "verve"
-   :default t
-   :token (auth-source-pick-first-password
-               :host '("verve.slack.com")
-               :user "brian@verve.com" :type 'netrc :max 1)
-   :subscribed-channels '(random)
-   :full-and-display-names t))
+   )
 #+end_src
