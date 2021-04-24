@@ -22,7 +22,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
-   '("~/documents/org/gcal/personal.org" "~/documents/org/gcal/work.org" "~/documents/org/index.org" "~/documents/org/events.org" "~/documents/org/habits.org" "~/documents/org/recurring-events.org" "~/documents/org/work.org"))
+   '("~/documents/org/gcal/personal.org" "~/documents/org/gcal/work.org" "~/documents/org/index.org" "~/documents/org/events.org" "~/documents/org/habits.org" "~/documents/org/recurring-events.org" "~/documents/org/work.org" "~/documents/org/home.org"))
  '(package-selected-packages
    '(org-appear org-roam-protocol org-roam-server go-mode slack doom-modeline ivy-rich auto-compile use-package-ensure-system-package)))
 (custom-set-faces
