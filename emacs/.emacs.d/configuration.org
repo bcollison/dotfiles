@@ -683,6 +683,12 @@ This section contains the basic configuration for =org-mode= plus the configurat
     (variable-pitch-mode 1)
     (visual-line-mode 1))
 
+  (setq org-directory "~/Documents/org")
+
+  (defun org-file-path (filename)
+    "Return the absolute address of an org file, given its relative name."
+    (concat (file-name-as-directory org-directory) filename))
+
   (use-package org
     :pin org
     :commands (org-capture org-agenda)
@@ -938,12 +944,6 @@ the location of an index file (my main todo list), and archive finished tasks in
 =~/documents/org/archive.org=.
 
 #+begin_src emacs-lisp
-  (setq org-directory "~/documents/org")
-
-  (defun org-file-path (filename)
-    "Return the absolute address of an org file, given its relative name."
-    (concat (file-name-as-directory org-directory) filename))
-
   (setq org-inbox-file "~/Dropbox/inbox.org")
   (setq org-index-file (org-file-path "index.org"))
   (setq org-archive-location
