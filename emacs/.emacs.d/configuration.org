@@ -701,9 +701,9 @@ This section contains the basic configuration for =org-mode= plus the configurat
     (setq org-log-into-drawer t)
 
     (setq org-agenda-files
-          '("~/documents/org/Tasks.org"
-            "~/documents/org/Habits.org"
-            "~/documents/org/Birthdays.org"))
+	  `(,(org-file-path "Tasks.org")
+	       ,(org-file-path "Habits.org")
+	       ,(org-file-path "Birthdays.org")))
 
     (require 'org-habit)
     (add-to-list 'org-modules 'org-habit)
@@ -711,108 +711,76 @@ This section contains the basic configuration for =org-mode= plus the configurat
 
     (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-        (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+	(sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
     (setq org-refile-targets
       '(("Archive.org" :maxlevel . 1)
-        ("Tasks.org" :maxlevel . 1)))
+	("home.org" :maxlevel . 2)))
 
     ;; Save Org buffers after refiling!
     (advice-add 'org-refile :after 'org-save-all-org-buffers)
 
     (setq org-tag-alist
       '((:startgroup)
-         ; Put mutually exclusive tags here
-         (:endgroup)
-         ("@errand" . ?E)
-         ("@home" . ?H)
-         ("@work" . ?W)
-         ("agenda" . ?a)
-         ("planning" . ?p)
-         ("publish" . ?P)
-         ("batch" . ?b)
-         ("note" . ?n)
-         ("idea" . ?i)))
+	 ; Put mutually exclusive tags here
+	 (:endgroup)
+	 ("@errand" . ?E)
+	 ("@home" . ?H)
+	 ("@work" . ?W)
+	 ("agenda" . ?a)
+	 ("planning" . ?p)
+	 ("publish" . ?P)
+	 ("batch" . ?b)
+	 ("note" . ?n)
+	 ("idea" . ?i)))
 
     ;; Configure custom agenda views
     (setq org-agenda-custom-commands
      '(("d" "Dashboard"
        ((agenda "" ((org-deadline-warning-days 7)))
-        (todo "NEXT"
-          ((org-agenda-overriding-header "Next Tasks")))
-        (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+	(todo "NEXT"
+	  ((org-agenda-overriding-header "Next Tasks")))
+	(tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
       ("n" "Next Tasks"
        ((todo "NEXT"
-          ((org-agenda-overriding-header "Next Tasks")))))
+	  ((org-agenda-overriding-header "Next Tasks")))))
 
       ("W" "Work Tasks" tags-todo "+work-email")
 
       ;; Low-effort next actions
       ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
        ((org-agenda-overriding-header "Low Effort Tasks")
-        (org-agenda-max-todos 20)
-        (org-agenda-files org-agenda-files)))
+	(org-agenda-max-todos 20)
+	(org-agenda-files org-agenda-files)))
 
       ("w" "Workflow Status"
        ((todo "WAIT"
-              ((org-agenda-overriding-header "Waiting on External")
-               (org-agenda-files org-agenda-files)))
-        (todo "REVIEW"
-              ((org-agenda-overriding-header "In Review")
-               (org-agenda-files org-agenda-files)))
-        (todo "PLAN"
-              ((org-agenda-overriding-header "In Planning")
-               (org-agenda-todo-list-sublevels nil)
-               (org-agenda-files org-agenda-files)))
-        (todo "BACKLOG"
-              ((org-agenda-overriding-header "Project Backlog")
-               (org-agenda-todo-list-sublevels nil)
-               (org-agenda-files org-agenda-files)))
-        (todo "READY"
-              ((org-agenda-overriding-header "Ready for Work")
-               (org-agenda-files org-agenda-files)))
-        (todo "ACTIVE"
-              ((org-agenda-overriding-header "Active Projects")
-               (org-agenda-files org-agenda-files)))
-        (todo "COMPLETED"
-              ((org-agenda-overriding-header "Completed Projects")
-               (org-agenda-files org-agenda-files)))
-        (todo "CANC"
-              ((org-agenda-overriding-header "Cancelled Projects")
-               (org-agenda-files org-agenda-files)))))))
-
-    (setq org-capture-templates
-      `(("t" "Tasks / Projects")
-        ("tt" "Task" entry (file+olp "~/documents/org/Tasks.org" "Inbox")
-             "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
-
-        ("j" "Journal Entries")
-        ("jj" "Journal" entry
-             (file+olp+datetree "~/documents/org/Journal.org")
-             "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-             ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
-             :clock-in :clock-resume
-             :empty-lines 1)
-        ("jm" "Meeting" entry
-             (file+olp+datetree "~/documents/org/Journal.org")
-             "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-             :clock-in :clock-resume
-             :empty-lines 1)
-
-        ("w" "Workflows")
-        ("we" "Checking Email" entry (file+olp+datetree "~/documents/org/Journal.org")
-             "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
-
-        ("m" "Metrics Capture")
-        ("mw" "Weight" table-line (file+headline "~/documents/org/Metrics.org" "Weight")
-         "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
-
-    (define-key global-map (kbd "C-c j")
-      (lambda () (interactive) (org-capture nil "jj")))
-
-    (efs/org-font-setup))
-
+	      ((org-agenda-overriding-header "Waiting on External")
+	       (org-agenda-files org-agenda-files)))
+	(todo "REVIEW"
+	      ((org-agenda-overriding-header "In Review")
+	       (org-agenda-files org-agenda-files)))
+	(todo "PLAN"
+	      ((org-agenda-overriding-header "In Planning")
+	       (org-agenda-todo-list-sublevels nil)
+	       (org-agenda-files org-agenda-files)))
+	(todo "BACKLOG"
+	      ((org-agenda-overriding-header "Project Backlog")
+	       (org-agenda-todo-list-sublevels nil)
+	       (org-agenda-files org-agenda-files)))
+	(todo "READY"
+	      ((org-agenda-overriding-header "Ready for Work")
+	       (org-agenda-files org-agenda-files)))
+	(todo "ACTIVE"
+	      ((org-agenda-overriding-header "Active Projects")
+	       (org-agenda-files org-agenda-files)))
+	(todo "COMPLETED"
+	      ((org-agenda-overriding-header "Completed Projects")
+	       (org-agenda-files org-agenda-files)))
+	(todo "CANC"
+	      ((org-agenda-overriding-header "Cancelled Projects")
+	       (org-agenda-files org-agenda-files))))))))
 
 #+end_src
 
@@ -888,6 +856,11 @@ You can add more =src= block templates below by copying one of the lines and cha
    (setq initial-major-mode 'org-mode)
  #+end_src
 
+*** org-protocol?
+#+begin_src emacs-lisp
+  (server-start)
+  (require 'org-protocol)
+#+end_src
 ** Display preferences
 
 I like to see an outline of pretty bullets instead of a list of asterisks.
@@ -944,10 +917,9 @@ the location of an index file (my main todo list), and archive finished tasks in
 =~/documents/org/archive.org=.
 
 #+begin_src emacs-lisp
-  (setq org-inbox-file "~/Dropbox/inbox.org")
   (setq org-index-file (org-file-path "index.org"))
   (setq org-archive-location
-        (concat (org-file-path "archive.org") "::* From %s"))
+	(concat (org-file-path "archive.org") "::* From %s"))
 #+end_src
 
 I store most of my personal tasks in my index and maintain a separate file for
@@ -963,6 +935,7 @@ reasonably, a =recurring-events.org= file. Those are (mostly) structured as
                                (org-file-path "events.org")
                                (org-file-path "habits.org")
                                (org-file-path "recurring-events.org")
+			         (org-file-path "home.org")
                                (org-file-path "work.org")))
 #+end_src
 
@@ -1003,60 +976,41 @@ Define a few common tasks as capture templates. Specifically, I frequently:
 
 #+begin_src emacs-lisp
   (setq org-capture-templates
-        '(("b" "Blog idea"
+        `(("B" "Blog idea"
            entry
-           (file "~/documents/org/notes/blog-ideas.org")
+           (file ,(org-file-path  "notes/blog-ideas.org"))
            "* %?\n")
-
-          ("c" "Contact"
-           entry
-           (file "~/documents/org/contacts.org")
-           "* %(org-contacts-template-name)
-  :PROPERTIES:
-  :ADDRESS: %^{123 Fake St., City, ST 12345}
-  :PHONE: %^{555-555-5555}
-  :EMAIL: %(org-contacts-template-email)
-  :NOTE: %^{note}
-  :END:")
-
-          ("d" "Delivery" entry
-           (file+headline "~/documents/org/events.org" "Deliveries")
-           "** %?\n   SCHEDULED: %t\n")
 
           ("e" "Email" entry
            (file+headline org-index-file "Inbox")
            "* TODO %?\n\n%a\n\n")
 
-          ("f" "Finished book"
-           table-line (file "~/documents/org/notes/books-read.org")
-           "| %^{Title} | %^{Author} | %u |")
-
           ("j" "Work task"
            entry
-           (file+headline "~/documents/org/work.org" "Tasks")
-           "* TODO %?\n")
-
-          ("k" "Kookaburra ingest"
-           entry
-           (file+headline "~/documents/org/kookaburra-ingest.org" "Queue")
+           (file+headline ,(org-file-path "work.org") "Tasks")
            "* TODO %?\n")
 
           ("s" "Subscribe to an RSS feed"
            plain
-           (file "~/documents/org/rss-feeds.org")
+           (file ,(org-file-path "rss-feeds.org"))
            "*** [[%^{Feed URL}][%^{Feed name}]]")
+
+          ("p" "Protocol" entry (file+headline  ,(org-file-path "index.org") "Inbox")
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+
+          ("L" "Protocol Link" entry (file+headline ,(org-file-path "index.org") "Links")
+           "* %? [[%:link][%:description]] \nCaptured On: %U")
+
+	     ;; coming from org-protocol via the browser.
+          ("z" "A link, for reading later." entry
+           (file+headline ,(org-file-path "index.org") "Reading List")
+           "* [[%:link][%:description]]\n%u\n\n%i"
+           :empty-lines 1)
 
           ("t" "Todo"
            entry
-           (file+headline org-index-file "Inbox")
+           (file+headline ,(org-file-path "index.org") "Inbox")
            "* TODO %?\n")))
-#+end_src
-
-When I'm starting an Org capture template I'd like to begin in insert mode. I'm
-opening it up in order to start typing something, so this skips a step. (Disabled)
-
-#+begin_src emacs-lisp
-;;  (add-hook 'org-capture-mode-hook 'evil-insert-state)
 #+end_src
 
 Refiling according to the document's hierarchy.
@@ -1245,14 +1199,14 @@ I'm usually actually in an org document.
 #+begin_src emacs-lisp
 (use-package org-brain :ensure t
   :init
-  (setq org-brain-path "~/documents/org/org-brain")
+  (setq org-brain-path (org-file-path "org-brain"))
   ;; For Evil users
 ;;  (with-eval-after-load 'evil
 ;;    (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
   :config
   (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
   (setq org-id-track-globally t)
-  (setq org-id-locations-file "~/documents/org/.org-id-locations")
+  (setq org-id-locations-file (org-file-path ".org-id-locations"))
   (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
   (push '("b" "Brain" plain (function org-brain-goto-end)
           "* %i%?" :empty-lines 1)
@@ -1275,7 +1229,7 @@ I'm usually actually in an org document.
       :hook
       (after-init . org-roam-mode)
       :custom
-      (org-roam-directory "~/documents/org/org-roam")
+      (org-roam-directory (org-file-path "org-roam"))
       :bind (:map org-roam-mode-map
               (("C-c n l" . org-roam)
                ("C-c n f" . org-roam-find-file)
@@ -1307,7 +1261,7 @@ I'm usually actually in an org document.
 
 *** Let's play around with dailies
 #+begin_src emacs-lisp
-  (setq org-roam-dailies-directory "~/documents/org/daily/")
+  (setq org-roam-dailies-directory (org-file-path "daily/"))
   (setq org-roam-dailies-capture-templates
       '(("p" "planned" entry
          #'org-roam-capture--get-point
@@ -1526,11 +1480,12 @@ Install elfeed and load up my feeds.
     (elfeed-set-max-connections 32)
     (setq elfeed-search-filter "@1-week-ago +unread "))
 
+
   (use-package elfeed-org
     :config
     (progn
       (elfeed-org)
-      (setq rmh-elfeed-org-files (list "~/documents/org/rss-feeds.org"))))
+             (setq rmh-elfeed-org-files (list (org-file-path "rss-feeds.org")))))
 #+end_src
 
 Sort RSS feeds first by tag (=comics= come before =haskell=, for example), then
