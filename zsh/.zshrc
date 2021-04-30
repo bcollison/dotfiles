@@ -112,12 +112,17 @@ source $ZSH/oh-my-zsh.sh
   fi
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
-   source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  if [ -d /usr/local/share/zsh-syntax-highlighting ]; then
+    source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  fi
 else   
    source ~/.zshrc.d/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
-  
-source ~/.zshrc.d/work.zsh.private
+
+if [ -d ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
+    source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi 
+# source ~/.zshrc.d/work.zsh.private
 export SBT_HOME=/usr/local/sbt
 export PATH=$SBT_HOME/bin:$PATH
 
@@ -147,8 +152,12 @@ export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
    . /usr/local/opt/asdf/asdf.sh
+if [ -d /usr/local/Caskroom/google-cloud-sdk/ ]; then
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
+fi
 else
    . $HOME/.asdf/asdf.sh
 fi
+
+export RAKEN_HOME="/Users/brian.collison/projects"
