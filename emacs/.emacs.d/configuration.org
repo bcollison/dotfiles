@@ -624,6 +624,13 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
 
 #+end_src
 
+** Jira
+#+begin_src emacs-lisp
+  (use-package org-jira
+    :config
+(setq jiralib-url "https://rakenapp.atlassian.net/")
+  )
+#+end_src
 
 * Publishing and task management with Org-mode
 

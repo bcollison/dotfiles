@@ -160,4 +160,8 @@ else
    . $HOME/.asdf/asdf.sh
 fi
 
+alias history-without-id="history | cut -c 8-"
+
 export RAKEN_HOME="/Users/brian.collison/projects"
+
+export PATH="/usr/local/opt/mysql-client/bin:$PATH"
