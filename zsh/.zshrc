@@ -74,7 +74,14 @@ ZSH_THEME="mira"
 # Add wisely, as too many plugins slow down shell startup.
 #
 # git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-plugins=(z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
+#plugins=(zsh-z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
+#plugins=(z git jenv mvn zsh-autosuggestions)
+
+if [ "$(uname 2> /dev/null)" != "Linux" ]; then
+  plugins=(z git jenv mvn zsh-autosuggestions)
+else
+  plugins=(zsh-z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
+fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -146,7 +153,9 @@ local jenv_java='%{$fg[blue]%}‹java:$(jenv_prompt_info)›%{$reset_color%}'
 export PROMPT="╭─${user_host} ${current_dir} ${rvm_ruby} ${jenv_java} 
 ╰─ %D{%H:%M} %B$%b "
 
-export RPROMPT='$(git_super_status)'
+if [ "$(uname 2> /dev/null)" = "Linux" ]; then
+   export RPROMPT='$(git_super_status)'
+fi
 
 export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
@@ -165,3 +174,5 @@ alias history-without-id="history | cut -c 8-"
 export RAKEN_HOME="/Users/brian.collison/projects"
 
 export PATH="/usr/local/opt/mysql-client/bin:$PATH"
+
+export PATH="/Users/brian.collison/bin:$PATH"
