@@ -52,6 +52,14 @@ Disable TLS 1.3; ELPA has higher standards. That'll be the default in Emacs
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 #+end_src
 
+* gpg stuff
+(probably really just need to put gpg on the path? but this appears to work)
+#+begin_src emacs-lisp
+(require 'epa-file)
+(custom-set-variables '(epg-gpg-program  "/usr/local/bin/gpg"))
+(epa-file-enable)
+#+end_src
+
 * Some shortcuts to help tweaking this configuration
 This was repurposed from: https://github.com/mrvdb/emacs-config
 The config file gets openened *a lot* because I tend to fiddle with this config at least once a day. So, it warrants it's own keybinding.
@@ -358,6 +366,44 @@ This is an example of using [[https://github.com/abo-abo/hydra][Hydra]] to desig
 
   ;;  (efs/leader-keys
   ;;    "ts" '(hydra-text-scale/body :which-key "scale text"))
+
+#+end_src
+
+** Switch and rebalance windows when splitting
+When splitting a window, I invariably want to switch to the new window. This makes that automatic.
+
+#+begin_src emacs-lisp
+
+  (defun hrs/split-window-below-and-switch ()
+    "Split the window horizontally, then switch to the new pane."
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+
+  (defun hrs/split-window-right-and-switch ()
+    "Split the window vertically, then switch to the new pane."
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+
+  (global-set-key (kbd "C-x 2") 'hrs/split-window-below-and-switch)
+  (global-set-key (kbd "C-x 3") 'hrs/split-window-right-and-switch)
+
+#+end_src
+
+** Always kill current buffer
+Assume that I always want to kill the current buffer when hitting C-x k.
+
+#+begin_src emacs-lisp
+
+  (defun hrs/kill-current-buffer ()
+    "Kill the current buffer without prompting."
+    (interactive)
+    (kill-buffer (current-buffer)))
+
+  (global-set-key (kbd "C-x k") 'hrs/kill-current-buffer)
 
 #+end_src
 
@@ -939,12 +985,13 @@ reasonably, a =recurring-events.org= file. Those are (mostly) structured as
 =org-habit= items so they can recur according to a schedule.
 
 #+begin_src emacs-lisp
-  (setq org-agenda-files (list org-index-file
-                               (org-file-path "events.org")
-                               (org-file-path "habits.org")
-                               (org-file-path "recurring-events.org")
-			         (org-file-path "home.org")
-                               (org-file-path "work.org")))
+    (setq org-agenda-files (list org-index-file
+                                 (org-file-path "events.org")
+                                 (org-file-path "habits.org")
+                                 (org-file-path "recurring-events.org")
+                                   (org-file-path "home.org")
+                                 (org-file-path "work.org")
+                                 (org-file-path ".org-gcal/raken.org")))
 #+end_src
 
 Hitting =C-c C-x C-s= will mark a todo as done and move it to an appropriate
@@ -1514,6 +1561,26 @@ I'm usually actually in an org document.
   ;;  (setq mu4e-views-auto-view-selected-message t) ;; automatically open messages when moving in the headers view
   ;;  )
 #+end_src
+
+* Calendar
+Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I just want org-agenda to show meetings
+#+begin_src emacs-lisp
+  (defun get-authinfo (host port)
+    (let* ((netrc (netrc-parse (expand-file-name "~/.authinfo.gpg")))
+        (hostentry (netrc-machine netrc host port port)))
+    (when hostentry (netrc-get hostentry "password"))))
+  (use-package org-gcal
+    :ensure t
+    :init
+    (setq org-gcal-dir "~/Documents/org/.org-gcal/")
+    :config
+    (setq org-gcal-client-id "104759143706-1kj1r66cs5ij3ssfreasf5cqlavbrqjn.apps.googleusercontent.com"
+org-gcal-client-secret (get-authinfo "gcal.api" "9999")
+org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.collison/Documents/org/.org-gcal/raken.org")
+)))
+
+(add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+#+end_src
 * Reading things
 
 ** RSS with =elfeed=
@@ -1631,4 +1698,36 @@ at recreating that
   (setq slack-prefer-current-team t)
   :config
    )
+#+end_src
+** show gcal calendar via gcalcli
+via http://pragmaticemacs.com/emacs/how-i-view-my-google-calendar-agenda-in-emacs/
+#+begin_src emacs-lisp
+;; define function to display ansi colours for a buffer
+;; http://stackoverflow.com/questions/23378271/how-do-i-display-ansi-color-codes-in-emacs-for-any-mode
+(require 'ansi-color)
+(defun display-ansi-colors ()
+  (interactive)
+  (ansi-color-apply-on-region (point-min) (point-max)))
+
+(defun bjm/open-gcal-agenda ()
+  "Open my google calendar agenda file. The agenda is displayed in the buffer *gcal*."
+  (interactive)
+  ;; set name of calendar buffer and location of file containing my agenda
+  (let ((tmp-buff-name "*gcal*") (cal-file (expand-file-name "~/.gcal-files/gcal-agenda")))
+    ;; switch to calendar buffer
+    (switch-to-buffer tmp-buff-name)
+    ;; turn off read only to overwrite if buffer exists
+    (read-only-mode -1)
+    ;; clear buffer
+    (erase-buffer)
+    ;; insert agenda file
+    (insert-file-contents cal-file)
+    ;; turn on colours
+    (display-ansi-colors)
+    ;; turn on special mode
+    (special-mode)
+    ;; turn off line wrapping
+    (visual-line-mode -1)))
+
+  (global-set-key (kbd "C-?") 'bjm/open-gcal-agenda)
 #+end_src
