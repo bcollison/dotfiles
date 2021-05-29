@@ -171,6 +171,8 @@ fi
 
 alias history-without-id="history | cut -c 8-"
 
+alias week="gcalcli calw"
+
 export RAKEN_HOME="/Users/brian.collison/projects"
 
 export PATH="/usr/local/opt/mysql-client/bin:$PATH"
