@@ -178,3 +178,10 @@ export RAKEN_HOME="/Users/brian.collison/projects"
 export PATH="/usr/local/opt/mysql-client/bin:$PATH"
 
 export PATH="/Users/brian.collison/bin:$PATH"
+
+export CHARLES_HOME="/Applications/Charles.app/Contents/MacOS"
+
+export PATH="$CHARLES_HOME:$PATH"
+
+alias ch="Charles -headless"
+
