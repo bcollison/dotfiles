@@ -1034,42 +1034,51 @@ Define a few common tasks as capture templates. Specifically, I frequently:
 - Convert emails into todos to maintain an empty inbox.
 
 #+begin_src emacs-lisp
-  (setq org-capture-templates
-        `(("B" "Blog idea"
-           entry
-           (file ,(org-file-path  "notes/blog-ideas.org"))
-           "* %?\n")
+    (setq org-capture-templates
+          `(("B" "Blog idea"
+             entry
+             (file ,(org-file-path  "notes/blog-ideas.org"))
+             "* %?\n")
 
-          ("e" "Email" entry
-           (file+headline org-index-file "Inbox")
-           "* TODO %?\n\n%a\n\n")
+            ("e" "Email" entry
+             (file+headline org-index-file "Inbox")
+             "* TODO %?\n\n%a\n\n")
 
-          ("j" "Work task"
-           entry
-           (file+headline ,(org-file-path "work.org") "Tasks")
-           "* TODO %?\n")
+            ("j" "Work task"
+             entry
+             (file+headline ,(org-file-path "work.org") "Tasks")
+             "* TODO %?\n")
 
-          ("s" "Subscribe to an RSS feed"
-           plain
-           (file ,(org-file-path "rss-feeds.org"))
-           "*** [[%^{Feed URL}][%^{Feed name}]]")
+            ("s" "Subscribe to an RSS feed"
+             plain
+             (file ,(org-file-path "rss-feeds.org"))
+             "*** [[%^{Feed URL}][%^{Feed name}]]")
 
-          ("p" "Protocol" entry (file+headline  ,(org-file-path "index.org") "Inbox")
-           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+            ("p" "Protocol" entry (file+headline  ,(org-file-path "index.org") "Inbox")
+             "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
 
-          ("L" "Protocol Link" entry (file+headline ,(org-file-path "index.org") "Links")
-           "* %? [[%:link][%:description]] \nCaptured On: %U")
+            ("L" "Protocol Link" entry (file+headline ,(org-file-path "index.org") "Links")
+             "* %? [[%:link][%:description]] \nCaptured On: %U")
 
-	     ;; coming from org-protocol via the browser.
-          ("z" "A link, for reading later." entry
-           (file+headline ,(org-file-path "index.org") "Reading List")
-           "* [[%:link][%:description]]\n%u\n\n%i"
-           :empty-lines 1)
+               ;; coming from org-protocol via the browser.
+            ("z" "A link, for reading later." entry
+             (file+headline ,(org-file-path "index.org") "Reading List")
+             "* [[%:link][%:description]]\n%u\n\n%i"
+             :empty-lines 1)
 
-          ("t" "Todo"
-           entry
-           (file+headline ,(org-file-path "index.org") "Inbox")
-           "* TODO %?\n")))
+            ("t" "Todo"
+             entry
+             (file+headline ,(org-file-path "index.org") "Inbox")
+             "* TODO %?\n")
+            ("u" "UA Reading"
+                table-line
+                (file+headline, (org-file-path "health.org") "Uric Acid")
+                   "|%u|%?| | | |")
+            ("w" "Weight"
+                table-line
+                (file+headline, (org-file-path "health.org") "Weight")
+                   "|%u|%?| |")
+          ))
 #+end_src
 
 Refiling according to the document's hierarchy.
