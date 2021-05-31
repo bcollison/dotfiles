@@ -1771,3 +1771,39 @@ via http://pragmaticemacs.com/emacs/how-i-view-my-google-calendar-agenda-in-emac
 
   (global-set-key (kbd "C-?") 'bjm/open-gcal-agenda)
 #+end_src
+** Let's see if this edit with emacs works well
+#+begin_src emacs-lisp
+(use-package edit-server
+  :ensure t
+  :commands edit-server-start
+  :init (if after-init-time
+              (edit-server-start)
+            (add-hook 'after-init-hook
+                      #'(lambda() (edit-server-start))))
+  :config (setq edit-server-new-frame-alist
+                '(
+                  (top . 200)
+                  (left . 200)
+                  (width . 80)
+                  (height . 25)
+                  (minibuffer . t)
+                  (menu-bar-lines . t)
+                  (window-system . ns))))
+#+end_src
+** Displaying World Time
+
+=display-time-world= command provides a nice display of the time at a specified
+list of timezones.  Nice for working in a team with remote members.
+
+#+begin_src emacs-lisp
+
+  (setq display-time-world-list
+    '(
+      ("America/Los_Angeles" "San Diego")
+      ("Pacific/Auckland" "New Zealand")
+      ("America/New_York" "Maryland")
+      ("Etc/UTC" "UTC")
+      ))
+  (setq display-time-world-time-format "%a, %d %b %I:%M %p %Z")
+  (global-set-key (kbd "C-c t") 'display-time-world)
+#+end_src
