@@ -124,6 +124,14 @@ Use [[https://github.com/hrs/sensible-defaults.el][sensible-defaults.el]] for so
 #+end_src
 
 * More UI stuff
+
+** Window management
+Seeing what a vanilla install of bufler looks like to manage buffers
+#+begin_src emacs-lisp
+(use-package bufler
+  :bind (("C-M-j" . bufler-switch-buffer)
+         ("C-M-k" . bufler-workspace-frame-set)))
+#+end_src
 ** Disable visual bell
 
 =sensible-defaults= replaces the audible bell with a visual one, but I really
