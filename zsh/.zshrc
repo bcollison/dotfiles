@@ -318,3 +318,5 @@ alias dvol="docker volumne"
 alias dm="docker-machine"
 alias dmx="docker-machine ssh"
 alias daliases="grep dalias ~/.zshrc | grep -v '^alias' | sed s/dalias//g"
+
+neofetch
