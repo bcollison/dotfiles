@@ -20,6 +20,8 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
      (getenv "PATH")
     )
   )
+
+  (setq exec-path (append exec-path '("/usr/local/bin")))
 #+end_src
 * Configure =use-package=
 
