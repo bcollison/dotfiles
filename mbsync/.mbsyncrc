@@ -102,6 +102,13 @@ Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-receipts
+Master :bcollison-gmail-remote:"Receipts"
+Slave :bcollison-gmail-local:"[bcollison].receipts"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-all
 Master :bcollison-gmail-remote:"[Gmail]/All Mail"
 Slave :bcollison-gmail-local:"[bcollison].All Mail"
@@ -133,6 +140,7 @@ Channel bcollison-gmail-actionable
 Channel bcollison-gmail-wait
 Channel bcollison-gmail-inflight
 Channel bcollison-gmail-reference
+Channel bcollison-gmail-receipts
 
 ##################################################
 # Raken
