@@ -434,6 +434,12 @@ Assume that I always want to kill the current buffer when hitting C-x k.
         (switch-to-buffer (other-buffer))))))
 #+end_src
 
+** Avy jump to char
+#+begin_src emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind ("C-;" . avy-goto-char-2))
+#+end_src
 * Development
 
 ** Languages
