@@ -1536,6 +1536,7 @@ I'm usually actually in an org document.
                 ("/bcollison-gmail/[bcollison].actionable"  . ?a)
                 ("/bcollison-gmail/[bcollison].wait"   . ?w)
                 ("/bcollison-gmail/[bcollison].reference"   . ?F)
+                ("/bcollison-gmail/[bcollison].receipts"   . ?R)
                 ("/bcollison-gmail/[bcollison].inflight"   . ?f)
                 ("/bcollison-gmail/[bcollison].drafts"    . ?d)
                 ))))
