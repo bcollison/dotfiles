@@ -1416,10 +1416,12 @@ I'm usually actually in an org document.
       (use-package org-mime)
 
     (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e")
+;;    (add-to-list 'load-path "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e")
     (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
     (use-package mu4e
       :load-path ("/home/brian/Personal/projects/third-party/mu/mu4e"
                   "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e"
+;;                  "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e"
                   "/usr/local/share/emacs/site-lisp/mu4e/"))
 
     (cond ((eq system-type 'gnu/linux)
