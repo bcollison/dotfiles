@@ -85,6 +85,18 @@ The following variables are used to tweak some of the configuration pieces for u
   (defvar efs/frame-transparency '(100 . 100))
 #+end_src
 
+** Using persp-mode for window managment
+#+begin_src emacs-lisp
+(use-package perspective
+  :bind
+  ("C-x C-b" . persp-list-buffers)   ; or use a nicer switcher, see below
+  :custom
+  (persp-initial-frame-name "Main")
+  :config
+  ;; Running `persp-mode' multiple times resets the perspective list...
+  (unless (equal persp-mode t)
+    (persp-mode)))
+#+end_src
 * Set personal information
 ** Who am I? Where am I?
 
