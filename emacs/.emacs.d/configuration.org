@@ -786,6 +786,10 @@ This section contains the basic configuration for =org-mode= plus the configurat
 
   (setq org-directory "~/Documents/org")
 
+;; does org-jira set this up for us?
+  (setq org-link-abbrev-alist
+      '(("JIRA"        . "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")))
+
   (defun org-file-path (filename)
     "Return the absolute address of an org file, given its relative name."
     (concat (file-name-as-directory org-directory) filename))
