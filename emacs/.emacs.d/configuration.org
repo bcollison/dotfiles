@@ -1671,6 +1671,15 @@ org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.colli
 (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
 #+end_src
 * Reading things
+** Reddit thru Gnus?
+#+begin_src emacs-lisp
+;; Applies to first-time Gnus users
+(custom-set-variables '(gnus-select-method (quote (nnreddit ""))))
+;; Applies to existing Gnus users
+;; (add-to-list 'gnus-secondary-select-methods '(nnreddit ""))
+;; set python command here?
+(setq nnreddit-python-command "python3")
+#+end_src
 
 ** RSS with =elfeed=
 
