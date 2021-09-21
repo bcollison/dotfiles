@@ -185,6 +185,8 @@ export PATH="$CHARLES_HOME:$PATH"
 
 alias ch="Charles -headless"
 
+export LESS="--no-init --quit-if-one-screen -R"
+
 ############################################################################
 #                                                                          #
 #               ------- Useful Docker Aliases --------                     #
