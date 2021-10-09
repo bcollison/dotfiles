@@ -6,8 +6,7 @@
 # - **
 # for more details see duplicity manpage, section File Selection
 # http://duplicity.nongnu.org/duplicity.1.html#sect9
-#+ Music
-+ /home/brian/Pictures
-+ /home/brian/Music
-+ /home/brian/Videos
-- **
+**/target
+**/build
+**/raken-website-2.0
+**/node_modules

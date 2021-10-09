@@ -75,7 +75,7 @@ ZSH_THEME="mira"
 #
 # git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
 #plugins=(zsh-z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
-#plugins=(z git jenv mvn zsh-autosuggestions)
+#plugins=(z git git-prompt jenv mvn zsh-autosuggestions)
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
   plugins=(z git jenv mvn zsh-autosuggestions)
@@ -157,7 +157,7 @@ if [ "$(uname 2> /dev/null)" = "Linux" ]; then
    export RPROMPT='$(git_super_status)'
 fi
 
-export ZSH_HIGHLIGHT_STYLES[comment]='none'
+#export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
    . /usr/local/opt/asdf/asdf.sh
