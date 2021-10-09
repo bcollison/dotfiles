@@ -1,0 +1,22 @@
+# although called exclude, this file is actually a globbing file list
+# duplicity accepts some globbing patterns, even including ones here
+# here is an example, this incl. only 'dir/bar' except it's subfolder 'foo'
+# - dir/bar/foo
+# + dir/bar
+# - **
+# for more details see duplicity manpage, section File Selection
+# http://duplicity.nongnu.org/duplicity.1.html#sect9
+#+ Music
+- /Users/brian.collison/Dropbox
+- /Users/brian.collison/projects
+- /Users/brian.collison/.duply
+- /Users/brian.collison/Snapshots
+- /Users/brian.collison/tmp
+- /Users/brian.collison/sonarqube-8.8.0.42792
+- /Users/brian.collison/.m2
+- /Users/brian.collison/.gradle
+- /Users/brian.collison/Library
+- /Users/brian.collison/Maildir
+- /Users/brian.collison/Downloads
+- /Users/brian.collison/Applications
+- /Users/brian.collison/.Trash

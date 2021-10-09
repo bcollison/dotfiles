@@ -1,12 +1,12 @@
 # mbsyncrc based on
 # http://www.ict4g.net/adolfo/notes/2014/12/27/EmacsIMAP.html
-# https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/ 
+# https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/
 # ACCOUNT INFORMATION
 IMAPAccount bcollison-gmail
 # Address to connect to
 Host imap.gmail.com
 User bcollison@gmail.com
-PassCmd "gpg2 -q --for-your-eyes-only --no-tty -d ~/.mbsyncpass-bcollison.gpg"
+PassCmd "gpg -q --for-your-eyes-only --no-tty -d ~/.mbsyncpass-bcollison.gpg"
 AuthMechs LOGIN
 SSLType IMAPS
 SSLVersions TLSv1.2
@@ -88,6 +88,20 @@ Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-school
+Master :bcollison-gmail-remote:"School"
+Slave :bcollison-gmail-local:"[bcollison].CalvinSchool"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-olivia-school
+Master :bcollison-gmail-remote:"Olivia School"
+Slave :bcollison-gmail-local:"[bcollison].OliviaSchool"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-raken
 Master :bcollison-gmail-remote:"Raken"
 Slave :bcollison-gmail-local:"[bcollison].Raken"
@@ -98,6 +112,13 @@ SyncState *
 Channel bcollison-gmail-reference
 Master :bcollison-gmail-remote:"Reference"
 Slave :bcollison-gmail-local:"[bcollison].reference"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-receipts
+Master :bcollison-gmail-remote:"Receipts"
+Slave :bcollison-gmail-local:"[bcollison].receipts"
 Create Both
 Expunge Both
 SyncState *
@@ -133,3 +154,131 @@ Channel bcollison-gmail-actionable
 Channel bcollison-gmail-wait
 Channel bcollison-gmail-inflight
 Channel bcollison-gmail-reference
+Channel bcollison-gmail-receipts
+
+##################################################
+# Raken
+# ACCOUNT INFORMATION
+IMAPAccount raken-gmail
+# Address to connect to
+Host imap.gmail.com
+User brian.collison@rakenapp.com
+PassCmd "gpg -q --for-your-eyes-only --no-tty -d ~/.mbsyncpass-raken.gpg"
+AuthMechs LOGIN
+SSLType IMAPS
+SSLVersions TLSv1.2
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+PipelineDepth 50
+
+# THEN WE SPECIFY THE LOCAL AND REMOTE STORAGE
+# - THE REMOTE STORAGE IS WHERE WE GET THE MAIL FROM (E.G., THE
+#   SPECIFICATION OF AN IMAP ACCOUNT)
+# - THE LOCAL STORAGE IS WHERE WE STORE THE EMAIL ON OUR COMPUTER
+
+# REMOTE STORAGE (USE THE IMAP ACCOUNT SPECIFIED ABOVE)
+IMAPStore raken-gmail-remote
+Account raken-gmail
+
+# LOCAL STORAGE (CREATE DIRECTORIES with mkdir -p ~/Maildir/bcollison-gmail)
+MaildirStore raken-gmail-local
+Path ~/Maildir/raken-gmail/
+Inbox ~/Maildir/raken-gmail/INBOX
+# REQUIRED ONLY IF YOU WANT TO DOWNLOAD ALL SUBFOLDERS; SYNCING SLOWS DOWN
+# SubFolders Verbatim
+
+# CONNECTIONS SPECIFY LINKS BETWEEN REMOTE AND LOCAL FOLDERS
+#
+# CONNECTIONS ARE SPECIFIED USING PATTERNS, WHICH MATCH REMOTE MAIl
+# FOLDERS. SOME COMMONLY USED PATTERS INCLUDE:
+#
+# 1 "*" TO MATCH EVERYTHING
+# 2 "!DIR" TO EXCLUDE "DIR"
+# 3 "DIR" TO MATCH DIR
+
+Channel raken-gmail-inbox
+Master :raken-gmail-remote:
+Slave :raken-gmail-local:
+Patterns "INBOX"
+Create Both
+Expunge Both
+SyncState *
+
+Channel raken-gmail-trash
+Master :raken-gmail-remote:"[Gmail]/Trash"
+Slave :raken-gmail-local:"[raken].trash"
+Create Both
+Expunge Both
+SyncState *
+
+Channel raken-gmail-sent
+Master :raken-gmail-remote:"[Gmail]/Sent Mail"
+Slave :raken-gmail-local:"[raken].sent"
+Create Both
+Expunge Both
+SyncState *
+
+Channel raken-gmail-drafts
+Master :raken-gmail-remote:"[Gmail]/Drafts"
+Slave :raken-gmail-local:"[raken].drafts"
+Create Both
+Expunge Both
+SyncState *
+
+Channel raken-gmail-actionable
+Master :raken-gmail-remote:"Actionable"
+Slave :raken-gmail-local:"[raken].actionable"
+Create Both
+Expunge Both
+SyncState *
+
+Channel raken-gmail-wait
+Master :raken-gmail-remote:"Wait"
+Slave :raken-gmail-local:"[raken].wait"
+Create Both
+Expunge Both
+SyncState *
+
+Channel raken-gmail-inflight
+Master :raken-gmail-remote:"In-Flight"
+Slave :raken-gmail-local:"[raken].inflight"
+Create Both
+Expunge Both
+SyncState *
+
+Channel raken-gmail-reference
+Master :raken-gmail-remote:"Reference"
+Slave :raken-gmail-local:"[raken].reference"
+Create Both
+Expunge Both
+SyncState *
+
+Channel raken-gmail-all
+Master :raken-gmail-remote:"[Gmail]/All Mail"
+Slave :raken-gmail-local:"[raken].All Mail"
+Create Both
+Expunge Both
+SyncState *
+
+#Channel acc1-gmail-starred
+#Master :acc1-gmail-remote:"[Gmail]/Starred"
+#Slave :acc1-gmail-local:"[acc1].Starred"
+#Create Both
+#Expunge Both
+#SyncState *
+
+# GROUPS PUT TOGETHER CHANNELS, SO THAT WE CAN INVOKE
+# MBSYNC ON A GROUP TO SYNC ALL CHANNELS
+#
+# FOR INSTANCE: "mbsync gmail" GETS MAIL FROM
+# "gmail-inbox", "gmail-sent", and "gmail-trash"
+#
+Group raken-gmail
+Channel raken-gmail-inbox
+Channel raken-gmail-sent
+Channel raken-gmail-drafts
+Channel raken-gmail-trash
+Channel raken-gmail-all
+Channel raken-gmail-actionable
+Channel raken-gmail-wait
+Channel raken-gmail-inflight
+Channel raken-gmail-reference

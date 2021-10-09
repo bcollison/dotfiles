@@ -1,5 +1,5 @@
 [user]
-        email = brian@verve.com
+        email = brian.collison@rakenapp.com
         name = Brian Collison
 [push]
         default = simple
@@ -41,3 +41,5 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[core]
+	excludesfile = /Users/brian.collison/.gitignore_global
