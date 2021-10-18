@@ -352,6 +352,79 @@ This Prescient configuration is optimized for use in System Crafters videos and 
 
 #+end_src
 
+*** Marginalia
+#+begin_src emacs-lisp
+;; Enable richer annotations using the Marginalia package
+(use-package marginalia
+  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+  :bind (("M-A" . marginalia-cycle)
+         :map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init configuration is always executed (Not lazy!)
+  :init
+
+  ;; Must be in the :init section of use-package such that the mode gets
+  ;; enabled right away. Note that this forces loading the package.
+  (marginalia-mode))
+
+#+end_src
+*** Vertico
+#+begin_src emacs-lisp
+;; Enable vertico
+(use-package vertico
+  :init
+  (vertico-mode)
+
+  ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
+  )
+
+;; Optionally use the `orderless' completion style. See
+;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
+;; dispatcher. Additionally enable `partial-completion' for file path
+;; expansion. `partial-completion' is important for wildcard support.
+;; Multiple files can be opened at once with `find-file' if you enter a
+;; wildcard. You may also give the `initials' completion style a try.
+(use-package orderless
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-dispatch))
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; Alternatively try `consult-completing-read-multiple'.
+  (defun crm-indicator (args)
+    (cons (concat "[CRM] " (car args)) (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+
+#+end_src
 ** Helpful Help Commands
 
 [[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful (get it?) information to Emacs' =describe-= command buffers.  For example, if you use =describe-function=, you will not only get the documentation about the function, you will also see the source code of the function and where it gets used in other places in the Emacs configuration.  It is very useful for figuring out how things work in Emacs.
@@ -596,16 +669,16 @@ There are a number of other language servers for Python so if you find that =pyl
 
 #+begin_src emacs-lisp
 
-  (use-package python-mode
-    :ensure t
-    :hook (python-mode . lsp-deferred)
-    :custom
+;;  (use-package python-mode
+;;    :ensure t
+;;    :hook (python-mode . lsp-deferred)
+;;    :custom
     ;; NOTE: Set these if Python 3 is called "python3" on your system!
     ;; (python-shell-interpreter "python3")
     ;; (dap-python-executable "python3")
-    (dap-python-debugger 'debugpy)
-    :config
-    (require 'dap-python))
+;;    (dap-python-debugger 'debugpy)
+;;    :config
+;;    (require 'dap-python))
 
 
 #+end_src
@@ -1960,18 +2033,18 @@ FlyCheck checks for errors in code at run-time.
 Emacs Debug Adapter Protocol aka DAP Mode allows us to debug your program. Below we will integrate ~dap-mode~ with ~dap-hydra~. ~Dap-hydra~ shows keys you can use to enable various options and jump through code at runtime. After we install dap-mode we will also install ~dap-java~.
 
 #+begin_src emacs-lisp
-(use-package dap-mode
-  :ensure t
-  :after (lsp-mode)
-  :functions dap-hydra/nil
-  :config
-  (require 'lsp-java)
-  :bind (:map lsp-mode-map
-         ("<f5>" . dap-debug)
-         ("M-<f5>" . dap-hydra))
-  :hook ((dap-mode . dap-ui-mode)
-    (dap-session-created . (lambda (&_rest) (dap-hydra)))
-    (dap-terminated . (lambda (&_rest) (dap-hydra/nil)))))
+;;(use-package dap-mode
+;;  :ensure t
+;;  :after (lsp-mode)
+;;  :functions dap-hydra/nil
+;;  :config
+;;  (require 'lsp-java)
+;;  :bind (:map lsp-mode-map
+;;         ("<f5>" . dap-debug)
+;;         ("M-<f5>" . dap-hydra))
+;;  :hook ((dap-mode . dap-ui-mode)
+;;    (dap-session-created . (lambda (&_rest) (dap-hydra)))
+ ;;   (dap-terminated . (lambda (&_rest) (dap-hydra/nil)))))
 
 ;;(use-package dap-java :ensure nil)
 #+end_src
