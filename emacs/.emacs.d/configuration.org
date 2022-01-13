@@ -85,6 +85,18 @@ The config file gets openened *a lot* because I tend to fiddle with this config 
 #+end_src
 
 * UI preferences
+
+** Ace-Window seems like a nice way to navigate and manipulate multiple windows in a frame
+Don't forget that a question-mark will get you all the action bindings
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :bind
+    ("M-o" . ace-window)
+    :init
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+#+end_src
+
+** Some variables to be used elsewhere for UI stuff
 The following variables are used to tweak some of the configuration pieces for use in the live streams so you might need to adjust them for your local machine if you try to use this configuration directly.
 
 #+begin_src emacs-lisp
@@ -1823,7 +1835,6 @@ Some external integrations need access to the current entry at point:
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-w") 'backward-kill-word)
-  (global-set-key (kbd "M-o") 'other-window)
 #+end_src
 
 Remap when working in terminal Emacs.
