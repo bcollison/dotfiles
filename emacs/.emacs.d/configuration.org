@@ -761,7 +761,7 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
     :init
     ;; NOTE: Set this to the folder where you keep your Git repos!
     (when (file-directory-p "~/projects")
-      (setq projectile-project-search-path '("~/projects")))
+      (setq projectile-project-search-path '("~/projects" "~/Personal/projects")))
     (setq projectile-switch-project-action #'projectile-dired))
 
   (use-package counsel-projectile
@@ -829,7 +829,13 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
     )
 
 #+end_src
-
+** Code format
+I'm in the spaces camp.
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
+#+end_src
 * Publishing and task management with Org-mode
 
 ** Better Font Faces
@@ -2045,8 +2051,8 @@ Complete anything aka Company provides auto-completion. Company-capf is enabled 
 Yasnippet is a template system for Emacs. It allows you to type abbreviation and complete the associated text.
 
 #+begin_src emacs-lisp
-;;(use-package yasnippet :config (yas-global-mode))
-;;(use-package yasnippet-snippets :ensure t)
+(use-package yasnippet :config (yas-global-mode))
+(use-package yasnippet-snippets :ensure t)
 #+end_src
 
 E.g. In java mode, if you type ~pr~ and hit ~<TAB>~ it should complete to ~System.out.println("text");~
