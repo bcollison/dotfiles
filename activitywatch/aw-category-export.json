@@ -1,0 +1,316 @@
+{
+  "categories": [
+    {
+      "name": [
+        "Work"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "Google Docs|libreoffice|ReText|iTerm2|Emacs"
+      },
+      "data": {
+        "color": "#0F0"
+      },
+      "name_pretty": "Work",
+      "subname": "Work",
+      "parent": null,
+      "depth": 0,
+      "id": 0
+    },
+    {
+      "name": [
+        "Work",
+        "Programming"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "GitHub|Stack Overflow|BitBucket|Gitlab|vim|Spyder|kate|Ghidra|Scite|IntelliJ IDEA|DataGrip|Postman|YourKit"
+      },
+      "name_pretty": "Work>Programming",
+      "subname": "Programming",
+      "parent": [
+        "Work"
+      ],
+      "depth": 1,
+      "id": 1,
+      "data": {
+        "color": "#A4DD00"
+      }
+    },
+    {
+      "name": [
+        "Work",
+        "Productivity"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "ActivityWatch|aw-",
+        "ignore_case": true
+      },
+      "name_pretty": "Work>Productivity",
+      "subname": "Productivity",
+      "parent": [
+        "Work"
+      ],
+      "depth": 1,
+      "id": 2,
+      "data": {
+        "color": "#C4DD00"
+      }
+    },
+    {
+      "name": [
+        "Media",
+        "Games"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "Minecraft|RimWorld"
+      },
+      "data": {
+        "color": "#F80"
+      },
+      "name_pretty": "Media>Games",
+      "subname": "Games",
+      "parent": [
+        "Media"
+      ],
+      "depth": 1,
+      "id": 3
+    },
+    {
+      "name": [
+        "Media",
+        "Video"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "YouTube|Plex|VLC"
+      },
+      "data": {
+        "color": "#F33"
+      },
+      "name_pretty": "Media>Video",
+      "subname": "Video",
+      "parent": [
+        "Media"
+      ],
+      "depth": 1,
+      "id": 4
+    },
+    {
+      "name": [
+        "Media",
+        "Social Media"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "reddit|Facebook|Twitter|Instagram|devRant",
+        "ignore_case": true
+      },
+      "data": {
+        "color": "#FCC400"
+      },
+      "name_pretty": "Media>Social Media",
+      "subname": "Social Media",
+      "parent": [
+        "Media"
+      ],
+      "depth": 1,
+      "id": 5
+    },
+    {
+      "name": [
+        "Media",
+        "Music"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "Spotify|Deezer",
+        "ignore_case": true
+      },
+      "data": {
+        "color": "#A8FC00"
+      },
+      "name_pretty": "Media>Music",
+      "subname": "Music",
+      "parent": [
+        "Media"
+      ],
+      "depth": 1,
+      "id": 6
+    },
+    {
+      "name": [
+        "Comms"
+      ],
+      "rule": {
+        "type": null
+      },
+      "data": {
+        "color": "#9FF"
+      },
+      "name_pretty": "Comms",
+      "subname": "Comms",
+      "parent": null,
+      "depth": 0,
+      "id": 7
+    },
+    {
+      "name": [
+        "Comms",
+        "IM"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "Messenger|Telegram|Signal|WhatsApp|Rambox|Slack|Riot|Discord|Nheko"
+      },
+      "name_pretty": "Comms>IM",
+      "subname": "IM",
+      "parent": [
+        "Comms"
+      ],
+      "depth": 1,
+      "id": 8
+    },
+    {
+      "name": [
+        "Comms",
+        "Email"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "Gmail|Thunderbird|mutt|alpine|mu4e"
+      },
+      "name_pretty": "Comms>Email",
+      "subname": "Email",
+      "parent": [
+        "Comms"
+      ],
+      "depth": 1,
+      "id": 9,
+      "data": {}
+    },
+    {
+      "name": [
+        "Uncategorized"
+      ],
+      "rule": {
+        "type": null
+      },
+      "data": {
+        "color": "#CCC"
+      },
+      "name_pretty": "Uncategorized",
+      "subname": "Uncategorized",
+      "parent": null,
+      "depth": 0,
+      "id": 10
+    },
+    {
+      "name": [
+        "Media"
+      ],
+      "rule": {
+        "type": null
+      },
+      "name_pretty": "Media",
+      "subname": "Media",
+      "parent": null,
+      "depth": 0,
+      "id": 11
+    },
+    {
+      "name": [
+        "Comms",
+        "Meetings"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "zoom"
+      },
+      "id": 12,
+      "data": {},
+      "name_pretty": "Comms>Meetings",
+      "subname": "Meetings",
+      "parent": [
+        "Comms"
+      ],
+      "depth": 1
+    },
+    {
+      "name": [
+        "Work",
+        "Browsing"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "Google Chrome"
+      },
+      "id": 13,
+      "data": {
+        "color": "#68BC00"
+      },
+      "name_pretty": "Work>Browsing",
+      "subname": "Browsing",
+      "parent": [
+        "Work"
+      ],
+      "depth": 1
+    },
+    {
+      "name": [
+        "Work",
+        "Code Reviews"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "Pull Request"
+      },
+      "id": 14,
+      "data": {
+        "color": "#C8FC40"
+      },
+      "name_pretty": "Work>Code Reviews",
+      "subname": "Code Reviews",
+      "parent": [
+        "Work"
+      ],
+      "depth": 1
+    },
+    {
+      "name": [
+        "Work",
+        "Process/Planning"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "JIRA"
+      },
+      "id": 15,
+      "data": {
+        "color": "#84bba0"
+      },
+      "name_pretty": "Work>Process/Planning",
+      "subname": "Process/Planning",
+      "parent": [
+        "Work"
+      ],
+      "depth": 1
+    },
+    {
+      "name": [
+        "Work",
+        "Verifying/Testing"
+      ],
+      "rule": {
+        "type": "regex",
+        "regex": "local.rakenapp.com|develop.rakenapp.com|alpha-priv.rakenapp.com|alpha-pub.rakenapp.com"
+      },
+      "id": 16,
+      "data": {
+        "color": "#bddC55"
+      }
+    }
+  ]
+}
