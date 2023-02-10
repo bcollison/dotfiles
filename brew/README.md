@@ -9,4 +9,5 @@ probably not the right place for this, but barrier required a post-install step 
 I cd'd there and ran this:
    openssl req -x509 -nodes -days 365 -subj /CN=Barrier -newkey rsa:4096 -keyout Barrier.pem -out Barrier.pem
 
-
+qutebrowser--
+sudo xattr -rd com.apple.quarantine /Applications/qutebrowser.app
