@@ -160,13 +160,17 @@ fi
 #export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
-   . /usr/local/opt/asdf/asdf.sh
+   . /usr/local/opt/asdf/libexec/asdf.sh
 if [ -d /usr/local/Caskroom/google-cloud-sdk/ ]; then
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
 fi
 else
    . $HOME/.asdf/asdf.sh
+fi
+
+if [ "$(uname 2> /dev/null)" != "Linux" ]; then
+  export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 fi
 
 alias history-without-id="history | cut -c 8-"
@@ -186,6 +190,8 @@ export PATH="$CHARLES_HOME:$PATH"
 alias ch="Charles -headless"
 
 export LESS="--no-init --quit-if-one-screen -R"
+
+eval "$(fakedata --completion zsh)"
 
 ############################################################################
 #                                                                          #
@@ -322,3 +328,6 @@ alias dmx="docker-machine ssh"
 alias daliases="grep dalias ~/.zshrc | grep -v '^alias' | sed s/dalias//g"
 
 neofetch
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+

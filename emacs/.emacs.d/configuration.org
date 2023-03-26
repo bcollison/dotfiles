@@ -162,6 +162,12 @@ Use [[https://github.com/hrs/sensible-defaults.el][sensible-defaults.el]] for so
 
 * More UI stuff
 
+** Enable tab-bar-mode on startup
+This enables ctrl-tab through tabs.
+#+begin_src emacs-lisp
+(tab-bar-mode)
+#+end_src
+
 ** Window management
 Seeing what a vanilla install of bufler looks like to manage buffers
 #+begin_src emacs-lisp
@@ -184,13 +190,25 @@ the bell altogether.
 I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://fonts.google.com/specimen/Cantarell][Cantarell]] fonts for this configuration which will more than likely need to be installed on your machine.  Both can usually be found in the various Linux distro package managers or downloaded from the links above.
 
 #+begin_src emacs-lisp
-  (set-face-attribute 'default nil :font "Fira Code" :height efs/default-font-size)
+  (defun bmc/set-font-faces ()
+    (message "Setting faces!")
+    (set-face-attribute 'default nil :font "Fira Code" :height efs/default-font-size)
 
-  ;; Set the fixed pitch face
-  (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height efs/default-font-size)
+    ;; Set the fixed pitch face
+    (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height efs/default-font-size)
 
-  ;; Set the variable pitch face
-  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular)
+    ;; Set the variable pitch face
+    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular))
+
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda (frame)
+                  ;; (setq doom-modeline-icon t)
+                  (with-selected-frame frame
+                    (bmc/set-font-faces))))
+      (bmc/set-font-faces)
+      (efs/org-font-setup)
+      )
 #+end_src
 
 ** Tweak window chrome
@@ -722,6 +740,15 @@ You can use the pyvenv package to use =virtualenv= environments in Emacs.  The =
   (use-package go-mode)
 #+end_src
 
+*** Groovy
+#+begin_src emacs-lisp
+  (use-package groovy-mode
+  :init
+  (setq groovy-indent-offset 2)
+  :mode (("\\.groovy$" . groovy-mode)
+         ("\\.gradle$" . groovy-mode)))
+#+end_src
+
 ** Company Mode
 
 [[http://company-mode.github.io/][Company Mode]] provides a nicer in-buffer completion interface than =completion-at-point= which is more reminiscent of what you would expect from an IDE.  We add a simple configuration to make the keybindings a little more useful (=TAB= now completes the selection and initiates completion at the current location if needed).
@@ -762,6 +789,9 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
     ;; NOTE: Set this to the folder where you keep your Git repos!
     (when (file-directory-p "~/projects")
       (setq projectile-project-search-path '("~/projects")))
+    (when (file-directory-p "~/sample-projects")
+      (setq projectile-project-search-path '("~/sample-projects")))
+
     (setq projectile-switch-project-action #'projectile-dired))
 
   (use-package counsel-projectile
@@ -912,11 +942,6 @@ This section contains the basic configuration for =org-mode= plus the configurat
     (setq org-log-done 'time)
     (setq org-log-into-drawer t)
 
-    (setq org-agenda-files
-          `(,(org-file-path "Tasks.org")
-               ,(org-file-path "Habits.org")
-               ,(org-file-path "Birthdays.org")))
-
     (require 'org-habit)
     (add-to-list 'org-modules 'org-habit)
     (setq org-habit-graph-column 60)
@@ -1062,6 +1087,7 @@ You can add more =src= block templates below by copying one of the lines and cha
     (add-to-list 'org-structure-template-alist '("ja" . "src java"))
     (add-to-list 'org-structure-template-alist '("sql" . "src sql"))
     (add-to-list 'org-structure-template-alist '("js" . "src javascript"))
+    (add-to-list 'org-structure-template-alist '("uml" . "src plantuml"))
     (add-to-list 'org-structure-template-alist '("py" . "src python")))
 
 #+end_src
@@ -1561,13 +1587,11 @@ I'm usually actually in an org document.
           ;; from https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/elgoumx
           (add-hook 'mu4e-headers-mode-hook
                 (defun my/mu4e-change-headers ()
-            (interactive)
-           (setq mu4e-headers-fields
-                  `((:human-date . 25) ;; alternatively, use :date
-              (:flags . 6)
-              (:from . 22)
-              (:thread-subject . ,(- (window-body-width) 70)) ;; alternatively, use :subject
-              (:size . 7)))))
+                   (interactive)
+                   (setq mu4e-headers-fields
+                      `((:human-date . 10)
+                       (:from . 22)
+                       (:subject)))))
 
           ;; if you use date instead of human-date in the above, use this setting
           ;; give me ISO(ish) format date-time stamps in the header list
@@ -1708,6 +1732,11 @@ I'm usually actually in an org document.
           )
 
       (global-set-key (kbd "C-\"") 'mu4e)
+
+  (add-to-list 'mu4e-bookmarks
+  '( :name  "Unread Inbox not Bitbucket"
+     :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket"
+     :key   ?I))
 
 #+END_SRC
 
@@ -1930,25 +1959,26 @@ Completely ripped off from daviwil... will have to revisit this.
 #+end_src
 
 * Extra
-** sublima Sublime-like Scratch files
+** sublima Sublime-like Scratch files (Disabled)
+2022-03-28: Disabled this-- I don't use it
 I use sublime as a temporary place to do text modification/searching. I like how
 sublime auto-saves things. Someone else enjoyed that too. Here is his attempt
 at recreating that
 #+begin_src emacs-lisp
-  (load-file "~/Personal/projects/emacs-libraries/sublima/sublima.el")
-(global-set-key (kbd "<f7>") 'sublima-scratch)
-(global-set-key (kbd "<f8>") 'previous-buffer)
-(global-set-key (kbd "<f9>") 'next-buffer)
+;;(load-file "~/Personal/projects/emacs-libraries/sublima/sublima.el")
+;;(global-set-key (kbd "<f7>") 'sublima-scratch)
+;;(global-set-key (kbd "<f8>") 'previous-buffer)
+;;(global-set-key (kbd "<f9>") 'next-buffer)
 #+end_src
-** Slack? let's give it a go (removed verve team)
+** Slack? let's give it a go (removed verve team) (Disabled)
 #+begin_src emacs-lisp
-(use-package slack
-  :commands (slack-start)
-  :init
-  (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
-  (setq slack-prefer-current-team t)
-  :config
-   )
+;;(use-package slack
+;;  :commands (slack-start)
+;;  :init
+;;  (setq slack-buffer-emojify t) ;; if you want to enable emoji, default nil
+;;  (setq slack-prefer-current-team t)
+;;  :config
+;;   )
 #+end_src
 ** show gcal calendar via gcalcli
 via http://pragmaticemacs.com/emacs/how-i-view-my-google-calendar-agenda-in-emacs/
@@ -2202,12 +2232,44 @@ This is the package that handles server installation and session management.
 (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
 (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
 #+end_src
+* rest client/jq
+#+begin_src emacs-lisp
+  (use-package restclient
+  :ensure t)
+  (use-package ob-restclient
+    :ensure t)
+  (add-to-list 'org-src-lang-modes '("rest" . restclient))
+
+  (use-package jq-mode
+    :ensure t)
+  (use-package restclient-jq
+    :ensure t)
+  (add-to-list 'org-src-lang-modes '("jq" . jq))
+  (org-babel-do-load-languages 'org-babel-load-languages
+                             '((jq . t)))
+#+end_src
+* Is this elastic search mode useful?
+#+begin_src emacs-lisp
+(use-package es-mode
+:ensure t)
+#+end_src
+
+* Terminal helpers
+
+** iterm2 on mac
+#+begin_src emacs-lisp
+(define-key global-map (kbd "C-$") 'iterm-here)
+
+(defun iterm-here ()
+  (interactive)
+  (dired-smart-shell-command "open -a iTerm $PWD" nil nil))
+#+end_src
 * Fun
 ** xkcd
 #+begin_src emacs-lisp
 (use-package xkcd
 :ensure t
-:bind (("C-x x" . xkcd)))
+:bind (("C-c x" . xkcd)))
 #+end_src
 ** will Pomodoro be good for me?
 #+begin_src emacs-lisp
