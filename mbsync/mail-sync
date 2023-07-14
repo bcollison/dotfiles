@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+exec &> >(while read line; do echo "$(date -R) $line"; done;)
+
+which -s mbsync
+if [[ $? -ne 0 ]]; then
+    brew install isync
+fi
+
+which -s mu
+if [[ $? -ne 0 ]]; then
+    brew install mu
+fi
+
+echo Mail Sync &&
+    mbsync -Va &&
+    echo Mail Index &&
+
+if pgrep -f 'mu server'; then
+    emacsclient -e '(mu4e-update-index)'
+else
+    mu index
+fi

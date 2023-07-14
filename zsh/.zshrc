@@ -129,7 +129,11 @@ fi
 if [ -d ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
     source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi 
-# source ~/.zshrc.d/work.zsh.private
+
+if [ -f ~/.zshrc.d/work.zsh.private ]; then
+  source ~/.zshrc.d/work.zsh.private
+fi
+
 export SBT_HOME=/usr/local/sbt
 export PATH=$SBT_HOME/bin:$PATH
 
@@ -169,6 +173,10 @@ else
    . $HOME/.asdf/asdf.sh
 fi
 
+if [ "$(uname 2> /dev/null)" != "Linux" ]; then
+  export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+fi
+
 alias history-without-id="history | cut -c 8-"
 
 alias week="gcalcli calw"
@@ -186,6 +194,8 @@ export PATH="$CHARLES_HOME:$PATH"
 alias ch="Charles -headless"
 
 export LESS="--no-init --quit-if-one-screen -R"
+
+eval "$(fakedata --completion zsh)"
 
 ############################################################################
 #                                                                          #
