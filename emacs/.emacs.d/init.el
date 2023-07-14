@@ -27,11 +27,13 @@
  '(gnus-select-method '(nnreddit ""))
  '(org-agenda-files
    '("~/Documents/org/sprints/2021.13.org" "~/documents/org/gcal/personal.org" "~/documents/org/gcal/work.org" "~/documents/org/index.org" "~/documents/org/events.org" "~/documents/org/habits.org" "~/documents/org/recurring-events.org" "~/documents/org/work.org" "~/documents/org/home.org" "/Users/brian.collison/Documents/org/.org-gcal/raken.org"))
- '(org-plantuml-executable-args '("-headless"))
+ '(org-jira-done-states '("Closed" "Resolved" "Done" "Deployed"))
+ '(org-jira-use-status-as-todo t)
+ '(org-plantuml-args '("-headless"))
  '(org-plantuml-executable-path "plantuml")
  '(org-plantuml-jar-path "/Users/brian.collison/plantuml.jar")
  '(package-selected-packages
-   '(vterm restclient-jq jq-mode ob-restclient restclient logview groovy-mode es-mode pomm org-tree-slide orderless marginalia vertico gnu-elpa-keyring-update popper flycheck-plantuml plantuml-mode xkcd esup perspective actionscript-mode actionscript lsp-actionscript helm-lsp lsp-java dap-mode flycheck nnreddit docker dired-collapse dired-ranger dired-single dired-rainbow all-the-icons-dired bufler edit-server org-gcal org-jira org-appear org-roam-protocol org-roam-server go-mode slack doom-modeline ivy-rich auto-compile use-package-ensure-system-package))
+   '(ement vterm restclient-jq jq-mode ob-restclient restclient logview groovy-mode es-mode pomm org-tree-slide orderless marginalia vertico gnu-elpa-keyring-update popper flycheck-plantuml plantuml-mode xkcd esup perspective actionscript-mode actionscript lsp-actionscript helm-lsp lsp-java dap-mode flycheck nnreddit docker dired-collapse dired-ranger dired-single dired-rainbow all-the-icons-dired bufler edit-server org-gcal org-jira org-appear org-roam-protocol org-roam-server go-mode slack doom-modeline ivy-rich auto-compile use-package-ensure-system-package))
  '(plantuml-default-exec-mode 'jar)
  '(plantuml-executable-args '("-headless" "-DPLANTUML_LIMIT_SIZE=18192"))
  '(plantuml-jar-args '("-charset" "UTF-8" "-DPLANTUML_LIMIT_SIZE=18192"))

@@ -207,7 +207,7 @@ I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://f
                   (with-selected-frame frame
                     (bmc/set-font-faces))))
       (bmc/set-font-faces)
-      (efs/org-font-setup)
+;;      (efs/org-font-setup)
       )
 #+end_src
 
@@ -316,6 +316,17 @@ pairing or presenting code.
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
+#+end_src
+*** doom-modeline updated to nerd-icons
+This package is able to display icons if nerd-icons package and required fonts are installed. Run M-x nerd-icons-install-fonts to install the necessary fonts. Please refer to the installation guide.
+#+begin_src emacs-lisp
+(use-package nerd-icons
+;; :custom
+;; The Nerd Font you want to use in GUI
+;; "Symbols Nerd Font Mono" is the default and is recommended
+;; but you can use any other Nerd Font if you want
+;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+)
 #+end_src
 
 ** Which Key
@@ -1531,212 +1542,227 @@ I'm usually actually in an org document.
 
 * Email
 #+BEGIN_SRC emacs-lisp
-          (use-package org-mime)
+            (use-package org-mime)
 
-        (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e")
-    ;;    (add-to-list 'load-path "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e")
-        (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
-        (use-package mu4e
-          :load-path ("/home/brian/Personal/projects/third-party/mu/mu4e"
-                      "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e"
-    ;;                  "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e"
-                      "/usr/local/share/emacs/site-lisp/mu4e/"))
+          (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e")
+      ;;    (add-to-list 'load-path "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e")
+          (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
+          (use-package mu4e
+            :load-path ("/home/brian/Personal/projects/third-party/mu/mu4e"
+                        "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e"
+      ;;                  "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e"
+                        "/usr/local/share/emacs/site-lisp/mu4e/"))
 
-        (cond ((eq system-type 'gnu/linux)
-             (setq mu4e-mu-binary "/usr/bin/mu"))
-           ((eq system-type 'darwin)
-             (setq mu4e-mu-binary "/usr/local/bin/mu")))
-      ;  "mu4e no longer uses the mu4e-maildir and mu4e-user-mail-address-list variables; instead it uses the information it gets from mu (see the mu section above). If you have a non-default mu4e-mu-home, make sure to set it before mu4e starts."
-      ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
+          (cond ((eq system-type 'gnu/linux)
+               (setq mu4e-mu-binary "/usr/bin/mu"))
+             ((eq system-type 'darwin)
+               (setq mu4e-mu-binary "/usr/local/bin/mu")))
+        ;  "mu4e no longer uses the mu4e-maildir and mu4e-user-mail-address-list variables; instead it uses the information it gets from mu (see the mu section above). If you have a non-default mu4e-mu-home, make sure to set it before mu4e starts."
+        ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
 
-          ; get mail
-  ;; going to try to do this at the os scheduled level
-  ;;        (setq mu4e-get-mail-command "/usr/local/bin/mbsync -c ~/.mbsyncrc -a"
-  ;;          ;; mu4e-html2text-command "w3m -T text/html" ;;using the default mu4e-shr2text
-  ;;          mu4e-update-interval 600
-  ;;          mu4e-headers-auto-update t
-  ;;          mu4e-compose-signature-auto-include nil
-  ;;          mu4e-compose-format-flowed t)
+            ; get mail
+    ;; going to try to do this at the os scheduled level
+    ;;        (setq mu4e-get-mail-command "/usr/local/bin/mbsync -c ~/.mbsyncrc -a"
+    ;;          ;; mu4e-html2text-command "w3m -T text/html" ;;using the default mu4e-shr2text
+    ;;          mu4e-update-interval 600
+    ;;          mu4e-headers-auto-update t
+    ;;          mu4e-compose-signature-auto-include nil
+    ;;          mu4e-compose-format-flowed t)
 
-          ;; to view selected message in the browser, no signin, just html mail
-          (add-to-list 'mu4e-view-actions
-            '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+            ;; to view selected message in the browser, no signin, just html mail
+            (add-to-list 'mu4e-view-actions
+              '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
-          ;; enable inline images
-          (setq mu4e-view-show-images t)
-          ;; use imagemagick, if available
-          (when (fboundp 'imagemagick-register-types)
-            (imagemagick-register-types))
+            ;; enable inline images
+            (setq mu4e-view-show-images t)
+            ;; use imagemagick, if available
+            (when (fboundp 'imagemagick-register-types)
+              (imagemagick-register-types))
 
-          ;; every new email composition gets its own frame!
-          (setq mu4e-compose-in-new-frame t)
+            ;; every new email composition gets its own frame!
+            (setq mu4e-compose-in-new-frame t)
 
-          ;; don't save message to Sent Messages, IMAP takes care of this
-          (setq mu4e-sent-messages-behavior 'delete)
+            ;; don't save message to Sent Messages, IMAP takes care of this
+            (setq mu4e-sent-messages-behavior 'delete)
 
-          (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
+            (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
 
-          ;; <tab> to navigate to links, <RET> to open them in browser
-          (add-hook 'mu4e-view-mode-hook
-            (lambda()
-          ;; try to emulate some of the eww key-bindings
-          (local-set-key (kbd "<RET>") 'mu4e~view-browse-url-from-binding)
-          (local-set-key (kbd "<tab>") 'shr-next-link)
-          (local-set-key (kbd "<backtab>") 'shr-previous-link)))
+            ;; <tab> to navigate to links, <RET> to open them in browser
+            (add-hook 'mu4e-view-mode-hook
+              (lambda()
+            ;; try to emulate some of the eww key-bindings
+            (local-set-key (kbd "<RET>") 'mu4e~view-browse-url-from-binding)
+            (local-set-key (kbd "<tab>") 'shr-next-link)
+            (local-set-key (kbd "<backtab>") 'shr-previous-link)))
 
-          ;; from https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/elgoumx
-          (add-hook 'mu4e-headers-mode-hook
-                (defun my/mu4e-change-headers ()
-                   (interactive)
-                   (setq mu4e-headers-fields
-                      `((:human-date . 10)
-                       (:from . 22)
-                       (:subject)))))
+            ;; from https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/elgoumx
+            (add-hook 'mu4e-headers-mode-hook
+                  (defun my/mu4e-change-headers ()
+                     (interactive)
+                     (setq mu4e-headers-fields
+                        `((:human-date . 10)
+                         (:from . 22)
+                         (:subject)))))
 
-          ;; if you use date instead of human-date in the above, use this setting
-          ;; give me ISO(ish) format date-time stamps in the header list
-          ;(setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
+            ;; if you use date instead of human-date in the above, use this setting
+            ;; give me ISO(ish) format date-time stamps in the header list
+            ;(setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
 
-          ;; spell check
-          (add-hook 'mu4e-compose-mode-hook
-              (defun my-do-compose-stuff ()
-                 "My settings for message composition."
-                 (visual-line-mode)
-                 (org-mu4e-compose-org-mode)
-                     (use-hard-newlines -1)
-                 (flyspell-mode)))
+            ;; spell check
+            (add-hook 'mu4e-compose-mode-hook
+                (defun my-do-compose-stuff ()
+                   "My settings for message composition."
+                   (visual-line-mode)
+                   (org-mu4e-compose-org-mode)
+                       (use-hard-newlines -1)
+                   (flyspell-mode)))
 
-          (require 'smtpmail)
+            (require 'smtpmail)
 
-          ;;rename files when moving
-          ;;NEEDED FOR MBSYNC
-          (setq mu4e-change-filenames-when-moving t)
+            ;;rename files when moving
+            ;;NEEDED FOR MBSYNC
+            (setq mu4e-change-filenames-when-moving t)
 
-          ;;set up queue for offline email
-          ;;use mu mkdir  ~/Maildir/acc/queue to set up first
-          (setq smtpmail-queue-mail nil)  ;; start in normal mode
+            ;;set up queue for offline email
+            ;;use mu mkdir  ~/Maildir/acc/queue to set up first
+            (setq smtpmail-queue-mail nil)  ;; start in normal mode
 
-          ;;from the info manual
-          (setq mu4e-attachment-dir  "~/Downloads")
+            ;;from the info manual
+            (setq mu4e-attachment-dir  "~/Downloads")
 
-          (setq message-kill-buffer-on-exit t)
-          (setq mu4e-compose-dont-reply-to-self t)
+            (setq message-kill-buffer-on-exit t)
+            (setq mu4e-compose-dont-reply-to-self t)
 
-          (require 'org-mu4e)
+  ;;          (require 'org-mu4e)
 
-          ;; convert org mode to HTML automatically
-          (setq org-mu4e-convert-to-html t)
+            ;; convert org mode to HTML automatically
+            (setq org-mu4e-convert-to-html t)
 
-          ;;from vxlabs config
-          ;; show full addresses in view message (instead of just names)
-          ;; toggle per name with M-RET
-          (setq mu4e-view-show-addresses 't)
+            ;;from vxlabs config
+            ;; show full addresses in view message (instead of just names)
+            ;; toggle per name with M-RET
+            (setq mu4e-view-show-addresses 't)
 
-          ;; don't ask when quitting
-          (setq mu4e-confirm-quit nil)
+            ;; don't ask when quitting
+            (setq mu4e-confirm-quit nil)
 
-          ;; from: https://www.reddit.com/r/emacs/comments/6ul9rz/email_html_rendering_mu4e_with_html2text_how_to/
-          (require 'mu4e-contrib)
+            ;; from: https://www.reddit.com/r/emacs/comments/6ul9rz/email_html_rendering_mu4e_with_html2text_how_to/
+            (require 'mu4e-contrib)
 
-          (setq mu4e-html2text-command 'mu4e-shr2text)
+            (setq mu4e-html2text-command 'mu4e-shr2text)
 
-          (setq shr-color-visible-luminance-min 80)
+            (setq shr-color-visible-luminance-min 80)
 
-          (setq shr-color-visible-distance-min 5)
+            (setq shr-color-visible-distance-min 5)
 
-          ;; mu4e-context
-          (setq mu4e-context-policy 'ask-if-none)
-          (setq mu4e-compose-context-policy 'always-ask)
-          (setq mu4e-contexts
-            (list
-             (make-mu4e-context
-              :name "personal" ;;for bcollison-gmail
-              :enter-func (lambda () (mu4e-message "Entering context personal"))
-              :leave-func (lambda () (mu4e-message "Leaving context personal"))
-              :match-func (lambda (msg)
-                (when msg
-              (mu4e-message-contact-field-matches
-               msg '(:from :to :cc :bcc) "bcollison@gmail.com")))
-              :vars '((user-mail-address . "bcollison@gmail.com")
-                (user-full-name . "Brian Collison")
-                (mu4e-sent-folder . "/bcollison-gmail/[bcollison].sent")
-                (mu4e-drafts-folder . "/bcollison-gmail/[bcollison].drafts")
-                (mu4e-trash-folder . "/bcollison-gmail/[bcollison].trash")
-                (mu4e-refile-folder . "/bcollison-gmail/[bcollison].All Mail")
-                (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
-                (mu4e-compose-format-flowed . t)
-                (smtpmail-queue-dir . "/home/brian/Maildir/bcollison-gmail/queue/cur")
-                (message-send-mail-function . smtpmail-send-it)
-                (smtpmail-smtp-user . "bcollison")
-                (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
-                (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
-                (smtpmail-default-smtp-server . "smtp.gmail.com")
-                (smtpmail-smtp-server . "smtp.gmail.com")
-                (smtpmail-smtp-service . 587)
-                (smtpmail-debug-info . t)
-                (smtpmail-debug-verbose . t)
-                (mu4e-maildir-shortcuts . ( ("/bcollison-gmail/INBOX"            . ?i)
-                    ("/bcollison-gmail/[bcollison].Raken" . ?r)
-                    ("/bcollison-gmail/[bcollison].sent" . ?s)
-                    ("/bcollison-gmail/[bcollison].trash"       . ?t)
-                    ("/bcollison-gmail/[bcollison].All Mail"       . ?l)
-                    ("/bcollison-gmail/[bcollison].actionable"  . ?a)
-                    ("/bcollison-gmail/[bcollison].wait"   . ?w)
-                    ("/bcollison-gmail/[bcollison].reference"   . ?F)
-                    ("/bcollison-gmail/[bcollison].receipts"   . ?R)
-                    ("/bcollison-gmail/[bcollison].inflight"   . ?f)
-                    ("/bcollison-gmail/[bcollison].CalvinSchool"   . ?C)
-                    ("/bcollison-gmail/[bcollison].OliviaSchool"   . ?O)
-                    ("/bcollison-gmail/[bcollison].drafts"    . ?d)
-                    ))))
+            ;; mu4e-context
+            (setq mu4e-context-policy 'ask-if-none)
+            (setq mu4e-compose-context-policy 'always-ask)
+            (setq mu4e-contexts
+              (list
+               (make-mu4e-context
+                :name "personal" ;;for bcollison-gmail
+                :enter-func (lambda () (mu4e-message "Entering context personal"))
+                :leave-func (lambda () (mu4e-message "Leaving context personal"))
+                :match-func (lambda (msg)
+                  (when msg
+                (mu4e-message-contact-field-matches
+                 msg '(:from :to :cc :bcc) "bcollison@gmail.com")))
+                :vars '((user-mail-address . "bcollison@gmail.com")
+                  (user-full-name . "Brian Collison")
+                  (mu4e-sent-folder . "/bcollison-gmail/[bcollison].sent")
+                  (mu4e-drafts-folder . "/bcollison-gmail/[bcollison].drafts")
+                  (mu4e-trash-folder . "/bcollison-gmail/[bcollison].trash")
+                  (mu4e-refile-folder . "/bcollison-gmail/[bcollison].All Mail")
+                  (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
+                  (mu4e-compose-format-flowed . t)
+                  (smtpmail-queue-dir . "/home/brian/Maildir/bcollison-gmail/queue/cur")
+                  (message-send-mail-function . smtpmail-send-it)
+                  (smtpmail-smtp-user . "bcollison")
+                  (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+                  (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+                  (smtpmail-default-smtp-server . "smtp.gmail.com")
+                  (smtpmail-smtp-server . "smtp.gmail.com")
+                  (smtpmail-smtp-service . 587)
+                  (smtpmail-debug-info . t)
+                  (smtpmail-debug-verbose . t)
+                  (mu4e-maildir-shortcuts . ( ("/bcollison-gmail/INBOX"            . ?i)
+                      ("/bcollison-gmail/[bcollison].Raken" . ?r)
+                      ("/bcollison-gmail/[bcollison].sent" . ?s)
+                      ("/bcollison-gmail/[bcollison].trash"       . ?t)
+                      ("/bcollison-gmail/[bcollison].All Mail"       . ?l)
+                      ("/bcollison-gmail/[bcollison].actionable"  . ?a)
+                      ("/bcollison-gmail/[bcollison].wait"   . ?w)
+                      ("/bcollison-gmail/[bcollison].reference"   . ?F)
+                      ("/bcollison-gmail/[bcollison].receipts"   . ?R)
+                      ("/bcollison-gmail/[bcollison].inflight"   . ?f)
+                      ("/bcollison-gmail/[bcollison].CalvinSchool"   . ?C)
+                      ("/bcollison-gmail/[bcollison].OliviaSchool"   . ?O)
+                      ("/bcollison-gmail/[bcollison].drafts"    . ?d)
+                      ))))
 
-             (make-mu4e-context
-              :name "work" ;;for raken-gmail
-              :enter-func (lambda () (mu4e-message "Entering context work"))
-              :leave-func (lambda () (mu4e-message "Leaving context work"))
-              :match-func (lambda (msg)
-                (when msg
-              (mu4e-message-contact-field-matches
-               msg '(:from :to :cc :bcc) "brian.collison@rakenapp.com")))
-              :vars '((user-mail-address . "brian.collison@rakenapp.com")
-                (user-full-name . "Brian Collison")
-                (mu4e-sent-folder . "/raken-gmail/[raken].sent")
-                (mu4e-drafts-folder . "/raken-gmail/[raken].drafts")
-                (mu4e-trash-folder . "/raken-gmail/[raken].trash")
-                (mu4e-refile-folder . "/raken-gmail/[raken].All Mail")
-                (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
+               (make-mu4e-context
+                :name "work" ;;for raken-gmail
+                :enter-func (lambda () (mu4e-message "Entering context work"))
+                :leave-func (lambda () (mu4e-message "Leaving context work"))
+                :match-func (lambda (msg)
+                  (when msg
+                (mu4e-message-contact-field-matches
+                 msg '(:from :to :cc :bcc) "brian.collison@rakenapp.com")))
+                :vars '((user-mail-address . "brian.collison@rakenapp.com")
+                  (user-full-name . "Brian Collison")
+                  (mu4e-sent-folder . "/raken-gmail/[raken].sent")
+                  (mu4e-drafts-folder . "/raken-gmail/[raken].drafts")
+                  (mu4e-trash-folder . "/raken-gmail/[raken].trash")
+                  (mu4e-refile-folder . "/raken-gmail/[raken].All Mail")
+                  (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
 
-                (mu4e-compose-format-flowed . t)
-                (smtpmail-queue-dir . "/home/brian/Maildir/raken-gmail/queue/cur")
-                (message-send-mail-function . smtpmail-send-it)
-                (smtpmail-smtp-user . "brian.collison@rakenapp.com")
-                (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
-                (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
-                (smtpmail-default-smtp-server . "smtp.gmail.com")
-                (smtpmail-smtp-server . "smtp.gmail.com")
-                (smtpmail-smtp-service . 587)
-                (smtpmail-debug-info . t)
-                (smtpmail-debug-verbose . t)
-                (mu4e-maildir-shortcuts . ( ("/raken-gmail/INBOX"            . ?i)
-                    ("/raken-gmail/[raken].Raken" . ?r)
-                    ("/raken-gmail/[raken].sent" . ?s)
-                    ("/raken-gmail/[raken].trash"       . ?t)
-                    ("/raken-gmail/[raken].All Mail"       . ?l)
-                    ("/raken-gmail/[raken].actionable"  . ?a)
-                    ("/raken-gmail/[raken].wait"   . ?w)
-                    ("/raken-gmail/[raken].reference"   . ?F)
-                    ("/raken-gmail/[raken].inflight"   . ?f)
-                    ("/raken-gmail/[raken].drafts"    . ?d)
-                    ))))
-             )
-          )
+                  (mu4e-compose-format-flowed . t)
+                  (smtpmail-queue-dir . "/home/brian/Maildir/raken-gmail/queue/cur")
+                  (message-send-mail-function . smtpmail-send-it)
+                  (smtpmail-smtp-user . "brian.collison@rakenapp.com")
+                  (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+                  (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+                  (smtpmail-default-smtp-server . "smtp.gmail.com")
+                  (smtpmail-smtp-server . "smtp.gmail.com")
+                  (smtpmail-smtp-service . 587)
+                  (smtpmail-debug-info . t)
+                  (smtpmail-debug-verbose . t)
+                  (mu4e-maildir-shortcuts . ( ("/raken-gmail/INBOX"            . ?i)
+                      ("/raken-gmail/[raken].Raken" . ?r)
+                      ("/raken-gmail/[raken].sent" . ?s)
+                      ("/raken-gmail/[raken].trash"       . ?t)
+                      ("/raken-gmail/[raken].All Mail"       . ?l)
+                      ("/raken-gmail/[raken].actionable"  . ?a)
+                      ("/raken-gmail/[raken].wait"   . ?w)
+                      ("/raken-gmail/[raken].reference"   . ?F)
+                      ("/raken-gmail/[raken].inflight"   . ?f)
+                      ("/raken-gmail/[raken].drafts"    . ?d)
+                      ))))
+               )
+            )
 
-      (global-set-key (kbd "C-\"") 'mu4e)
+        (global-set-key (kbd "C-\"") 'mu4e)
 
-  (add-to-list 'mu4e-bookmarks
-  '( :name  "Unread Inbox not Bitbucket"
-     :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket"
-     :key   ?I))
+    (add-to-list 'mu4e-bookmarks
+    '( :name  "Unread Inbox not Bitbucket"
+       :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket"
+       :key   ?I))
+
+    (add-to-list 'mu4e-bookmarks
+  '( :name  "Unread Inbox Bitbucket"
+     :query "maildir:/raken-gmail/INBOX and flag:unread and subject:Bitbucket"
+     :key   ?B))
+
+      (add-to-list 'mu4e-bookmarks
+  '( :name  "Unread Inbox not Bitbucket or Jira"
+     :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket and not subject:JIRA"
+     :key   ?N))
+
+        (add-to-list 'mu4e-bookmarks
+  '( :name  "JIRA Mentions"
+     :query "maildir:/raken-gmail/INBOX and subject:JIRA and subject:mentioned"
+     :key   ?M))
 
 #+END_SRC
 
@@ -1760,21 +1786,28 @@ I'm usually actually in an org document.
   ;;  )
 #+end_src
 
+* Plstore
+#+begin_src emacs-lisp
+   (require 'plstore)
+   (add-to-list 'plstore-encrypt-to "2E57D75DD0574200AEE2DF42F5D5717141896CE3")
+#+end_src
 * Calendar
+
 Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I just want org-agenda to show meetings
 #+begin_src emacs-lisp
-  (use-package org-gcal
-    :ensure t
-    :init
-    (setq org-gcal-dir "~/Documents/org/.org-gcal/")
-    :config
-    (setq org-gcal-remove-api-cancelled-events t)
-    (setq org-gcal-client-id "104759143706-1kj1r66cs5ij3ssfreasf5cqlavbrqjn.apps.googleusercontent.com"
-org-gcal-client-secret (get-authinfo "gcal.api" "9999")
-org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.collison/Documents/org/.org-gcal/raken.org")
-)))
+      (use-package org-gcal
+        :ensure t
+        :init
+        (setq org-gcal-dir "~/Documents/org/.org-gcal/")
+        (setq org-gcal-client-id "104759143706-1kj1r66cs5ij3ssfreasf5cqlavbrqjn.apps.googleusercontent.com"
+  org-gcal-client-secret (get-authinfo "gcal.api" "9999")
+  org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.collison/Documents/org/.org-gcal/raken.org")))
+      (setq org-gcal-remove-api-cancelled-events t))
 
-(add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+;;        :config
+;;        (setq org-gcal-remove-api-cancelled-events t))
+
+    (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
 #+end_src
 * Reading things
 ** Reddit thru Gnus?
@@ -2275,4 +2308,12 @@ This is the package that handles server installation and session management.
 #+begin_src emacs-lisp
 (use-package pomm
   :commands (pomm))
+#+end_src
+* bug-reference-mode
+#+begin_src emacs-lisp
+(use-package bug-reference)
+(setq bug-reference-bug-regexp "\\b\\(\\(ENG\\{1,10\\}-[0-9]+\\)\\)"
+            bug-reference-url-format "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")
+(add-hook 'org-mode-hook 'bug-reference-mode)
+
 #+end_src
