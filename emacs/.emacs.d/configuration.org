@@ -18,12 +18,14 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
      "/usr/local/bin" ":"
      "/Library/TeX/texbin" ":"
      "/Users/brian.collison/.asdf/shims" ":"
+     "/Users/briancollison/.asdf/shims" ":"
      (getenv "PATH")
     )
   )
 
   (setq exec-path (append exec-path '("/usr/local/bin")))
   (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
+  (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
 #+end_src
 
 * Common functions
@@ -184,13 +186,27 @@ the bell altogether.
 I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://fonts.google.com/specimen/Cantarell][Cantarell]] fonts for this configuration which will more than likely need to be installed on your machine.  Both can usually be found in the various Linux distro package managers or downloaded from the links above.
 
 #+begin_src emacs-lisp
-  (set-face-attribute 'default nil :font "Fira Code" :height efs/default-font-size)
+  (defun bmc/set-font-faces ()
+    (message "Setting faces!")
+    (set-face-attribute 'default nil :font "Fira Code" :height efs/default-font-size)
 
-  ;; Set the fixed pitch face
-  (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height efs/default-font-size)
+    ;; Set the fixed pitch face
+    (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height efs/default-font-size)
 
-  ;; Set the variable pitch face
-  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular)
+    ;; Set the variable pitch face
+    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular))
+
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda (frame)
+                  ;; (setq doom-modeline-icon t)
+                  (with-selected-frame frame
+                    (bmc/set-font-faces))))
+      (bmc/set-font-faces)
+ ;;     (efs/org-font-setup)
+      )
+
+
 #+end_src
 
 ** Tweak window chrome
@@ -299,6 +315,20 @@ pairing or presenting code.
   :custom ((doom-modeline-height 15)))
 
 #+end_src
+
+*** doom-modeline updated to nerd-icons
+This package is able to display icons if nerd-icons package and required fonts are installed. Run M-x nerd-icons-install-fonts to install the necessary fonts. Please refer to the installation guide.
+#+begin_src emacs-lisp
+(use-package nerd-icons
+  ;; :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+  )
+#+end_src
+
+
 
 ** Which Key
 
@@ -1154,13 +1184,13 @@ reasonably, a =recurring-events.org= file. Those are (mostly) structured as
 =org-habit= items so they can recur according to a schedule.
 
 #+begin_src emacs-lisp
-    (setq org-agenda-files (list org-index-file
-                                 (org-file-path "events.org")
-                                 (org-file-path "habits.org")
-                                 (org-file-path "recurring-events.org")
-                                   (org-file-path "home.org")
-                                 (org-file-path "work.org")
-                                 (org-file-path ".org-gcal/raken.org")))
+  (setq org-agenda-files (list org-index-file
+                               (org-file-path "events.org")
+                               (org-file-path "habits.org")
+                               (org-file-path "recurring-events.org")
+                               (org-file-path "home.org")
+                               (org-file-path "work.org")
+                               (org-file-path ".org-gcal/v-raken.org")))
 #+end_src
 
 Hitting =C-c C-x C-s= will mark a todo as done and move it to an appropriate
@@ -1604,7 +1634,7 @@ I'm usually actually in an org document.
           (setq message-kill-buffer-on-exit t)
           (setq mu4e-compose-dont-reply-to-self t)
 
-          (require 'org-mu4e)
+;;          (require 'org-mu4e)
 
           ;; convert org mode to HTML automatically
           (setq org-mu4e-convert-to-html t)
@@ -1748,7 +1778,7 @@ Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I 
     (setq org-gcal-remove-api-cancelled-events t)
     (setq org-gcal-client-id "104759143706-1kj1r66cs5ij3ssfreasf5cqlavbrqjn.apps.googleusercontent.com"
 org-gcal-client-secret (get-authinfo "gcal.api" "9999")
-org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.collison/Documents/org/.org-gcal/raken.org")
+org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "~/Documents/org/.org-gcal/v-raken.org")
 )))
 
 (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
@@ -2219,4 +2249,47 @@ This is the package that handles server installation and session management.
 #+begin_src emacs-lisp
 (use-package pomm
   :commands (pomm))
+#+end_src
+** mastodon
+#+begin_src emacs-lisp
+  (use-package mastodon
+   :ensure t
+   )
+  (setq mastodon-instance-url "https://emacs.ch")
+  (setq mastodon-active-user "bcollison")
+#+end_src
+* Matrix Client, ement.el
+#+begin_src emacs-lisp
+  ;; Install and load `quelpa-use-package'.
+  (package-install 'quelpa-use-package)
+  (require 'quelpa-use-package)
+
+  ;; Install Ement.
+  (use-package ement
+    :quelpa (ement :fetcher github :repo "alphapapa/ement.el"))
+
+#+end_src
+* Lisp Environment
+Lets try slime!
+#+begin_src emacs-lisp
+  (use-package slime
+    :init
+    (setq inferior-lisp-program "/usr/local/bin/sbcl"))
+#+end_src
+* SICP
+#+begin_src emacs-lisp
+(add-hook 'Info-mode-hook '(lambda ()
+	     (add-to-list 'Info-directory-list
+			  (expand-file-name "~/.emacs.d/elpa/sicp-20200512.1137/"))))
+#+end_src
+* Exercism
+#+begin_src emacs-lisp
+(use-package exercism)
+#+end_src
+* ChatGPT
+How can I use chatGPT inside of emacs?
+
+To use chatGPT inside of Emacs, you can interact with the model by using the Emacs' built-in shell feature. You can launch a shell session in Emacs by typing =M-x shell=. Then, open a web browser within Emacs by typing =M-x eww= and navigate to OpenAI's playground or API documentation page to access the model. Alternatively, you can also use a package like =request= to make HTTP requests to the OpenAI API from within Emacs.
+#+begin_src emacs-lisp
+(use-package gptel)
 #+end_src
