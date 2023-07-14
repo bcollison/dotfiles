@@ -160,7 +160,7 @@ fi
 #export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
-   . /usr/local/opt/asdf/asdf.sh
+   . /usr/local/opt/asdf/libexec/asdf.sh
 if [ -d /usr/local/Caskroom/google-cloud-sdk/ ]; then
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
@@ -322,3 +322,6 @@ alias dmx="docker-machine ssh"
 alias daliases="grep dalias ~/.zshrc | grep -v '^alias' | sed s/dalias//g"
 
 neofetch
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
