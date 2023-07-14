@@ -129,7 +129,11 @@ fi
 if [ -d ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ]; then
     source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi 
-# source ~/.zshrc.d/work.zsh.private
+
+if [ -f ~/.zshrc.d/work.zsh.private ]; then
+  source ~/.zshrc.d/work.zsh.private
+fi
+
 export SBT_HOME=/usr/local/sbt
 export PATH=$SBT_HOME/bin:$PATH
 
