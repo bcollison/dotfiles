@@ -18,12 +18,14 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
      "/usr/local/bin" ":"
      "/Library/TeX/texbin" ":"
      "/Users/brian.collison/.asdf/shims" ":"
+     "/Users/briancollison/.asdf/shims" ":"
      (getenv "PATH")
     )
   )
 
   (setq exec-path (append exec-path '("/usr/local/bin")))
   (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
+  (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
 #+end_src
 
 * Common functions
@@ -328,6 +330,20 @@ This package is able to display icons if nerd-icons package and required fonts a
 ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
 )
 #+end_src
+
+*** doom-modeline updated to nerd-icons
+This package is able to display icons if nerd-icons package and required fonts are installed. Run M-x nerd-icons-install-fonts to install the necessary fonts. Please refer to the installation guide.
+#+begin_src emacs-lisp
+(use-package nerd-icons
+  ;; :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+  )
+#+end_src
+
+
 
 ** Which Key
 
@@ -799,10 +815,7 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
     :init
     ;; NOTE: Set this to the folder where you keep your Git repos!
     (when (file-directory-p "~/projects")
-      (setq projectile-project-search-path '("~/projects")))
-    (when (file-directory-p "~/sample-projects")
-      (setq projectile-project-search-path '("~/sample-projects")))
-
+      (setq projectile-project-search-path '("~/projects" "~/Personal/projects")))
     (setq projectile-switch-project-action #'projectile-dired))
 
   (use-package counsel-projectile
@@ -870,7 +883,13 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
     )
 
 #+end_src
-
+** Code format
+I'm in the spaces camp.
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
+#+end_src
 * Publishing and task management with Org-mode
 
 ** Better Font Faces
@@ -1185,13 +1204,13 @@ reasonably, a =recurring-events.org= file. Those are (mostly) structured as
 =org-habit= items so they can recur according to a schedule.
 
 #+begin_src emacs-lisp
-    (setq org-agenda-files (list org-index-file
-                                 (org-file-path "events.org")
-                                 (org-file-path "habits.org")
-                                 (org-file-path "recurring-events.org")
-                                   (org-file-path "home.org")
-                                 (org-file-path "work.org")
-                                 (org-file-path ".org-gcal/raken.org")))
+  (setq org-agenda-files (list org-index-file
+                               (org-file-path "events.org")
+                               (org-file-path "habits.org")
+                               (org-file-path "recurring-events.org")
+                               (org-file-path "home.org")
+                               (org-file-path "work.org")
+                               (org-file-path ".org-gcal/v-raken.org")))
 #+end_src
 
 Hitting =C-c C-x C-s= will mark a todo as done and move it to an appropriate
@@ -1542,7 +1561,7 @@ I'm usually actually in an org document.
 
 * Email
 #+BEGIN_SRC emacs-lisp
-            (use-package org-mime)
+     (use-package org-mime)
 
           (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e")
       ;;    (add-to-list 'load-path "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e")
@@ -1795,7 +1814,8 @@ I'm usually actually in an org document.
 
 Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I just want org-agenda to show meetings
 #+begin_src emacs-lisp
-      (use-package org-gcal
+
+(use-package org-gcal
         :ensure t
         :init
         (setq org-gcal-dir "~/Documents/org/.org-gcal/")
@@ -2108,8 +2128,8 @@ Complete anything aka Company provides auto-completion. Company-capf is enabled 
 Yasnippet is a template system for Emacs. It allows you to type abbreviation and complete the associated text.
 
 #+begin_src emacs-lisp
-;;(use-package yasnippet :config (yas-global-mode))
-;;(use-package yasnippet-snippets :ensure t)
+(use-package yasnippet :config (yas-global-mode))
+(use-package yasnippet-snippets :ensure t)
 #+end_src
 
 E.g. In java mode, if you type ~pr~ and hit ~<TAB>~ it should complete to ~System.out.println("text");~
@@ -2309,6 +2329,50 @@ This is the package that handles server installation and session management.
 (use-package pomm
   :commands (pomm))
 #+end_src
+
+** mastodon
+#+begin_src emacs-lisp
+  (use-package mastodon
+   :ensure t
+   )
+  (setq mastodon-instance-url "https://emacs.ch")
+  (setq mastodon-active-user "bcollison")
+#+end_src
+* Matrix Client, ement.el
+#+begin_src emacs-lisp
+  ;; Install and load `quelpa-use-package'.
+  (package-install 'quelpa-use-package)
+  (require 'quelpa-use-package)
+
+  ;; Install Ement.
+  (use-package ement
+    :quelpa (ement :fetcher github :repo "alphapapa/ement.el"))
+
+#+end_src
+* Lisp Environment
+Lets try slime!
+#+begin_src emacs-lisp
+  (use-package slime
+    :init
+    (setq inferior-lisp-program "/usr/local/bin/sbcl"))
+#+end_src
+* SICP
+#+begin_src emacs-lisp
+(add-hook 'Info-mode-hook '(lambda ()
+	     (add-to-list 'Info-directory-list
+			  (expand-file-name "~/.emacs.d/elpa/sicp-20200512.1137/"))))
+#+end_src
+* Exercism
+#+begin_src emacs-lisp
+(use-package exercism)
+#+end_src
+* ChatGPT
+How can I use chatGPT inside of emacs?
+
+To use chatGPT inside of Emacs, you can interact with the model by using the Emacs' built-in shell feature. You can launch a shell session in Emacs by typing =M-x shell=. Then, open a web browser within Emacs by typing =M-x eww= and navigate to OpenAI's playground or API documentation page to access the model. Alternatively, you can also use a package like =request= to make HTTP requests to the OpenAI API from within Emacs.
+#+begin_src emacs-lisp
+(use-package gptel)
+
 * bug-reference-mode
 #+begin_src emacs-lisp
 (use-package bug-reference)
