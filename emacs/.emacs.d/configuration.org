@@ -2372,6 +2372,7 @@ How can I use chatGPT inside of emacs?
 To use chatGPT inside of Emacs, you can interact with the model by using the Emacs' built-in shell feature. You can launch a shell session in Emacs by typing =M-x shell=. Then, open a web browser within Emacs by typing =M-x eww= and navigate to OpenAI's playground or API documentation page to access the model. Alternatively, you can also use a package like =request= to make HTTP requests to the OpenAI API from within Emacs.
 #+begin_src emacs-lisp
 (use-package gptel)
+#+end_src
 
 * bug-reference-mode
 #+begin_src emacs-lisp

@@ -37,8 +37,6 @@
  '(org-plantuml-jar-path "/Users/brian.collison/plantuml.jar")
  '(package-selected-packages
    '(gptel exercism zenburn-theme sicp slime rubik quelpa-use-package mastodon yasnippet-snippets yasnippet ement vterm restclient-jq jq-mode ob-restclient restclient logview groovy-mode es-mode pomm org-tree-slide orderless marginalia vertico gnu-elpa-keyring-update popper flycheck-plantuml plantuml-mode xkcd esup perspective actionscript-mode actionscript lsp-actionscript helm-lsp lsp-java dap-mode flycheck nnreddit docker dired-collapse dired-ranger dired-single dired-rainbow all-the-icons-dired bufler edit-server org-gcal org-jira org-appear org-roam-protocol org-roam-server go-mode slack doom-modeline ivy-rich auto-compile use-package-ensure-system-package))
- '(tab-bar-select-tab-modifiers '(super))
- '(warning-suppress-types '((comp))))
  '(plantuml-default-exec-mode 'jar)
  '(plantuml-executable-args '("-headless" "-DPLANTUML_LIMIT_SIZE=18192"))
  '(plantuml-jar-args '("-charset" "UTF-8" "-DPLANTUML_LIMIT_SIZE=18192"))
