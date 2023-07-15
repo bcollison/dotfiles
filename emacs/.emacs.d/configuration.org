@@ -2033,38 +2033,7 @@ at recreating that
 ;;  :config
 ;;   )
 #+end_src
-** show gcal calendar via gcalcli
-via http://pragmaticemacs.com/emacs/how-i-view-my-google-calendar-agenda-in-emacs/
-#+begin_src emacs-lisp
-;; define function to display ansi colours for a buffer
-;; http://stackoverflow.com/questions/23378271/how-do-i-display-ansi-color-codes-in-emacs-for-any-mode
-(require 'ansi-color)
-(defun display-ansi-colors ()
-  (interactive)
-  (ansi-color-apply-on-region (point-min) (point-max)))
 
-(defun bjm/open-gcal-agenda ()
-  "Open my google calendar agenda file. The agenda is displayed in the buffer *gcal*."
-  (interactive)
-  ;; set name of calendar buffer and location of file containing my agenda
-  (let ((tmp-buff-name "*gcal*") (cal-file (expand-file-name "~/.gcal-files/gcal-agenda")))
-    ;; switch to calendar buffer
-    (switch-to-buffer tmp-buff-name)
-    ;; turn off read only to overwrite if buffer exists
-    (read-only-mode -1)
-    ;; clear buffer
-    (erase-buffer)
-    ;; insert agenda file
-    (insert-file-contents cal-file)
-    ;; turn on colours
-    (display-ansi-colors)
-    ;; turn on special mode
-    (special-mode)
-    ;; turn off line wrapping
-    (visual-line-mode -1)))
-
-  (global-set-key (kbd "M-G") 'bjm/open-gcal-agenda)
-#+end_src
 ** Let's see if this edit with emacs works well
 #+begin_src emacs-lisp
 (use-package edit-server
