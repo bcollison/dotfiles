@@ -2068,7 +2068,7 @@ list of timezones.  Nice for working in a team with remote members.
       ("Etc/UTC" "UTC")
       ))
   (setq display-time-world-time-format "%a, %d %b %I:%M %p %Z")
-  (global-set-key (kbd "C-c t") 'display-time-world)
+  (global-set-key (kbd "C-c t") 'world-clock)
 #+end_src
 ** Some Registers
 #+begin_src emacs-lisp
