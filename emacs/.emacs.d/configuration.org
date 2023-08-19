@@ -951,7 +951,7 @@ This section contains the basic configuration for =org-mode= plus the configurat
     (variable-pitch-mode 1)
     (visual-line-mode 1))
 
-  (setq org-directory "~/Documents/org")
+  (setq org-directory "/Users/brian.collison/Dropbox/Apps/MobileOrg")
 
 ;; does org-jira set this up for us?
   (setq org-link-abbrev-alist
@@ -1510,6 +1510,12 @@ I'm usually actually in an org document.
         :config
         (org-roam-setup)
         (require 'org-roam-dailies)
+        (setq org-roam-dailies-capture-templates
+              '(("d" "default" entry
+                 "* %?"
+                 :target (file+head "%<%Y-%m-%d>.org"
+                                    "#+title: %<%Y-%m-%d>\n* Plan\n* Notes\n* Work Log"))))
+
         ;; If using org-roam-protocol
         (require 'org-roam-protocol))
 #+end_src
@@ -1818,7 +1824,7 @@ Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I 
 (use-package org-gcal
         :ensure t
         :init
-        (setq org-gcal-dir "~/Documents/org/.org-gcal/")
+        (setq org-gcal-dir "/Users/brian.collison/Dropbox/Apps/MobileOrg/.org-gcal/")
         (setq org-gcal-client-id "104759143706-1kj1r66cs5ij3ssfreasf5cqlavbrqjn.apps.googleusercontent.com"
   org-gcal-client-secret (get-authinfo "gcal.api" "9999")
   org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.collison/Documents/org/.org-gcal/raken.org")))
@@ -2090,15 +2096,16 @@ list of timezones.  Nice for working in a team with remote members.
 ** Company
 Complete anything aka Company provides auto-completion. Company-capf is enabled by default when you start LSP on a project. You can also invoke ~M-x company-capf~ to enable capf (completion at point function).
 #+begin_src emacs-lisp
-;;(use-package company :ensure t)
+(use-package company :ensure t)
 #+end_src
+I worry that company mode might make typing a bit slower than I'd like.
 
 ** Yasnippet
 Yasnippet is a template system for Emacs. It allows you to type abbreviation and complete the associated text.
 
 #+begin_src emacs-lisp
-(use-package yasnippet :config (yas-global-mode))
-(use-package yasnippet-snippets :ensure t)
+;;(use-package yasnippet :config (yas-global-mode))
+;;(use-package yasnippet-snippets :ensure t)
 #+end_src
 
 E.g. In java mode, if you type ~pr~ and hit ~<TAB>~ it should complete to ~System.out.println("text");~
@@ -2350,4 +2357,21 @@ To use chatGPT inside of Emacs, you can interact with the model by using the Ema
             bug-reference-url-format "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")
 (add-hook 'org-mode-hook 'bug-reference-mode)
 
+#+end_src
+
+* sql workflows
+#+begin_src emacs-lisp
+  (require 'ejc-sql)
+
+  (load-library "~/.emacs.d/ejc-connections.el.gpg")
+  (require 'ejc-company)
+  (push 'ejc-company-backend company-backends)
+  (setq ejc-complete-on-dot t)
+
+  (add-hook 'ejc-sql-minor-mode-hook
+          (lambda ()
+            (company-mode t)))
+  (add-hook 'ejc-sql-connected-hook
+          (lambda ()
+            (ejc-set-column-width-limit nil)))
 #+end_src
