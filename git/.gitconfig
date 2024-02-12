@@ -33,6 +33,9 @@
 	arc = !arc
 	new = !sh -c 'git log $1@{1}..$1@{0} "$@"'
 	rl = reflog
+        aliases = "!git config --get-regexp ^alias | sed -e 's/^alias\\.\\([^ ]*\\)/\\x1B[33m\\1\\x1B[0m =/'"
+	gpf = git push --force-with-lease
+
 [pretty]
         myline = %C(auto)%h %s %C(green)(%cr)%C(auto) %C(blue)<%an>%C(auto)%d
         myfull = format:%C(auto)%h %C(bold)%s%C(auto) %d%nAuthor: %C(blue)%an <%ae>%C(auto)%nAuthor Date: %C(green)%ad (%ar)%C(auto)%nCommitter: %C(blue)%cn <%ce>%C(auto)%nCommitter Date: %C(green)%cd (%cr)%C(auto)%n%w(76,4,4)%+b
@@ -54,3 +57,7 @@
 	autoUpdate = true
 [include]
 	path = ~/.gitconfig-work.private
+[branch]
+	sort = -committerdate
+[column]
+	ui = auto
