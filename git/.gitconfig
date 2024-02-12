@@ -1,8 +1,11 @@
 [user]
         email = brian.collison@rakenapp.com
         name = Brian Collison
+[includeIf "gitdir:~/Personal/"]
+	path = ~/.gitconfig-personal
 [push]
         default = simple
+	autoSetupRemote = true
 [alias]
         st = status -sb
         fe = fetch
@@ -44,3 +47,10 @@
 	required = true
 [core]
 	excludesfile = /Users/brian.collison/.gitignore_global
+[init]
+	defaultBranch = main
+[rerere]
+	enabled = true
+	autoUpdate = true
+[include]
+	path = ~/.gitconfig-work.private
