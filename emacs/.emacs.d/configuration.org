@@ -2358,3 +2358,54 @@ To use chatGPT inside of Emacs, you can interact with the model by using the Ema
           (lambda ()
             (ejc-set-column-width-limit nil)))
 #+end_src
+
+* search integration
+#+begin_src emacs-lisp
+(use-package google-this
+   :config
+   (google-this-mode 1))
+#+end_src
+
+* time blocking finally here?
+#+begin_src emacs-lisp
+  (use-package org-ql)
+  (use-package org-timeblock)
+  (define-key global-map (kbd "C-c b") 'org-timeblock-list)
+#+end_src
+
+* Move me to the right place
+#+begin_src emacs-lisp
+  (setq bmc/lombok-library-path (concat "~/tools/" "lombok.jar"))
+
+  (unless (file-exists-p bmc/lombok-library-path)
+    (url-copy-file "https://projectlombok.org/downloads/lombok.jar" bmc/lombok-library-path))
+
+  (setq lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx4G" "-Xms100m"))
+
+  (push (concat "-javaagent:"
+                  (expand-file-name bmc/lombok-library-path))
+          lsp-java-vmargs)
+#+end_src
+
+* Frame/Window Configurations
+Trying to find the right tool to easily switch from major contexts like: Emailing, Scheduling, "Working"
+
+** Trying activities.el
+#+begin_src emacs-lisp
+(use-package activities
+  :init
+  (activities-mode)
+  (activities-tabs-mode)
+
+:bind
+(("C-x C-a n" . activities-new)
+("C-x C-a g" . activities-revert)
+("C-x C-a s" . activities-suspend)
+("C-x C-a C-k" . activities-kill)    ; Alias for `-suspend'
+("C-x C-a a" . activities-resume)
+;; For convenience, we also bind `activities-resume' to "C-x C-a
+;; C-a", so the user need not lift the Control key.
+("C-x C-a C-a" . activities-resume)
+("C-x C-a RET" . activities-switch)
+("C-x C-a l" . activities-list)))
+#+end_src
