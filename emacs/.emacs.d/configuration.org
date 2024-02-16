@@ -16,6 +16,7 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
   (setenv "PATH"
     (concat
      "/usr/local/bin" ":"
+     "/opt/homebrew/bin" ":"
      "/Library/TeX/texbin" ":"
      "/Users/brian.collison/.asdf/shims" ":"
      "/Users/briancollison/.asdf/shims" ":"
@@ -24,6 +25,7 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
   )
 
   (setq exec-path (append exec-path '("/usr/local/bin")))
+  (setq exec-path (append exec-path '("/opt/homebrew/bin")))
   (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
   (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
 #+end_src
