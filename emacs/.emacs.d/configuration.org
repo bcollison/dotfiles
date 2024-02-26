@@ -135,6 +135,25 @@ The following variables are used to tweak some of the configuration pieces for u
         calendar-location-name "Carlsbad, CA")
 #+END_SRC
 
+** Access my netrc data
+
+I store a few credentials in a =.netrc= file. This is a convenient way
+to store not-too-terribly-sensitive secrets.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'netrc)
+
+  (setq netrc-file "~/.netrc")
+
+  (defun netrc-username (machine)
+    "Helper function to extract a username from my netrc."
+    (car (netrc-credentials machine)))
+
+  (defun netrc-password (machine)
+    "Helper function to extract a password from my netrc."
+    (cadr (netrc-credentials machine)))
+#+END_SRC
+
 * Use =sensible-defaults.el=
 
 Use [[https://github.com/hrs/sensible-defaults.el][sensible-defaults.el]] for some basic settings.
