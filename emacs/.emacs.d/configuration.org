@@ -2354,22 +2354,32 @@ To use chatGPT inside of Emacs, you can interact with the model by using the Ema
 
 * bug-reference-mode
 #+begin_src emacs-lisp
-(use-package bug-reference)
-(setq bug-reference-bug-regexp "\\b\\(\\(ENG\\{1,10\\}-[0-9]+\\)\\)"
-            bug-reference-url-format "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")
-(add-hook 'org-mode-hook 'bug-reference-mode)
+  (use-package bug-reference)
+  (setq bug-reference-bug-regexp "\\b\\(\\(ENG\\{1,10\\}-[0-9]+\\)\\)"
+              bug-reference-url-format "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")
+  (add-hook 'org-mode-hook 'bug-reference-mode)
+  (add-hook 'org-timeblock-list-mode-hook 'bug-reference-mode)
 
 #+end_src
 
-* sql workflows
+* sql workflow
+
+** sql-mysql
+#+begin_src emacs-lisp
+(setq exec-path (append exec-path '("/opt/homebrew/opt/mysql-client/bin")))
+(load-library "~/.emacs.d/mysql-connections.el.gpg")
+#+end_src
+
+** ejc
 #+begin_src emacs-lisp
   (require 'ejc-sql)
+  (setq clomacs-httpd-default-port 8380) ; Use a port other than 8080.
 
   (load-library "~/.emacs.d/ejc-connections.el.gpg")
   (require 'ejc-company)
   (push 'ejc-company-backend company-backends)
   (setq ejc-complete-on-dot t)
-
+  (add-hook 'sql-mode-hook (lambda() (electric-indent-mode -1)))
   (add-hook 'ejc-sql-minor-mode-hook
           (lambda ()
             (company-mode t)))
