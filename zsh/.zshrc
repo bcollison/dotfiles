@@ -7,6 +7,11 @@ export ZSH="$HOME/.oh-my-zsh"
 #   export ZSH="/Users/briancollison/.oh-my-zsh"
 #fi
 
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+ autoload -Uz compinit
+  compinit
+fi
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -78,9 +83,9 @@ ZSH_THEME="mira"
 #plugins=(z git git-prompt jenv mvn zsh-autosuggestions)
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
-  plugins=(z git jenv mvn zsh-autosuggestions)
+  plugins=(z git jenv mvn zsh-autosuggestions alias-finder gradle-completion)
 else
-  plugins=(zsh-z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions)
+  plugins=(zsh-z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions alias-finder gradle-completion)
 fi
 
 source $ZSH/oh-my-zsh.sh
@@ -154,7 +159,7 @@ local jenv_java='%{$fg[blue]%}‹java:$(jenv_prompt_info)›%{$reset_color%}'
 # provided:
 #  PROMPT="╭─${user_host} ${current_dir} ${nvm_node} ${rvm_ruby} ${jenv_java} ${git_branch}
 #  ╰─%B$%b "
-export PROMPT="╭─${user_host} ${current_dir} ${rvm_ruby} ${jenv_java} 
+export PROMPT="╭─${user_host} ${current_dir} ${jenv_java} ${git_branch}
 ╰─ %D{%H:%M} %B$%b "
 
 if [ "$(uname 2> /dev/null)" = "Linux" ]; then
@@ -164,7 +169,7 @@ fi
 #export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
-   . /usr/local/opt/asdf/libexec/asdf.sh
+   . /opt/homebrew/opt/asdf/libexec/asdf.sh 
 if [ -d /usr/local/Caskroom/google-cloud-sdk/ ]; then
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
@@ -331,7 +336,20 @@ alias dm="docker-machine"
 alias dmx="docker-machine ssh"
 alias daliases="grep dalias ~/.zshrc | grep -v '^alias' | sed s/dalias//g"
 
-neofetch
+fastfetch
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+ autoload -Uz compinit
+  compinit
+fi
+
+# Get color support for 'less'
+export LESS="--RAW-CONTROL-CHARS"
+
+# Use colors for less, man, etc.
+[[ -f ~/.LESS_TERMCAP ]] && . ~/.LESS_TERMCAP
+export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
+export PATH="/opt/homebrew/opt/curl/bin:$PATH"
