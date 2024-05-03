@@ -95,6 +95,13 @@ Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-gymnastics
+Master :bcollison-gmail-remote:"Gymnastics"
+Slave :bcollison-gmail-local:"[bcollison].Gymnastics"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-olivia-school
 Master :bcollison-gmail-remote:"Olivia School"
 Slave :bcollison-gmail-local:"[bcollison].OliviaSchool"
