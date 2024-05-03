@@ -35,6 +35,8 @@
 	rl = reflog
         aliases = "!git config --get-regexp ^alias | sed -e 's/^alias\\.\\([^ ]*\\)/\\x1B[33m\\1\\x1B[0m =/'"
 	gpf = git push --force-with-lease
+        sp = git switch -
+        o = open
 
 [pretty]
         myline = %C(auto)%h %s %C(green)(%cr)%C(auto) %C(blue)<%an>%C(auto)%d
