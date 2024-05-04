@@ -877,13 +877,7 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
 
 ** Jenkins
 #+begin_src emacs-lisp
-    (use-package jenkins
-      :config
-      (setq jenkins-api-token (get-authinfo "jenkins-ng-internal.rakenapp.com" "443"))
-      (setq jenkins-url "https://jenkins-ng-internal.rakenapp.com/")
-      (setq jenkins-username "brian.collison")
-    )
-
+  (load-library "~/.emacs.d/jenkins-config.el.private")
 #+end_src
 ** Code format
 I'm in the spaces camp.
