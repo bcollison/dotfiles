@@ -28,6 +28,7 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
   (setq exec-path (append exec-path '("/opt/homebrew/bin")))
   (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
   (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
+  (setq exec-path (append exec-path '("/opt/homebrew/opt/python@3.12/libexec/bin")))
 #+end_src
 
 * Common functions
@@ -1362,6 +1363,7 @@ Allow export to markdown and beamer (for presentations).
 #+begin_src emacs-lisp
   (require 'ox-md)
   (require 'ox-beamer)
+  (use-package ox-slack)
 #+end_src
 
 Allow =babel= to evaluate Emacs lisp, java, Ruby, =ditaa=, Graphviz, or Gnuplot code.
@@ -2362,13 +2364,44 @@ Lets try slime!
 #+begin_src emacs-lisp
 (use-package exercism)
 #+end_src
-* ChatGPT
+* LLM
 How can I use chatGPT inside of emacs?
 
 To use chatGPT inside of Emacs, you can interact with the model by using the Emacs' built-in shell feature. You can launch a shell session in Emacs by typing =M-x shell=. Then, open a web browser within Emacs by typing =M-x eww= and navigate to OpenAI's playground or API documentation page to access the model. Alternatively, you can also use a package like =request= to make HTTP requests to the OpenAI API from within Emacs.
 #+begin_src emacs-lisp
 (use-package gptel)
 #+end_src
+** Configuring ollama
+taken from https://github.com/gregoryg/emacs-gregoryg?tab=readme-ov-file#functions-to-use-in-hooks
+discovered through this video: https://www.youtube.com/watch?v=yAL0cw1ePqw
+#+begin_src emacs-lisp
+(setq gjg/ollama-api-endpoint "http://localhost:11434")
+(defun gjg/get-ollama-models ()
+  "Return a list of Ollama models from the API, or nil if the API is not available."
+  (when-let*
+      ((url (url-generic-parse-url gjg/ollama-api-endpoint))
+       (host (url-host url))
+       (port (url-port url))
+       (maybe-ollama-models (s-split "\n"
+                                     (shell-command-to-string (concat "curl -s --connect-timeout 0.5 '"
+                                                                      gjg/ollama-api-endpoint "/api/tags' | jq -r '.models[].name'"))))
+       (my-ollama-models (seq-filter (lambda (s) (not (string= s "")))
+                                     maybe-ollama-models)))
+    (gptel-make-ollama
+     "Ollama"
+     :host (concat host ":" (number-to-string port))
+     :models my-ollama-models
+     :stream t)
+    my-ollama-models))
+
+;; set globally, as ollama-models is relevant to more than gptel
+(setq ollama-models (gjg/get-ollama-models))
+
+(unless ollama-models
+  (setq gptel--known-backends
+        (assoc-delete-all "Ollama" gptel--known-backends #'equal)))
+#+end_src
+
 
 * bug-reference-mode
 #+begin_src emacs-lisp
@@ -2455,4 +2488,10 @@ Trying to find the right tool to easily switch from major contexts like: Emailin
 ("C-x C-a C-a" . activities-resume)
 ("C-x C-a RET" . activities-switch)
 ("C-x C-a l" . activities-list)))
+#+end_src
+
+* zap char
+I prefer the zap-up-to-char (like vim's 'dt')
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-z") 'zap-up-to-char)
 #+end_src

@@ -45,7 +45,7 @@
    "/Users/brian.collison/Dropbox/Apps/MobileOrg/raken-inbox.org")
  '(org-timeblock-scale-options '(8 . 22))
  '(package-selected-packages
-   '(code-review activities org-timeblock google-this gptel exercism zenburn-theme sicp slime rubik quelpa-use-package mastodon yasnippet-snippets yasnippet ement vterm restclient-jq jq-mode ob-restclient restclient logview groovy-mode es-mode pomm org-tree-slide orderless marginalia vertico gnu-elpa-keyring-update popper flycheck-plantuml plantuml-mode xkcd esup perspective actionscript-mode actionscript lsp-actionscript helm-lsp lsp-java dap-mode flycheck nnreddit docker dired-collapse dired-ranger dired-single dired-rainbow all-the-icons-dired bufler edit-server org-gcal org-jira org-appear org-roam-protocol org-roam-server go-mode slack doom-modeline ivy-rich auto-compile use-package-ensure-system-package))
+   '(ox-slack code-review activities org-timeblock google-this gptel exercism zenburn-theme sicp slime rubik quelpa-use-package mastodon yasnippet-snippets yasnippet ement vterm restclient-jq jq-mode ob-restclient restclient logview groovy-mode es-mode pomm org-tree-slide orderless marginalia vertico gnu-elpa-keyring-update popper flycheck-plantuml plantuml-mode xkcd esup perspective actionscript-mode actionscript lsp-actionscript helm-lsp lsp-java dap-mode flycheck nnreddit docker dired-collapse dired-ranger dired-single dired-rainbow all-the-icons-dired bufler edit-server org-gcal org-jira org-appear org-roam-protocol org-roam-server go-mode slack doom-modeline ivy-rich auto-compile use-package-ensure-system-package))
  '(plantuml-default-exec-mode 'jar)
  '(plantuml-executable-args '("-headless" "-DPLANTUML_LIMIT_SIZE=18192"))
  '(plantuml-jar-args '("-charset" "UTF-8" "-DPLANTUML_LIMIT_SIZE=18192"))
