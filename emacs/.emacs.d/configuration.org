@@ -16,6 +16,7 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
   (setenv "PATH"
     (concat
      "/usr/local/bin" ":"
+     "/opt/homebrew/bin" ":"
      "/Library/TeX/texbin" ":"
      "/Users/brian.collison/.asdf/shims" ":"
      "/Users/briancollison/.asdf/shims" ":"
@@ -24,8 +25,10 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
   )
 
   (setq exec-path (append exec-path '("/usr/local/bin")))
+  (setq exec-path (append exec-path '("/opt/homebrew/bin")))
   (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
   (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
+  (setq exec-path (append exec-path '("/opt/homebrew/opt/python@3.12/libexec/bin")))
 #+end_src
 
 * Common functions
@@ -867,21 +870,16 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
 
 ** Jira
 #+begin_src emacs-lisp
-  (use-package org-jira
-    :config
-(setq jiralib-url "https://rakenapp.atlassian.net/")
-  )
+    (use-package org-jira
+      :config
+  (setq jiralib-url "https://rakenapp.atlassian.net/")
+    )
+  (define-key global-map (kbd "C-c j") 'org-jira-get-issues)
 #+end_src
 
 ** Jenkins
 #+begin_src emacs-lisp
-    (use-package jenkins
-      :config
-      (setq jenkins-api-token (get-authinfo "jenkins-ng-internal.rakenapp.com" "443"))
-      (setq jenkins-url "https://jenkins-ng-internal.rakenapp.com/")
-      (setq jenkins-username "brian.collison")
-    )
-
+  (load-library "~/.emacs.d/jenkins-config.el.private")
 #+end_src
 ** Code format
 I'm in the spaces camp.
@@ -951,7 +949,7 @@ This section contains the basic configuration for =org-mode= plus the configurat
     (variable-pitch-mode 1)
     (visual-line-mode 1))
 
-  (setq org-directory "~/Documents/org")
+  (setq org-directory "/Users/brian.collison/Dropbox/Apps/MobileOrg")
 
 ;; does org-jira set this up for us?
   (setq org-link-abbrev-alist
@@ -1365,6 +1363,7 @@ Allow export to markdown and beamer (for presentations).
 #+begin_src emacs-lisp
   (require 'ox-md)
   (require 'ox-beamer)
+  (use-package ox-slack)
 #+end_src
 
 Allow =babel= to evaluate Emacs lisp, java, Ruby, =ditaa=, Graphviz, or Gnuplot code.
@@ -1510,6 +1509,12 @@ I'm usually actually in an org document.
         :config
         (org-roam-setup)
         (require 'org-roam-dailies)
+        (setq org-roam-dailies-capture-templates
+              '(("d" "default" entry
+                 "* %?"
+                 :target (file+head "%<%Y-%m-%d>.org"
+                                    "#+title: %<%Y-%m-%d>\n* Plan\n* Notes\n* Work Log"))))
+
         ;; If using org-roam-protocol
         (require 'org-roam-protocol))
 #+end_src
@@ -1561,227 +1566,234 @@ I'm usually actually in an org document.
 
 * Email
 #+BEGIN_SRC emacs-lisp
-     (use-package org-mime)
+           (use-package org-mime)
 
-          (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e")
-      ;;    (add-to-list 'load-path "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e")
-          (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
-          (use-package mu4e
-            :load-path ("/home/brian/Personal/projects/third-party/mu/mu4e"
-                        "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e"
-      ;;                  "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e"
-                        "/usr/local/share/emacs/site-lisp/mu4e/"))
+                (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e")
+            ;;    (add-to-list 'load-path "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e")
+                (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
+                (use-package mu4e
+                  :load-path ("/home/brian/Personal/projects/third-party/mu/mu4e"
+                              "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e"
+            ;;                  "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e"
+                              "/usr/local/share/emacs/site-lisp/mu4e/"))
 
-          (cond ((eq system-type 'gnu/linux)
-               (setq mu4e-mu-binary "/usr/bin/mu"))
-             ((eq system-type 'darwin)
-               (setq mu4e-mu-binary "/usr/local/bin/mu")))
-        ;  "mu4e no longer uses the mu4e-maildir and mu4e-user-mail-address-list variables; instead it uses the information it gets from mu (see the mu section above). If you have a non-default mu4e-mu-home, make sure to set it before mu4e starts."
-        ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
+                (cond ((eq system-type 'gnu/linux)
+                     (setq mu4e-mu-binary "/usr/bin/mu"))
+                   ((eq system-type 'darwin)
+      ;;               (setq mu4e-mu-binary "/usr/local/bin/mu")))
+                     (setq mu4e-mu-binary "/opt/homebrew/bin/mu")))
+              ;  "mu4e no longer uses the mu4e-maildir and mu4e-user-mail-address-list variables; instead it uses the information it gets from mu (see the mu section above). If you have a non-default mu4e-mu-home, make sure to set it before mu4e starts."
+              ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
 
-            ; get mail
-    ;; going to try to do this at the os scheduled level
-    ;;        (setq mu4e-get-mail-command "/usr/local/bin/mbsync -c ~/.mbsyncrc -a"
-    ;;          ;; mu4e-html2text-command "w3m -T text/html" ;;using the default mu4e-shr2text
-    ;;          mu4e-update-interval 600
-    ;;          mu4e-headers-auto-update t
-    ;;          mu4e-compose-signature-auto-include nil
-    ;;          mu4e-compose-format-flowed t)
+                  ; get mail
+          ;; going to try to do this at the os scheduled level
+          ;;        (setq mu4e-get-mail-command "/usr/local/bin/mbsync -c ~/.mbsyncrc -a"
+          ;;          ;; mu4e-html2text-command "w3m -T text/html" ;;using the default mu4e-shr2text
+          ;;          mu4e-update-interval 600
+          ;;          mu4e-headers-auto-update t
+          ;;          mu4e-compose-signature-auto-include nil
+          ;;          mu4e-compose-format-flowed t)
 
-            ;; to view selected message in the browser, no signin, just html mail
-            (add-to-list 'mu4e-view-actions
-              '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+                  ;; to view selected message in the browser, no signin, just html mail
+                  (add-to-list 'mu4e-view-actions
+                    '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
-            ;; enable inline images
-            (setq mu4e-view-show-images t)
-            ;; use imagemagick, if available
-            (when (fboundp 'imagemagick-register-types)
-              (imagemagick-register-types))
+                  ;; enable inline images
+                  (setq mu4e-view-show-images t)
+                  ;; use imagemagick, if available
+                  (when (fboundp 'imagemagick-register-types)
+                    (imagemagick-register-types))
 
-            ;; every new email composition gets its own frame!
-            (setq mu4e-compose-in-new-frame t)
+                  ;; every new email composition gets its own frame!
+                  (setq mu4e-compose-in-new-frame t)
 
-            ;; don't save message to Sent Messages, IMAP takes care of this
-            (setq mu4e-sent-messages-behavior 'delete)
+                  ;; don't save message to Sent Messages, IMAP takes care of this
+                  (setq mu4e-sent-messages-behavior 'delete)
 
-            (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
+                  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
 
-            ;; <tab> to navigate to links, <RET> to open them in browser
-            (add-hook 'mu4e-view-mode-hook
-              (lambda()
-            ;; try to emulate some of the eww key-bindings
-            (local-set-key (kbd "<RET>") 'mu4e~view-browse-url-from-binding)
-            (local-set-key (kbd "<tab>") 'shr-next-link)
-            (local-set-key (kbd "<backtab>") 'shr-previous-link)))
+                  ;; <tab> to navigate to links, <RET> to open them in browser
+                  (add-hook 'mu4e-view-mode-hook
+                    (lambda()
+                  ;; try to emulate some of the eww key-bindings
+                  (local-set-key (kbd "<RET>") 'mu4e~view-browse-url-from-binding)
+                  (local-set-key (kbd "<tab>") 'shr-next-link)
+                  (local-set-key (kbd "<backtab>") 'shr-previous-link)))
 
-            ;; from https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/elgoumx
-            (add-hook 'mu4e-headers-mode-hook
-                  (defun my/mu4e-change-headers ()
-                     (interactive)
-                     (setq mu4e-headers-fields
-                        `((:human-date . 10)
-                         (:from . 22)
-                         (:subject)))))
+                  ;; from https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/elgoumx
+                  (add-hook 'mu4e-headers-mode-hook
+                        (defun my/mu4e-change-headers ()
+                           (interactive)
+                           (setq mu4e-headers-fields
+                              `((:human-date . 10)
+                               (:from . 22)
+                               (:subject)))))
 
-            ;; if you use date instead of human-date in the above, use this setting
-            ;; give me ISO(ish) format date-time stamps in the header list
-            ;(setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
+                  ;; if you use date instead of human-date in the above, use this setting
+                  ;; give me ISO(ish) format date-time stamps in the header list
+                  ;(setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
 
-            ;; spell check
-            (add-hook 'mu4e-compose-mode-hook
-                (defun my-do-compose-stuff ()
-                   "My settings for message composition."
-                   (visual-line-mode)
-                   (org-mu4e-compose-org-mode)
-                       (use-hard-newlines -1)
-                   (flyspell-mode)))
+                  ;; spell check
+                  (add-hook 'mu4e-compose-mode-hook
+                      (defun my-do-compose-stuff ()
+                         "My settings for message composition."
+                         (visual-line-mode)
+                         (flyspell-mode)))
 
-            (require 'smtpmail)
+                  (require 'smtpmail)
 
-            ;;rename files when moving
-            ;;NEEDED FOR MBSYNC
-            (setq mu4e-change-filenames-when-moving t)
+                  ;;rename files when moving
+                  ;;NEEDED FOR MBSYNC
+                  (setq mu4e-change-filenames-when-moving t)
 
-            ;;set up queue for offline email
-            ;;use mu mkdir  ~/Maildir/acc/queue to set up first
-            (setq smtpmail-queue-mail nil)  ;; start in normal mode
+                  ;;set up queue for offline email
+                  ;;use mu mkdir  ~/Maildir/acc/queue to set up first
+                  (setq smtpmail-queue-mail nil)  ;; start in normal mode
 
-            ;;from the info manual
-            (setq mu4e-attachment-dir  "~/Downloads")
+                  ;;from the info manual
+                  (setq mu4e-attachment-dir  "~/Downloads")
 
-            (setq message-kill-buffer-on-exit t)
-            (setq mu4e-compose-dont-reply-to-self t)
+                  (setq message-kill-buffer-on-exit t)
+                  (setq mu4e-compose-dont-reply-to-self t)
 
-  ;;          (require 'org-mu4e)
+        ;;          (require 'org-mu4e)
 
-            ;; convert org mode to HTML automatically
-            (setq org-mu4e-convert-to-html t)
+                  ;; convert org mode to HTML automatically
+                  (setq org-mu4e-convert-to-html t)
 
-            ;;from vxlabs config
-            ;; show full addresses in view message (instead of just names)
-            ;; toggle per name with M-RET
-            (setq mu4e-view-show-addresses 't)
+                  ;;from vxlabs config
+                  ;; show full addresses in view message (instead of just names)
+                  ;; toggle per name with M-RET
+                  (setq mu4e-view-show-addresses 't)
 
-            ;; don't ask when quitting
-            (setq mu4e-confirm-quit nil)
+                  ;; don't ask when quitting
+                  (setq mu4e-confirm-quit nil)
 
-            ;; from: https://www.reddit.com/r/emacs/comments/6ul9rz/email_html_rendering_mu4e_with_html2text_how_to/
-            (require 'mu4e-contrib)
+                  ;; from: https://www.reddit.com/r/emacs/comments/6ul9rz/email_html_rendering_mu4e_with_html2text_how_to/
+                  (require 'mu4e-contrib)
 
-            (setq mu4e-html2text-command 'mu4e-shr2text)
+                  (setq mu4e-html2text-command 'mu4e-shr2text)
 
-            (setq shr-color-visible-luminance-min 80)
+                  (setq shr-color-visible-luminance-min 80)
 
-            (setq shr-color-visible-distance-min 5)
+                  (setq shr-color-visible-distance-min 5)
 
-            ;; mu4e-context
-            (setq mu4e-context-policy 'ask-if-none)
-            (setq mu4e-compose-context-policy 'always-ask)
-            (setq mu4e-contexts
-              (list
-               (make-mu4e-context
-                :name "personal" ;;for bcollison-gmail
-                :enter-func (lambda () (mu4e-message "Entering context personal"))
-                :leave-func (lambda () (mu4e-message "Leaving context personal"))
-                :match-func (lambda (msg)
-                  (when msg
-                (mu4e-message-contact-field-matches
-                 msg '(:from :to :cc :bcc) "bcollison@gmail.com")))
-                :vars '((user-mail-address . "bcollison@gmail.com")
-                  (user-full-name . "Brian Collison")
-                  (mu4e-sent-folder . "/bcollison-gmail/[bcollison].sent")
-                  (mu4e-drafts-folder . "/bcollison-gmail/[bcollison].drafts")
-                  (mu4e-trash-folder . "/bcollison-gmail/[bcollison].trash")
-                  (mu4e-refile-folder . "/bcollison-gmail/[bcollison].All Mail")
-                  (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
-                  (mu4e-compose-format-flowed . t)
-                  (smtpmail-queue-dir . "/home/brian/Maildir/bcollison-gmail/queue/cur")
-                  (message-send-mail-function . smtpmail-send-it)
-                  (smtpmail-smtp-user . "bcollison")
-                  (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
-                  (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
-                  (smtpmail-default-smtp-server . "smtp.gmail.com")
-                  (smtpmail-smtp-server . "smtp.gmail.com")
-                  (smtpmail-smtp-service . 587)
-                  (smtpmail-debug-info . t)
-                  (smtpmail-debug-verbose . t)
-                  (mu4e-maildir-shortcuts . ( ("/bcollison-gmail/INBOX"            . ?i)
-                      ("/bcollison-gmail/[bcollison].Raken" . ?r)
-                      ("/bcollison-gmail/[bcollison].sent" . ?s)
-                      ("/bcollison-gmail/[bcollison].trash"       . ?t)
-                      ("/bcollison-gmail/[bcollison].All Mail"       . ?l)
-                      ("/bcollison-gmail/[bcollison].actionable"  . ?a)
-                      ("/bcollison-gmail/[bcollison].wait"   . ?w)
-                      ("/bcollison-gmail/[bcollison].reference"   . ?F)
-                      ("/bcollison-gmail/[bcollison].receipts"   . ?R)
-                      ("/bcollison-gmail/[bcollison].inflight"   . ?f)
-                      ("/bcollison-gmail/[bcollison].CalvinSchool"   . ?C)
-                      ("/bcollison-gmail/[bcollison].OliviaSchool"   . ?O)
-                      ("/bcollison-gmail/[bcollison].drafts"    . ?d)
-                      ))))
+                  ;; mu4e-context
+                  (setq mu4e-context-policy 'ask-if-none)
+                  (setq mu4e-compose-context-policy 'always-ask)
+                  (setq mu4e-contexts
+                    (list
+                     (make-mu4e-context
+                      :name "personal" ;;for bcollison-gmail
+                      :enter-func (lambda () (mu4e-message "Entering context personal"))
+                      :leave-func (lambda () (mu4e-message "Leaving context personal"))
+                      :match-func (lambda (msg)
+                        (when msg
+                      (mu4e-message-contact-field-matches
+                       msg '(:from :to :cc :bcc) "brian@briancollison.com")))
+                      :vars '((user-mail-address . "brian@briancollison.com")
+                        (user-full-name . "Brian Collison")
+                        (mu4e-sent-folder . "/bcollison-gmail/[bcollison].sent")
+                        (mu4e-drafts-folder . "/bcollison-gmail/[bcollison].drafts")
+                        (mu4e-trash-folder . "/bcollison-gmail/[bcollison].trash")
+                        (mu4e-refile-folder . "/bcollison-gmail/[bcollison].All Mail")
+                        (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
+                        (mu4e-compose-format-flowed . t)
+                        (smtpmail-queue-dir . "/home/brian/Maildir/bcollison-gmail/queue/cur")
+                        (message-send-mail-function . smtpmail-send-it)
+                        (smtpmail-smtp-user . "brian@briancollison.com")
+    ;;                    (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+                        (smtpmail-starttls-credentials . (("smtp.office365.com" 587 nil nil)))
+  ;;                      (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+                        (smtpmail-default-smtp-server . "smtp.office365.com")
+                        (smtpmail-smtp-server . "smtp.office365.com")
+                        (smtpmail-local-domain . "briancollison.com")
+                        (smtpmail-servers-requiring-authorization .  ".*")
+                        (smtpmail-smtp-service . 587)
+                        (smtpmail-stream-type  . starttls)
+                        (smtpmail-debug-info . t)
+                        (smtpmail-debug-verbose . t)
+                         (smtpmail-debug-verb . t)
+                        (mu4e-maildir-shortcuts . ( ("/bcollison-gmail/INBOX"            . ?i)
+                            ("/bcollison-gmail/[bcollison].Raken" . ?r)
+                            ("/bcollison-gmail/[bcollison].sent" . ?s)
+                            ("/bcollison-gmail/[bcollison].trash"       . ?t)
+                            ("/bcollison-gmail/[bcollison].All Mail"       . ?l)
+                            ("/bcollison-gmail/[bcollison].actionable"  . ?a)
+                            ("/bcollison-gmail/[bcollison].wait"   . ?w)
+                            ("/bcollison-gmail/[bcollison].reference"   . ?F)
+                            ("/bcollison-gmail/[bcollison].receipts"   . ?R)
+                            ("/bcollison-gmail/[bcollison].inflight"   . ?f)
+                            ("/bcollison-gmail/[bcollison].CalvinSchool"   . ?C)
+                            ("/bcollison-gmail/[bcollison].Gymnastics"   . ?g)
+                            ("/bcollison-gmail/[bcollison].OliviaSchool"   . ?O)
+                            ("/bcollison-gmail/[bcollison].drafts"    . ?d)
+                            ))))
 
-               (make-mu4e-context
-                :name "work" ;;for raken-gmail
-                :enter-func (lambda () (mu4e-message "Entering context work"))
-                :leave-func (lambda () (mu4e-message "Leaving context work"))
-                :match-func (lambda (msg)
-                  (when msg
-                (mu4e-message-contact-field-matches
-                 msg '(:from :to :cc :bcc) "brian.collison@rakenapp.com")))
-                :vars '((user-mail-address . "brian.collison@rakenapp.com")
-                  (user-full-name . "Brian Collison")
-                  (mu4e-sent-folder . "/raken-gmail/[raken].sent")
-                  (mu4e-drafts-folder . "/raken-gmail/[raken].drafts")
-                  (mu4e-trash-folder . "/raken-gmail/[raken].trash")
-                  (mu4e-refile-folder . "/raken-gmail/[raken].All Mail")
-                  (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
+                     (make-mu4e-context
+                      :name "work" ;;for raken-gmail
+                      :enter-func (lambda () (mu4e-message "Entering context work"))
+                      :leave-func (lambda () (mu4e-message "Leaving context work"))
+                      :match-func (lambda (msg)
+                        (when msg
+                      (mu4e-message-contact-field-matches
+                       msg '(:from :to :cc :bcc) "brian.collison@rakenapp.com")))
+                      :vars '((user-mail-address . "brian.collison@rakenapp.com")
+                        (user-full-name . "Brian Collison")
+                        (mu4e-sent-folder . "/raken-gmail/[raken].sent")
+                        (mu4e-drafts-folder . "/raken-gmail/[raken].drafts")
+                        (mu4e-trash-folder . "/raken-gmail/[raken].trash")
+                        (mu4e-refile-folder . "/raken-gmail/[raken].All Mail")
+                        (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
 
-                  (mu4e-compose-format-flowed . t)
-                  (smtpmail-queue-dir . "/home/brian/Maildir/raken-gmail/queue/cur")
-                  (message-send-mail-function . smtpmail-send-it)
-                  (smtpmail-smtp-user . "brian.collison@rakenapp.com")
-                  (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
-                  (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
-                  (smtpmail-default-smtp-server . "smtp.gmail.com")
-                  (smtpmail-smtp-server . "smtp.gmail.com")
-                  (smtpmail-smtp-service . 587)
-                  (smtpmail-debug-info . t)
-                  (smtpmail-debug-verbose . t)
-                  (mu4e-maildir-shortcuts . ( ("/raken-gmail/INBOX"            . ?i)
-                      ("/raken-gmail/[raken].Raken" . ?r)
-                      ("/raken-gmail/[raken].sent" . ?s)
-                      ("/raken-gmail/[raken].trash"       . ?t)
-                      ("/raken-gmail/[raken].All Mail"       . ?l)
-                      ("/raken-gmail/[raken].actionable"  . ?a)
-                      ("/raken-gmail/[raken].wait"   . ?w)
-                      ("/raken-gmail/[raken].reference"   . ?F)
-                      ("/raken-gmail/[raken].inflight"   . ?f)
-                      ("/raken-gmail/[raken].drafts"    . ?d)
-                      ))))
-               )
-            )
+                        (mu4e-compose-format-flowed . t)
+                        (smtpmail-queue-dir . "/home/brian/Maildir/raken-gmail/queue/cur")
+                        (message-send-mail-function . smtpmail-send-it)
+                        (smtpmail-smtp-user . "brian.collison@rakenapp.com")
+                        (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+                        (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+                        (smtpmail-local-domain . "rakenapp.com")
+                        (smtpmail-default-smtp-server . "smtp.gmail.com")
+                        (smtpmail-smtp-server . "smtp.gmail.com")
+                        (smtpmail-smtp-service . 587)
+                        (smtpmail-debug-info . t)
+                        (smtpmail-debug-verbose . t)
+                        (smtpmail-debug-verb . t)
+                        (mu4e-maildir-shortcuts . ( ("/raken-gmail/INBOX"            . ?i)
+                            ("/raken-gmail/[raken].Raken" . ?r)
+                            ("/raken-gmail/[raken].sent" . ?s)
+                            ("/raken-gmail/[raken].trash"       . ?t)
+                            ("/raken-gmail/[raken].All Mail"       . ?l)
+                            ("/raken-gmail/[raken].actionable"  . ?a)
+                            ("/raken-gmail/[raken].wait"   . ?w)
+                            ("/raken-gmail/[raken].reference"   . ?F)
+                            ("/raken-gmail/[raken].inflight"   . ?f)
+                            ("/raken-gmail/[raken].drafts"    . ?d)
+                            ))))
+                     )
+                  )
 
-        (global-set-key (kbd "C-\"") 'mu4e)
+              (global-set-key (kbd "C-\"") 'mu4e)
 
-    (add-to-list 'mu4e-bookmarks
-    '( :name  "Unread Inbox not Bitbucket"
-       :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket"
-       :key   ?I))
+          (add-to-list 'mu4e-bookmarks
+          '( :name  "Unread Inbox not Bitbucket"
+             :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket"
+             :key   ?I))
 
-    (add-to-list 'mu4e-bookmarks
-  '( :name  "Unread Inbox Bitbucket"
-     :query "maildir:/raken-gmail/INBOX and flag:unread and subject:Bitbucket"
-     :key   ?B))
+          (add-to-list 'mu4e-bookmarks
+        '( :name  "Unread Inbox Bitbucket"
+           :query "maildir:/raken-gmail/INBOX and flag:unread and subject:Bitbucket"
+           :key   ?B))
 
-      (add-to-list 'mu4e-bookmarks
-  '( :name  "Unread Inbox not Bitbucket or Jira"
-     :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket and not subject:JIRA"
-     :key   ?N))
+            (add-to-list 'mu4e-bookmarks
+        '( :name  "Unread Inbox not Bitbucket or Jira"
+           :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket and not subject:JIRA"
+           :key   ?N))
 
-        (add-to-list 'mu4e-bookmarks
-  '( :name  "JIRA Mentions"
-     :query "maildir:/raken-gmail/INBOX and subject:JIRA and subject:mentioned"
-     :key   ?M))
+              (add-to-list 'mu4e-bookmarks
+        '( :name  "JIRA Mentions"
+           :query "maildir:/raken-gmail/INBOX and subject:JIRA and subject:mentioned"
+           :key   ?M))
 
 #+END_SRC
 
@@ -1815,19 +1827,22 @@ I'm usually actually in an org document.
 Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I just want org-agenda to show meetings
 #+begin_src emacs-lisp
 
-(use-package org-gcal
-        :ensure t
-        :init
-        (setq org-gcal-dir "~/Documents/org/.org-gcal/")
-        (setq org-gcal-client-id "104759143706-1kj1r66cs5ij3ssfreasf5cqlavbrqjn.apps.googleusercontent.com"
-  org-gcal-client-secret (get-authinfo "gcal.api" "9999")
-  org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.collison/Documents/org/.org-gcal/raken.org")))
-      (setq org-gcal-remove-api-cancelled-events t))
+    (use-package org-gcal
+            :ensure t
+            :init
+            (setq org-gcal-dir "/Users/brian.collison/Dropbox/Apps/MobileOrg/.org-gcal/")
+            (setq org-gcal-client-id "104759143706-1kj1r66cs5ij3ssfreasf5cqlavbrqjn.apps.googleusercontent.com"
+      org-gcal-client-secret (get-authinfo "gcal.api" "9999")
+      org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.collison/Documents/org/.org-gcal/raken.org")))
+          (setq org-gcal-remove-api-cancelled-events t))
 
-;;        :config
-;;        (setq org-gcal-remove-api-cancelled-events t))
+    ;;        :config
+    ;;        (setq org-gcal-remove-api-cancelled-events t))
+  ;; fixes an issue with gpg that was causing lockup
+  ;; https://www.reddit.com/r/emacs/comments/137r7j7/gnupg_241_encryption_issues_with_emacs_orgmode/
+        (fset 'epg-wait-for-status 'ignore)
 
-    (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+        (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
 #+end_src
 * Reading things
 ** Reddit thru Gnus?
@@ -2090,15 +2105,16 @@ list of timezones.  Nice for working in a team with remote members.
 ** Company
 Complete anything aka Company provides auto-completion. Company-capf is enabled by default when you start LSP on a project. You can also invoke ~M-x company-capf~ to enable capf (completion at point function).
 #+begin_src emacs-lisp
-;;(use-package company :ensure t)
+(use-package company :ensure t)
 #+end_src
+I worry that company mode might make typing a bit slower than I'd like.
 
 ** Yasnippet
 Yasnippet is a template system for Emacs. It allows you to type abbreviation and complete the associated text.
 
 #+begin_src emacs-lisp
-(use-package yasnippet :config (yas-global-mode))
-(use-package yasnippet-snippets :ensure t)
+;;(use-package yasnippet :config (yas-global-mode))
+;;(use-package yasnippet-snippets :ensure t)
 #+end_src
 
 E.g. In java mode, if you type ~pr~ and hit ~<TAB>~ it should complete to ~System.out.println("text");~
@@ -2208,12 +2224,25 @@ You can start LSP server in a java project by using ~C-c l s s~. Once you type ~
 ** LSP Java
 This is the package that handles server installation and session management.
 #+begin_src  emacs-lisp
-(use-package lsp-java
-:ensure t
-:config (add-hook 'java-mode-hook 'lsp))
+    (use-package lsp-java :after lsp
+      :init (setq lsp-java-java-path "/Users/brian.collison/.jenv/versions/17.0/bin/java"
+                  lsp-java-import-gradle-java-home "/Users/brian.collison/.jenv/versions/17.0/bin/java"
+                  lsp-java-configuration-runtimes '[(:name "JavaSE-17"
+                                                           :path "/Users/brian.collison/.jenv/versions/17.0"
+                                                           :default t)]
+                  lsp-java-vmargs (list
+                                   "-noverify"
+                                   "--enable-preview"))
+      :config (progn (add-hook 'java-mode-hook #'lsp)
+                     (require 'dap-java)))
+  ;;    (use-package lsp-java
+  ;;    :ensure t
+  ;;    :init (setq lsp-java-java-path "/Users/brian.collison/.jenv/versions/17.0/bin/java")
+  ;;    :config (add-hook 'java-mode-hook 'lsp))
 
-(use-package actionscript-mode
-:ensure t)
+;;  (setq lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-javaagent:/Users/brian.collison/.m2/repository/org/projectlombok/lombok/1.18.16/lombok-1.18.16.jar" "-Xbootclasspath/a:/Users/brian.collison/.m2/repository/org/projectlombok/lombok/1.18.16/lombok-1.18.16.jar"))
+      (use-package actionscript-mode
+      :ensure t)
 
 
 #+end_src
@@ -2335,19 +2364,134 @@ Lets try slime!
 #+begin_src emacs-lisp
 (use-package exercism)
 #+end_src
-* ChatGPT
+* LLM
 How can I use chatGPT inside of emacs?
 
 To use chatGPT inside of Emacs, you can interact with the model by using the Emacs' built-in shell feature. You can launch a shell session in Emacs by typing =M-x shell=. Then, open a web browser within Emacs by typing =M-x eww= and navigate to OpenAI's playground or API documentation page to access the model. Alternatively, you can also use a package like =request= to make HTTP requests to the OpenAI API from within Emacs.
 #+begin_src emacs-lisp
 (use-package gptel)
 #+end_src
+** Configuring ollama
+taken from https://github.com/gregoryg/emacs-gregoryg?tab=readme-ov-file#functions-to-use-in-hooks
+discovered through this video: https://www.youtube.com/watch?v=yAL0cw1ePqw
+#+begin_src emacs-lisp
+(setq gjg/ollama-api-endpoint "http://localhost:11434")
+(defun gjg/get-ollama-models ()
+  "Return a list of Ollama models from the API, or nil if the API is not available."
+  (when-let*
+      ((url (url-generic-parse-url gjg/ollama-api-endpoint))
+       (host (url-host url))
+       (port (url-port url))
+       (maybe-ollama-models (s-split "\n"
+                                     (shell-command-to-string (concat "curl -s --connect-timeout 0.5 '"
+                                                                      gjg/ollama-api-endpoint "/api/tags' | jq -r '.models[].name'"))))
+       (my-ollama-models (seq-filter (lambda (s) (not (string= s "")))
+                                     maybe-ollama-models)))
+    (gptel-make-ollama
+     "Ollama"
+     :host (concat host ":" (number-to-string port))
+     :models my-ollama-models
+     :stream t)
+    my-ollama-models))
+
+;; set globally, as ollama-models is relevant to more than gptel
+(setq ollama-models (gjg/get-ollama-models))
+
+(unless ollama-models
+  (setq gptel--known-backends
+        (assoc-delete-all "Ollama" gptel--known-backends #'equal)))
+#+end_src
+
 
 * bug-reference-mode
 #+begin_src emacs-lisp
-(use-package bug-reference)
-(setq bug-reference-bug-regexp "\\b\\(\\(ENG\\{1,10\\}-[0-9]+\\)\\)"
-            bug-reference-url-format "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")
-(add-hook 'org-mode-hook 'bug-reference-mode)
+  (use-package bug-reference)
+  (setq bug-reference-bug-regexp "\\b\\(\\(ENG\\{1,10\\}-[0-9]+\\)\\)"
+              bug-reference-url-format "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")
+  (add-hook 'org-mode-hook 'bug-reference-mode)
+  (add-hook 'org-timeblock-list-mode-hook 'bug-reference-mode)
 
+#+end_src
+
+* sql workflow
+
+** sql-mysql
+#+begin_src emacs-lisp
+(setq exec-path (append exec-path '("/opt/homebrew/opt/mysql-client/bin")))
+(load-library "~/.emacs.d/mysql-connections.el.gpg")
+#+end_src
+
+** ejc
+#+begin_src emacs-lisp
+  (require 'ejc-sql)
+  (setq clomacs-httpd-default-port 8380) ; Use a port other than 8080.
+
+  (load-library "~/.emacs.d/ejc-connections.el.gpg")
+  (require 'ejc-company)
+  (push 'ejc-company-backend company-backends)
+  (setq ejc-complete-on-dot t)
+  (add-hook 'sql-mode-hook (lambda() (electric-indent-mode -1)))
+  (add-hook 'ejc-sql-minor-mode-hook
+          (lambda ()
+            (company-mode t)))
+  (add-hook 'ejc-sql-connected-hook
+          (lambda ()
+            (ejc-set-column-width-limit nil)))
+#+end_src
+
+* search integration
+#+begin_src emacs-lisp
+(use-package google-this
+   :config
+   (google-this-mode 1))
+#+end_src
+
+* time blocking finally here?
+#+begin_src emacs-lisp
+  (use-package org-ql)
+  (use-package org-timeblock)
+  (define-key global-map (kbd "C-c b") 'org-timeblock-list)
+#+end_src
+
+* Move me to the right place
+#+begin_src emacs-lisp
+  (setq bmc/lombok-library-path (concat "~/tools/" "lombok.jar"))
+
+  (unless (file-exists-p bmc/lombok-library-path)
+    (url-copy-file "https://projectlombok.org/downloads/lombok.jar" bmc/lombok-library-path))
+
+  (setq lsp-java-vmargs '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx4G" "-Xms100m"))
+
+  (push (concat "-javaagent:"
+                  (expand-file-name bmc/lombok-library-path))
+          lsp-java-vmargs)
+#+end_src
+
+* Frame/Window Configurations
+Trying to find the right tool to easily switch from major contexts like: Emailing, Scheduling, "Working"
+
+** Trying activities.el
+#+begin_src emacs-lisp
+(use-package activities
+  :init
+  (activities-mode)
+  (activities-tabs-mode)
+
+:bind
+(("C-x C-a n" . activities-new)
+("C-x C-a g" . activities-revert)
+("C-x C-a s" . activities-suspend)
+("C-x C-a C-k" . activities-kill)    ; Alias for `-suspend'
+("C-x C-a a" . activities-resume)
+;; For convenience, we also bind `activities-resume' to "C-x C-a
+;; C-a", so the user need not lift the Control key.
+("C-x C-a C-a" . activities-resume)
+("C-x C-a RET" . activities-switch)
+("C-x C-a l" . activities-list)))
+#+end_src
+
+* zap char
+I prefer the zap-up-to-char (like vim's 'dt')
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-z") 'zap-up-to-char)
 #+end_src
