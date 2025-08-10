@@ -1,0 +1,199 @@
+# mbsyncrc based on
+# http://www.ict4g.net/adolfo/notes/2014/12/27/EmacsIMAP.html
+# https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/
+# ACCOUNT INFORMATION
+IMAPAccount bcollison-gmail
+# Address to connect to
+Host imap.gmail.com
+User bcollison@gmail.com
+PassCmd "gpg -q --for-your-eyes-only --no-tty -d ~/.mbsyncpass-bcollison.gpg"
+AuthMechs LOGIN
+SSLType IMAPS
+SSLVersions TLSv1.2
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+PipelineDepth 50
+
+# THEN WE SPECIFY THE LOCAL AND REMOTE STORAGE
+# - THE REMOTE STORAGE IS WHERE WE GET THE MAIL FROM (E.G., THE
+#   SPECIFICATION OF AN IMAP ACCOUNT)
+# - THE LOCAL STORAGE IS WHERE WE STORE THE EMAIL ON OUR COMPUTER
+
+# REMOTE STORAGE (USE THE IMAP ACCOUNT SPECIFIED ABOVE)
+IMAPStore bcollison-gmail-remote
+Account bcollison-gmail
+
+# LOCAL STORAGE (CREATE DIRECTORIES with mkdir -p ~/Maildir/bcollison-gmail)
+MaildirStore bcollison-gmail-local
+Path ~/Maildir/bcollison-gmail/
+Inbox ~/Maildir/bcollison-gmail/INBOX
+# REQUIRED ONLY IF YOU WANT TO DOWNLOAD ALL SUBFOLDERS; SYNCING SLOWS DOWN
+# SubFolders Verbatim
+
+# CONNECTIONS SPECIFY LINKS BETWEEN REMOTE AND LOCAL FOLDERS
+#
+# CONNECTIONS ARE SPECIFIED USING PATTERNS, WHICH MATCH REMOTE MAIl
+# FOLDERS. SOME COMMONLY USED PATTERS INCLUDE:
+#
+# 1 "*" TO MATCH EVERYTHING
+# 2 "!DIR" TO EXCLUDE "DIR"
+# 3 "DIR" TO MATCH DIR
+
+Channel bcollison-gmail-inbox
+Master :bcollison-gmail-remote:
+Slave :bcollison-gmail-local:
+Patterns "INBOX"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-trash
+Master :bcollison-gmail-remote:"[Gmail]/Trash"
+Slave :bcollison-gmail-local:"[bcollison].trash"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-sent
+Master :bcollison-gmail-remote:"[Gmail]/Sent Mail"
+Slave :bcollison-gmail-local:"[bcollison].sent"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-drafts
+Master :bcollison-gmail-remote:"[Gmail]/Drafts"
+Slave :bcollison-gmail-local:"[bcollison].drafts"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-actionable
+Master :bcollison-gmail-remote:"Actionable"
+Slave :bcollison-gmail-local:"[bcollison].actionable"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-to-read
+Master :bcollison-gmail-remote:"To-Read"
+Slave :bcollison-gmail-local:"[bcollison].to-read"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-wait
+Master :bcollison-gmail-remote:"Wait"
+Slave :bcollison-gmail-local:"[bcollison].wait"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-inflight
+Master :bcollison-gmail-remote:"In-Flight"
+Slave :bcollison-gmail-local:"[bcollison].inflight"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-calvin-school
+Master :bcollison-gmail-remote:"School/Calvin School"
+Slave :bcollison-gmail-local:"[bcollison].CalvinSchool"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-school
+Master :bcollison-gmail-remote:"School"
+Slave :bcollison-gmail-local:"[bcollison].School"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-gymnastics
+Master :bcollison-gmail-remote:"Kids Activities/Gymnastics"
+Slave :bcollison-gmail-local:"[bcollison].Gymnastics"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-olivia-dance
+Master :bcollison-gmail-remote:"Kids Activities/Olivia Dance"
+Slave :bcollison-gmail-local:"[bcollison].OliviaDance"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-olivia-school
+Master :bcollison-gmail-remote:"School/Olivia School"
+Slave :bcollison-gmail-local:"[bcollison].OliviaSchool"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-health
+Master :bcollison-gmail-remote:"Health"
+Slave :bcollison-gmail-local:"[bcollison].Health"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-raken
+Master :bcollison-gmail-remote:"Raken"
+Slave :bcollison-gmail-local:"[bcollison].Raken"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-reference
+Master :bcollison-gmail-remote:"Reference"
+Slave :bcollison-gmail-local:"[bcollison].reference"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-receipts
+Master :bcollison-gmail-remote:"Receipts"
+Slave :bcollison-gmail-local:"[bcollison].receipts"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-all
+Master :bcollison-gmail-remote:"[Gmail]/All Mail"
+Slave :bcollison-gmail-local:"[bcollison].All Mail"
+Create Both
+Expunge Both
+SyncState *
+
+#Channel acc1-gmail-starred
+#Master :acc1-gmail-remote:"[Gmail]/Starred"
+#Slave :acc1-gmail-local:"[acc1].Starred"
+#Create Both
+#Expunge Both
+#SyncState *
+
+# GROUPS PUT TOGETHER CHANNELS, SO THAT WE CAN INVOKE
+# MBSYNC ON A GROUP TO SYNC ALL CHANNELS
+#
+# FOR INSTANCE: "mbsync gmail" GETS MAIL FROM
+# "gmail-inbox", "gmail-sent", and "gmail-trash"
+#
+Group bcollison-gmail
+Channel bcollison-gmail-inbox
+Channel bcollison-gmail-raken
+Channel bcollison-gmail-sent
+Channel bcollison-gmail-drafts
+Channel bcollison-gmail-trash
+Channel bcollison-gmail-all
+Channel bcollison-gmail-actionable
+Channel bcollison-gmail-to-read
+Channel bcollison-gmail-wait
+Channel bcollison-gmail-inflight
+Channel bcollison-gmail-reference
+Channel bcollison-gmail-receipts
+Channel bcollison-gmail-health
+Channel bcollison-gmail-olivia-school
+Channel bcollison-gmail-olivia-dance
+Channel bcollison-gmail-gymnastics
+Channel bcollison-gmail-calvin-school
+Channel bcollison-gmail-school
