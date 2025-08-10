@@ -74,6 +74,13 @@ Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-to-read
+Master :bcollison-gmail-remote:"To-Read"
+Slave :bcollison-gmail-local:"[bcollison].to-read"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-wait
 Master :bcollison-gmail-remote:"Wait"
 Slave :bcollison-gmail-local:"[bcollison].wait"
@@ -88,23 +95,44 @@ Create Both
 Expunge Both
 SyncState *
 
-Channel bcollison-gmail-school
-Master :bcollison-gmail-remote:"School"
+Channel bcollison-gmail-calvin-school
+Master :bcollison-gmail-remote:"School/Calvin School"
 Slave :bcollison-gmail-local:"[bcollison].CalvinSchool"
 Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-school
+Master :bcollison-gmail-remote:"School"
+Slave :bcollison-gmail-local:"[bcollison].School"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-gymnastics
-Master :bcollison-gmail-remote:"Gymnastics"
+Master :bcollison-gmail-remote:"Kids Activities/Gymnastics"
 Slave :bcollison-gmail-local:"[bcollison].Gymnastics"
 Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-olivia-dance
+Master :bcollison-gmail-remote:"Kids Activities/Olivia Dance"
+Slave :bcollison-gmail-local:"[bcollison].OliviaDance"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-olivia-school
-Master :bcollison-gmail-remote:"Olivia School"
+Master :bcollison-gmail-remote:"School/Olivia School"
 Slave :bcollison-gmail-local:"[bcollison].OliviaSchool"
+Create Both
+Expunge Both
+SyncState *
+
+Channel bcollison-gmail-health
+Master :bcollison-gmail-remote:"Health"
+Slave :bcollison-gmail-local:"[bcollison].Health"
 Create Both
 Expunge Both
 SyncState *
@@ -158,10 +186,18 @@ Channel bcollison-gmail-drafts
 Channel bcollison-gmail-trash
 Channel bcollison-gmail-all
 Channel bcollison-gmail-actionable
+Channel bcollison-gmail-to-read
 Channel bcollison-gmail-wait
 Channel bcollison-gmail-inflight
 Channel bcollison-gmail-reference
 Channel bcollison-gmail-receipts
+Channel bcollison-gmail-health
+Channel bcollison-gmail-olivia-school
+Channel bcollison-gmail-olivia-dance
+Channel bcollison-gmail-gymnastics
+Channel bcollison-gmail-calvin-school
+Channel bcollison-gmail-school
+
 
 ##################################################
 # Raken
