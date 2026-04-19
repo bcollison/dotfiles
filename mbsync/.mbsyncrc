@@ -116,6 +116,13 @@ Create Both
 Expunge Both
 SyncState *
 
+Channel bcollison-gmail-boy-scouts
+Master :bcollison-gmail-remote:"Kids Activities/Boy Scouts"
+Slave :bcollison-gmail-local:"[bcollison].BoyScouts"
+Create Both
+Expunge Both
+SyncState *
+
 Channel bcollison-gmail-olivia-dance
 Master :bcollison-gmail-remote:"Kids Activities/Olivia Dance"
 Slave :bcollison-gmail-local:"[bcollison].OliviaDance"
@@ -197,6 +204,7 @@ Channel bcollison-gmail-olivia-dance
 Channel bcollison-gmail-gymnastics
 Channel bcollison-gmail-calvin-school
 Channel bcollison-gmail-school
+Channel bcollison-gmail-boy-scouts
 
 
 ##################################################

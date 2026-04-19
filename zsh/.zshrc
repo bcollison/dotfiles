@@ -169,7 +169,9 @@ fi
 #export ZSH_HIGHLIGHT_STYLES[comment]='none'
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
-   . /opt/homebrew/opt/asdf/libexec/asdf.sh 
+   echo fix this
+#   . /opt/homebrew/opt/asdf/libexec/asdf.sh 
+#   . /opt/homebrew/opt/asdf/libexec/asdf.sh 
 if [ -d /usr/local/Caskroom/google-cloud-sdk/ ]; then
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
    source "/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
@@ -337,7 +339,7 @@ alias dm="docker-machine"
 alias dmx="docker-machine ssh"
 alias daliases="grep dalias ~/.zshrc | grep -v '^alias' | sed s/dalias//g"
 
-fastfetch
+neofetch
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
@@ -354,3 +356,4 @@ export LESS="--RAW-CONTROL-CHARS"
 [[ -f ~/.LESS_TERMCAP ]] && . ~/.LESS_TERMCAP
 export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
 export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"

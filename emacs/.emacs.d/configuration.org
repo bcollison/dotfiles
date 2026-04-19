@@ -1727,6 +1727,8 @@ I'm usually actually in an org document.
                             ("/bcollison-gmail/[bcollison].CalvinSchool"   . ?C)
                             ("/bcollison-gmail/[bcollison].Gymnastics"   . ?g)
                             ("/bcollison-gmail/[bcollison].OliviaSchool"   . ?O)
+                            ("/bcollison-gmail/[bcollison].OliviaDance"   . ?D)
+                            ("/bcollison-gmail/[bcollison].BoyScouts"   . ?B)
                             ("/bcollison-gmail/[bcollison].drafts"    . ?d)
                             ))))
 

@@ -14,7 +14,8 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(setq config-file (concat user-emacs-directory "configuration.org"))
+(setq config-file (concat user-emacs-directory "rewrite-configuration-from-scratch.org"))
+;; (setq config-file (concat user-emacs-directory "no-config.org"))
 (org-babel-load-file config-file)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -31,9 +32,20 @@
  '(lsp-java-completion-lazy-resolve-text-edit-enabled nil)
  '(lsp-java-import-gradle-java-home "/Users/brian.collison/.jenv/versions/17.0/")
  '(lsp-java-java-path "/Users/brian.collison/.jenv/versions/17.0/bin/java")
+ '(nnreddit-log-rpc t)
+ '(nnreddit-python-command "python3.8")
  '(org-agenda-block-separator 61)
  '(org-agenda-files
-   '("~/Documents/org/sprints/2021.13.org" "~/documents/org/gcal/personal.org" "~/documents/org/gcal/work.org" "~/documents/org/index.org" "~/documents/org/events.org" "~/documents/org/habits.org" "~/documents/org/recurring-events.org" "~/documents/org/work.org" "~/documents/org/home.org" "/Users/brian.collison/Documents/org/.org-gcal/raken.org" "/Users/brian.collison/Dropbox/Apps/MobileOrg/mobile-inbox.org" "/Users/brian.collison/Dropbox/Apps/MobileOrg/raken-inbox.org" "/Users/brian.collison/Dropbox/Apps/MobileOrg/vonnegut-inbox.org" "/Users/brian.collison/Dropbox/Apps/MobileOrg/inbox.org"))
+   '("~/Documents/org/sprints/2021.13.org" "~/documents/org/gcal/personal.org"
+     "~/documents/org/gcal/work.org" "~/documents/org/index.org"
+     "~/documents/org/events.org" "~/documents/org/habits.org"
+     "~/documents/org/recurring-events.org" "~/documents/org/work.org"
+     "~/documents/org/home.org"
+     "/Users/brian.collison/Documents/org/.org-gcal/raken.org"
+     "/Users/brian.collison/Dropbox/Apps/MobileOrg/mobile-inbox.org"
+     "/Users/brian.collison/Dropbox/Apps/MobileOrg/raken-inbox.org"
+     "/Users/brian.collison/Dropbox/Apps/MobileOrg/vonnegut-inbox.org"
+     "/Users/brian.collison/Dropbox/Apps/MobileOrg/inbox.org"))
  '(org-agenda-loop-over-headlines-in-active-region nil)
  '(org-agenda-start-with-log-mode t)
  '(org-jira-done-states '("Closed" "Resolved" "Done" "Deployed"))
@@ -45,17 +57,32 @@
    "/Users/brian.collison/Dropbox/Apps/MobileOrg/raken-inbox.org")
  '(org-timeblock-scale-options '(8 . 22))
  '(package-selected-packages
-   '(ox-slack code-review activities org-timeblock google-this gptel exercism zenburn-theme sicp slime rubik quelpa-use-package mastodon yasnippet-snippets yasnippet ement vterm restclient-jq jq-mode ob-restclient restclient logview groovy-mode es-mode pomm org-tree-slide orderless marginalia vertico gnu-elpa-keyring-update popper flycheck-plantuml plantuml-mode xkcd esup perspective actionscript-mode actionscript lsp-actionscript helm-lsp lsp-java dap-mode flycheck nnreddit docker dired-collapse dired-ranger dired-single dired-rainbow all-the-icons-dired bufler edit-server org-gcal org-jira org-appear org-roam-protocol org-roam-server go-mode slack doom-modeline ivy-rich auto-compile use-package-ensure-system-package))
+   '(actionscript actionscript-mode activities all-the-icons-dired auto-compile
+		  bufler code-review dap-mode dired-collapse dired-rainbow
+		  dired-ranger dired-single docker doom-modeline edit-server
+		  ement es-mode esup exercism flycheck flycheck-plantuml
+		  gnu-elpa-keyring-update go-mode google-this gptel groovy-mode
+		  helm-lsp ivy-rich jq-mode logview lsp-actionscript lsp-java
+		  lua-mode marginalia mastodon nnreddit ob-restclient orderless
+		  org-appear org-gcal org-jira org-roam-protocol org-roam-server
+		  org-timeblock org-tree-slide ox-slack perspective
+		  plantuml-mode pomm popper quelpa-use-package restclient
+		  restclient-jq rubik sicp slack slime
+		  use-package-ensure-system-package vertico vterm xkcd yasnippet
+		  yasnippet-snippets zenburn-theme))
  '(plantuml-default-exec-mode 'jar)
  '(plantuml-executable-args '("-headless" "-DPLANTUML_LIMIT_SIZE=18192"))
  '(plantuml-jar-args '("-charset" "UTF-8" "-DPLANTUML_LIMIT_SIZE=18192"))
  '(plantuml-jar-path "/Users/brian.collison/plantuml.jar")
  '(plantuml-java-args
-   '("-Djava.awt.headless=true" "-jar" "--illegal-access=deny" "-DPLANTUML_LIMIT_SIZE=18192"))
+   '("-Djava.awt.headless=true" "-jar" "--illegal-access=deny"
+     "-DPLANTUML_LIMIT_SIZE=18192"))
  '(tab-bar-new-tab-choice "*scratch*")
  '(tab-bar-select-tab-modifiers '(super))
  '(warning-suppress-log-types '((comp) (emacs) (emacs) (emacs)))
- '(warning-suppress-types '((emacs) (emacs) (emacs))))
+ '(warning-suppress-types '((emacs) (emacs) (emacs)))
+ '(ynab-base-url "https://api.ynab.com")
+ '(ynab-debug t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
