@@ -28,6 +28,7 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
   (setq exec-path (append exec-path '("/opt/homebrew/bin")))
   (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
   (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
+  (setq exec-path (append exec-path '("/Users/briancollison/go/bin")))
   (setq exec-path (append exec-path '("/opt/homebrew/opt/python@3.12/libexec/bin")))
 #+end_src
 
@@ -2205,6 +2206,7 @@ Let's install the main package for lsp. Here we will integrate lsp with which-ke
 :hook (
    (lsp-mode . lsp-enable-which-key-integration)
    (java-mode . #'lsp-deferred)
+   (sql-mode  . lsp-deferred)
 )
 :init (setq
     lsp-keymap-prefix "C-c l"              ; this is for which-key integration documentation, need to use lsp-mode-map
@@ -2423,23 +2425,55 @@ discovered through this video: https://www.youtube.com/watch?v=yAL0cw1ePqw
 (load-library "~/.emacs.d/mysql-connections.el.gpg")
 #+end_src
 
-** ejc
+** sql-mode setup
 #+begin_src emacs-lisp
-  (require 'ejc-sql)
-  (setq clomacs-httpd-default-port 8380) ; Use a port other than 8080.
-
-  (load-library "~/.emacs.d/ejc-connections.el.gpg")
-  (require 'ejc-company)
-  (push 'ejc-company-backend company-backends)
-  (setq ejc-complete-on-dot t)
-  (add-hook 'sql-mode-hook (lambda() (electric-indent-mode -1)))
-  (add-hook 'ejc-sql-minor-mode-hook
-          (lambda ()
-            (company-mode t)))
-  (add-hook 'ejc-sql-connected-hook
-          (lambda ()
-            (ejc-set-column-width-limit nil)))
+(use-package sql
+  :config
+  (setq sql-product 'mysql)
+  (add-hook 'sql-mode-hook
+    (lambda ()
+      (electric-indent-mode -1)
+      (local-set-key (kbd "C-c l s c") #'lsp-sql-switch-connection)
+      (local-set-key (kbd "C-c l s d") #'lsp-sql-switch-database))))
 #+end_src
+
+** sqlup — auto-uppercase SQL keywords
+#+begin_src emacs-lisp
+(use-package sqlup-mode
+  :hook ((sql-mode . sqlup-mode)
+         (sql-interactive-mode . sqlup-mode)))
+#+end_src
+
+** Dabbrev completion in sql-interactive-mode
+LSP doesn't attach to comint buffers, so we use =company-dabbrev= in the SQLi
+buffer to at least complete names already seen in the session. Write queries in
+a =.sql= file (with full sqls completion) and send with =C-c C-r= / =C-c C-c=.
+#+begin_src emacs-lisp
+(add-hook 'sql-interactive-mode-hook
+  (lambda ()
+    (setq-local company-backends '(company-dabbrev))
+    (company-mode 1)
+    (local-set-key (kbd "M-/") #'company-complete)))
+#+end_src
+
+** sqls — schema-aware completion via LSP
+=sqls= is the SQL language server used by lsp-mode for table/column completion.
+Install with =brew install sqls=.
+
+Do not create =~/.config/sqls/config.yml=. Instead, add =lsp-sqls-connections=
+directly to =~/.emacs.d/mysql-connections.el.gpg= (open it in Emacs with
+=C-x C-f= — EPA will decrypt it for editing). lsp-mode passes this to sqls
+via the LSP workspace configuration protocol, so credentials stay GPG-encrypted
+at rest alongside your =sql-connection-alist= entries.
+
+#+begin_example emacs-lisp
+(setq lsp-sqls-connections
+  '(((driver . "mysql")
+     (dataSourceName . "user:pass@tcp(host:3306)/dbname")
+     (alias . "mydb"))))
+#+end_example
+
+Multiple connections are supported — add one alist per entry.
 
 * search integration
 #+begin_src emacs-lisp

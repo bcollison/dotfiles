@@ -1,0 +1,934 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Brian Collison
+#+EMAIL: brian@briancollison.com
+#+OPTIONS: num:nil
+#+PROPERTY: header-args:emacs-lisp
+
+* Introduction
+This configuration started off as a clone of https://github.com/hrs/dotfiles/blob/main/emacs/dot-emacs.d/configuration.org
+Some content from the original source is still present. I have made an attempt to understand the packages that I
+have in this configuration as I increase my utilization of emacs.
+I've also started pulling things in from System Crafters' [[https://github.com/daviwil/emacs-from-scratch/][Emacs From Scratch]] videos/repository
+
+** (Another rewrite)
+There are a few things from the configuration I've been using for a while that I've left out I'll put those here
+*** Window management
+Seeing what a vanilla install of bufler looks like to manage buffers
+#+begin_src emacs-lisp
+;; (use-package bufler
+;;   :bind (("C-M-j" . bufler-switch-buffer)
+;;         ("C-M-k" . bufler-workspace-frame-set)))
+#+end_src
+
+* Envirionment setup
+emacs needs to run some utilties like gpg, and mbsync. We need to make sure these are on the PATH
+#+begin_src emacs-lisp
+  (setenv "PATH"
+    (concat
+     "/usr/local/bin" ":"
+     "/Library/TeX/texbin" ":"
+     "/Users/brian.collison/.asdf/shims" ":"
+     "/Users/briancollison/.asdf/shims" ":"
+     (getenv "PATH")
+    )
+  )
+
+  (setq exec-path (append exec-path '("/usr/local/bin")))
+  (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
+  (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
+  (setq exec-path (append exec-path '("/Users/briancollison/go/bin")))
+  (server-start)
+#+end_src
+
+* Configure =use-package=
+
+I use =use-package= to install and configure my packages. My =init.el= includes the
+initial setup for =package.el= and ensures that =use-package= is installed, since I
+wanna do that right away.
+
+This makes sure that =use-package= will install the package if it's not already
+available. It also means that I should be able to open Emacs for the first time
+on a fresh Debian box and have my whole environment automatically installed. I'm
+not /totally/ sure about that, but we're gettin' close.
+
+#+begin_src emacs-lisp
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t)
+#+end_src
+
+Always compile packages, and use the newest version available.
+
+#+begin_src emacs-lisp
+  (use-package auto-compile
+    :config (auto-compile-on-load-mode))
+  (setq load-prefer-newer t)
+#+end_src
+
+* Set personal information
+** Who am I? Where am I?
+
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Brian Collison"
+        user-mail-address "brian@briancollison.com"
+        calendar-latitude 33.1581
+        calendar-longitude -117.3506
+        calendar-location-name "Carlsbad, CA")
+#+END_SRC
+
+* Authorization Function
+
+** Authinfo is used to store netrc info in an encrypted manner
+#+begin_src emacs-lisp
+  (defun get-authinfo (host port)
+    (let* ((netrc (netrc-parse (expand-file-name "~/.authinfo.gpg")))
+        (hostentry (netrc-machine netrc host port port)))
+    (when hostentry (netrc-get hostentry "password"))))
+
+#+end_src
+
+** Access my netrc data
+
+I store a few credentials in a =.netrc= file. This is a convenient way
+to store not-too-terribly-sensitive secrets.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'netrc)
+
+  (setq netrc-file "~/.netrc")
+
+  (defun netrc-username (machine)
+    "Helper function to extract a username from my netrc."
+    (car (netrc-credentials machine)))
+
+  (defun netrc-password (machine)
+    "Helper function to extract a password from my netrc."
+    (cadr (netrc-credentials machine)))
+#+END_SRC
+
+* Some shortcuts to help tweaking this configuration
+This was repurposed from: https://github.com/mrvdb/emacs-config
+The config file gets openened *a lot* because I tend to fiddle with this config at least once a day. So, it warrants it's own keybinding.
+
+#+begin_src emacs-lisp
+  (defun bmc/open-config ()
+    (interactive)
+    (find-file config-file))
+  (global-set-key (kbd "C-~") 'bmc/open-config)
+#+end_src
+
+* Getting around
+** Enable tab-bar-mode on startup
+This enables ctrl-tab through tabs.
+#+begin_src emacs-lisp
+(tab-bar-mode)
+#+end_src
+
+** Switch and rebalance windows when splitting
+When splitting a window, I invariably want to switch to the new window. This makes that automatic.
+
+#+begin_src emacs-lisp
+
+  (defun bmc/split-window-below-and-switch ()
+    "Split the window horizontally, then switch to the new pane."
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+
+  (defun bmc/split-window-right-and-switch ()
+    "Split the window vertically, then switch to the new pane."
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+
+  (global-set-key (kbd "C-x 2") 'bmc/split-window-below-and-switch)
+  (global-set-key (kbd "C-x 3") 'bmc/split-window-right-and-switch)
+
+#+end_src
+
+** Always kill current buffer
+Assume that I always want to kill the current buffer when hitting C-x k.
+
+#+begin_src emacs-lisp
+
+  (defun bmc/kill-current-buffer ()
+    "Kill the current buffer without prompting."
+    (interactive)
+    (kill-buffer (current-buffer)))
+
+  (global-set-key (kbd "C-x k") 'bmc/kill-current-buffer)
+
+#+end_src
+
+** Two window split toggle
+#+begin_src emacs-lisp
+(defun window-split-toggle ()
+  "Toggle between horizontal and vertical split with two windows."
+  (interactive)
+  (if (> (length (window-list)) 2)
+      (error "Can't toggle with more than 2 windows!")
+    (let ((func (if (window-full-height-p)
+                    #'split-window-vertically
+                  #'split-window-horizontally)))
+      (delete-other-windows)
+      (funcall func)
+      (save-selected-window
+        (other-window 1)
+        (switch-to-buffer (other-buffer))))))
+#+end_src
+
+** Avy jump to char
+#+begin_src emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind ("C-;" . avy-goto-char-2))
+#+end_src
+** Ace-Window seems like a nice way to navigate and manipulate multiple windows in a frame
+Don't forget that a question-mark will get you all the action bindings
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :bind
+    ("M-o" . ace-window)
+    :init
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+#+end_src
+
+* UI Preferences
+** Font Configuration
+
+I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://fonts.google.com/specimen/Cantarell][ET Book fonts for this configuration which will more than likely need to be installed on your machine.  Both can usually be found in the various Linux distro package managers or downloaded from the links above.
+
+#+begin_src emacs-lisp
+   (defun bmc/set-font-faces ()
+     (message "Setting faces!")
+     (set-face-attribute 'default nil :font "Fira Code" :height efs/default-font-size)
+
+     ;; Set the fixed pitch face
+     (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height efs/default-font-size)
+
+     ;; Set the variable pitch face
+     (set-face-attribute 'variable-pitch nil :font "ETBembo" :height efs/default-variable-font-size :weight 'regular)
+
+   (if (daemonp)
+       (add-hook 'after-make-frame-functions
+		 (lambda (frame)
+		   ;; (setq doom-modeline-icon t)
+		   (with-selected-frame frame
+		     (bmc/set-font-faces))))
+       (bmc/set-font-faces)))
+       ;; (efs/org-font-setup)
+
+#+end_src
+
+** Load up a theme
+I'm currently using the "zenburn" theme.
+
+#+BEGIN_SRC emacs-lisp
+    ;;  (use-package doom-themes
+    ;;    :init (load-theme 'doom-gruvbox t))
+
+   (use-package zenburn-theme
+    :config
+      (load-theme `zenburn t))
+#+END_SRC
+
+If this code is being evaluated by =emacs --daemon=, ensure that each subsequent
+frame is themed appropriately.
+
+#+begin_src emacs-lisp
+    (defun bmc/apply-theme ()
+      "Apply the `zenburn' theme."
+      (interactive)
+      (load-theme 'zenburn t)
+      ;;(transparency 100)
+      )
+
+     (if (daemonp)
+	  (add-hook 'after-make-frame-functions
+		    (lambda (frame)
+		      (with-selected-frame frame (bmc/apply-theme))))
+	(bmc/apply-theme))
+#+end_src
+
+** Highlight the current line
+
+=global-hl-line-mode= softly highlights the background color of the line
+containing point. It makes it a bit easier to find point, and it's useful when
+pairing or presenting code.
+
+#+begin_src emacs-lisp
+  (global-hl-line-mode)
+#+end_src
+
+** Disable visual bell
+
+=sensible-defaults= replaces the audible bell with a visual one, but I really
+don't even want that (and my Emacs/Mac pair renders it poorly). This disables
+the bell altogether.
+
+#+begin_src emacs-lisp
+  (setq ring-bell-function 'ignore)
+#+end_src
+
+** Some variables to be used elsewhere for UI stuff
+The following variables are used to tweak some of the configuration pieces for use in the live streams so you might need to adjust them for your local machine if you try to use this configuration directly.
+
+#+begin_src emacs-lisp
+  ;; You will most likely need to adjust this font size for your system!
+  (defvar efs/default-font-size 150)
+  (defvar efs/default-variable-font-size 150)
+
+  ;; Make frame transparency overridable
+  (defvar efs/frame-transparency '(100 . 100))
+#+end_src
+
+** Tweak window chrome
+
+I don't usually use the menu or scroll bar, and they take up useful space.
+
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
+
+  (scroll-bar-mode -1)        ; Disable visible scrollbar
+  (tool-bar-mode -1)          ; Disable the toolbar
+  (tooltip-mode -1)           ; Disable tooltips
+  (set-fringe-mode 5)        ; Give some breathing room
+
+  (menu-bar-mode -1)            ; Disable the menu bar
+
+  ;; Set up the visible bell
+  (setq visible-bell t)
+
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+
+  ;; Set frame transparency
+  (set-frame-parameter (selected-frame) 'alpha efs/frame-transparency)
+  (add-to-list 'default-frame-alist `(alpha . ,efs/frame-transparency))
+  (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  treemacs-mode-hook
+                  mu4e-main-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+ #+end_src
+
+There's a tiny scroll bar that appears in the minibuffer window. This disables
+that:
+
+#+begin_src emacs-lisp
+  (set-window-scroll-bars (minibuffer-window) nil nil)
+#+end_src
+
+** Use fancy lambdas
+
+Why not?
+
+#+begin_src emacs-lisp
+  (global-prettify-symbols-mode t)
+#+end_src
+
+** Better Modeline
+
+[[https://github.com/seagle0128/doom-modeline][doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
+
+*NOTE:* The first time you load your configuration on a new machine, you'll need to run `M-x all-the-icons-install-fonts` so that mode line icons display correctly.
+
+#+begin_src emacs-lisp
+
+(use-package all-the-icons)
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
+
+#+end_src
+*** doom-modeline updated to nerd-icons
+This package is able to display icons if nerd-icons package and required fonts are installed. Run M-x nerd-icons-install-fonts to install the necessary fonts. Please refer to the installation guide.
+#+begin_src emacs-lisp
+(use-package nerd-icons
+;; :custom
+;; The Nerd Font you want to use in GUI
+;; "Symbols Nerd Font Mono" is the default and is recommended
+;; but you can use any other Nerd Font if you want
+;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+)
+#+end_src
+
+*** doom-modeline updated to nerd-icons
+This package is able to display icons if nerd-icons package and required fonts are installed. Run M-x nerd-icons-install-fonts to install the necessary fonts. Please refer to the installation guide.
+#+begin_src emacs-lisp
+  (use-package nerd-icons
+    ;; :custom
+    ;; The Nerd Font you want to use in GUI
+    ;; "Symbols Nerd Font Mono" is the default and is recommended
+    ;; but you can use any other Nerd Font if you want
+    ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+    )
+#+end_src
+** Which Key
+[[https://github.com/justbur/emacs-which-key][which-key]] is a useful UI panel that appears when you start pressing any key binding in Emacs to offer you all possible completions for the prefix.  For example, if you press =C-c= (hold control and press the letter =c=), a panel will appear at the bottom of the frame displaying all of the bindings under that prefix and which command they run.  This is very useful for learning the possible key bindings in the mode of your current buffer.
+
+#+begin_src emacs-lisp
+
+  (use-package which-key
+    :defer 0
+    :diminish which-key-mode
+    :config
+    (which-key-mode)
+    (setq which-key-idle-delay 1))
+
+#+end_src
+** Marginalia
+#+begin_src emacs-lisp
+;; Enable richer annotations using the Marginalia package
+(use-package marginalia
+  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+  :bind (("M-A" . marginalia-cycle)
+         :map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init configuration is always executed (Not lazy!)
+  :init
+
+  ;; Must be in the :init section of use-package such that the mode gets
+  ;; enabled right away. Note that this forces loading the package.
+  (marginalia-mode))
+#+end_src
+** Helpful Help Commands
+
+[[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful (get it?) information to Emacs' =describe-= command buffers.  For example, if you use =describe-function=, you will not only get the documentation about the function, you will also see the source code of the function and where it gets used in other places in the Emacs configuration.  It is very useful for figuring out how things work in Emacs.
+
+#+begin_src emacs-lisp
+
+  (use-package helpful
+    :commands (helpful-callable helpful-variable helpful-command helpful-key)
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+
+#+end_src
+** Ivy and Counsel
+
+[[https://oremacs.com/swiper/][Ivy]] is an excellent completion framework for Emacs.  It provides a minimal yet powerful selection menu that appears when you open files, switch buffers, and for many other tasks in Emacs.  Counsel is a customized set of commands to replace `find-file` with `counsel-find-file`, etc which provide useful commands for each of the default completion commands.
+
+[[https://github.com/Yevgnen/ivy-rich][ivy-rich]] adds extra columns to a few of the Counsel commands to provide more information about each item.
+
+#+begin_src emacs-lisp
+
+    (use-package ivy
+      :diminish
+      :bind (("C-s" . swiper)
+             :map ivy-minibuffer-map
+             ("TAB" . ivy-alt-done)
+             ("C-l" . ivy-alt-done)
+             ("C-j" . ivy-next-line)
+             ("C-k" . ivy-previous-line)
+             :map ivy-switch-buffer-map
+             ("C-k" . ivy-previous-line)
+             ("C-l" . ivy-done)
+            ("C-d" . ivy-switch-buffer-kill)
+             :map ivy-reverse-i-search-map
+             ("C-k" . ivy-previous-line)
+             ("C-d" . ivy-reverse-i-search-kill))
+      :config
+      (ivy-mode 1))
+
+
+;;    (use-package ivy-rich
+;;      :ensure t
+;;      :config (ivy-rich-mode 1))
+
+    (use-package counsel
+      :bind (("C-M-j" . 'counsel-switch-buffer)
+             :map minibuffer-local-map
+             ("C-r" . 'counsel-minibuffer-history))
+      :custom
+      (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+      :config
+      (counsel-mode 1))
+
+#+end_src
+
+* Use =sensible-defaults.el=
+
+Use [[https://github.com/hrs/sensible-defaults.el][sensible-defaults.el]] for some basic settings.
+
+#+begin_src emacs-lisp
+  (load-file "~/Personal/projects/sensible-defaults.el/sensible-defaults.el")
+  (sensible-defaults/use-all-settings)
+  (sensible-defaults/use-all-keybindings)
+#+end_src
+* Reading things
+** Reddit thru Gnus?
+#+begin_src emacs-lisp
+  ;; Applies to first-time Gnus users
+  (custom-set-variables '(gnus-select-method (quote (nnreddit ""))))
+  ;; Applies to existing Gnus users
+  ;; (add-to-list 'gnus-secondary-select-methods '(nnreddit ""))
+  ;; set python command here?
+;;  (setq nnreddit-python-command "python3")
+  (setq nnreddit-python-command "python3")
+#+end_src
+
+* Editing settings
+** Show my available key-bindings
+#+begin_src emacs-lisp
+  (use-package free-keys)
+#+end_src
+
+* Set custom keybindings
+** Just a few handy functions.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-w") 'backward-kill-word)
+#+end_src
+
+Remap when working in terminal Emacs.
+
+#+begin_src emacs-lisp
+  (define-key input-decode-map "\e[1;2A" [S-up])
+#+end_src
+
+** Mac swapping of option/command
+It's easier for my thumb to hit command rather than option on my mac... let's turn the command key int the meta key
+
+#+begin_src emacs-lisp
+    (cond  ((eq system-type 'darwin)
+         (setq mac-option-modifier 'super)
+         (setq mac-command-modifier 'meta)))
+#+end_src
+
+* Programming
+** Projectile
+
+[[https://projectile.mx/][Projectile]] is a project management library for Emacs which makes it a lot easier to navigate around code projects for various languages.  Many packages integrate with Projectile so it's a good idea to have it installed even if you don't use its commands directly.
+
+#+begin_src emacs-lisp
+
+  (use-package projectile
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :custom ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    ;; NOTE: Set this to the folder where you keep your Git repos!
+    (when (file-directory-p "~/projects")
+      (setq projectile-project-search-path '("~/projects" "~/Personal/projects")))
+    (setq projectile-switch-project-action #'projectile-dired))
+
+  (use-package counsel-projectile
+    :after projectile
+    :config (counsel-projectile-mode))
+
+#+end_src
+** Magit
+
+[[https://magit.vc/][Magit]] is the best Git interface I've ever used.  Common Git operations are easy to execute quickly using Magit's command panel system.
+
+#+begin_src emacs-lisp
+
+  (use-package magit
+    :commands magit-status
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+  ;; NOTE: Make sure to configure a GitHub token before using this package!
+  ;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
+  ;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
+  (use-package forge
+    :after magit)
+
+#+end_src
+** Mermaid (diagrams)
+there's org-babel support, as well as a standalone mode
+#+begin_src emacs-lisp
+  (use-package mermaid-mode)
+  (use-package ob-mermaid)
+#+end_src
+** Company — in-buffer completion
+#+begin_src emacs-lisp
+(use-package company
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection)
+         :map lsp-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.0))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+#+end_src
+
+** LSP
+*** lsp-mode
+#+begin_src emacs-lisp
+(defun bmc/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook ((lsp-mode . bmc/lsp-mode-setup)
+         (lsp-mode . lsp-enable-which-key-integration)
+         (sql-mode  . lsp-deferred))
+  :init
+  (setq lsp-keymap-prefix "C-c l"
+        lsp-enable-file-watchers nil
+        read-process-output-max (* 1024 1024)
+        lsp-completion-provider :capf
+        lsp-idle-delay 0.500)
+  :config
+  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
+#+end_src
+
+*** lsp-ui
+#+begin_src emacs-lisp
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom (lsp-ui-doc-position 'bottom))
+#+end_src
+
+*** lsp-treemacs
+#+begin_src emacs-lisp
+(use-package lsp-treemacs :after lsp)
+#+end_src
+
+*** lsp-ivy
+#+begin_src emacs-lisp
+(use-package lsp-ivy :after lsp)
+#+end_src
+
+* Dired setup
+** use coreutils' ls for dired
+the ls with mac does not accept the "--group-directories-first" flag
+#+begin_src emacs-lisp
+  (setq insert-directory-program "/usr/local/bin/gls" dired-use-ls-dired t)
+#+end_src
+* SQL Workflow
+
+** MySQL client on PATH
+#+begin_src emacs-lisp
+(setq exec-path (append exec-path '("/opt/homebrew/opt/mysql-client/bin")))
+#+end_src
+
+** Connections
+Connections live in an encrypted file that defines =sql-connection-alist=.
+#+begin_src emacs-lisp
+(load-library "~/.emacs.d/mysql-connections.el.gpg")
+#+end_src
+
+** sql-mode setup
+#+begin_src emacs-lisp
+(use-package sql
+  :config
+  (setq sql-product 'mysql)
+  (add-hook 'sql-mode-hook
+    (lambda ()
+      (electric-indent-mode -1)
+      (local-set-key (kbd "C-c l s c") #'lsp-sql-switch-connection)
+      (local-set-key (kbd "C-c l s d") #'lsp-sql-switch-database))))
+#+end_src
+
+** Schema-aware completion via sqls (LSP)
+=sqls= is a SQL language server — the =sql-mode= LSP hook is configured in the
+Programming > LSP section above. Install with =brew install sqls=.
+
+Do not create =~/.config/sqls/config.yml=. Instead, add =lsp-sqls-connections=
+directly to =~/.emacs.d/mysql-connections.el.gpg= (open it in Emacs with
+=C-x C-f= — EPA will decrypt it for editing). lsp-mode passes this to sqls
+via the LSP workspace configuration protocol, so credentials stay GPG-encrypted
+at rest alongside your =sql-connection-alist= entries.
+
+#+begin_example emacs-lisp
+(setq lsp-sqls-connections
+  '(((driver . "mysql")
+     (dataSourceName . "user:pass@tcp(host:3306)/dbname")
+     (alias . "mydb"))))
+#+end_example
+
+Multiple connections are supported — add one alist per entry.
+
+** sqlup — auto-uppercase SQL keywords
+#+begin_src emacs-lisp
+(use-package sqlup-mode
+  :hook ((sql-mode . sqlup-mode)
+         (sql-interactive-mode . sqlup-mode)))
+#+end_src
+
+** Dabbrev completion in sql-interactive-mode
+LSP doesn't attach to comint buffers, so we use =company-dabbrev= in the SQLi
+buffer to at least complete names already seen in the session. Write queries in
+a =.sql= file (with full sqls completion) and send with =C-c C-r= / =C-c C-c=.
+#+begin_src emacs-lisp
+(add-hook 'sql-interactive-mode-hook
+  (lambda ()
+    (setq-local company-backends '(company-dabbrev))
+    (company-mode 1)
+    (local-set-key (kbd "M-/") #'company-complete)))
+#+end_src
+
+* LLM
+How can I use chatGPT inside of emacs?
+
+To use chatGPT inside of Emacs, you can interact with the model by using the Emacs' built-in shell feature. You can launch a shell session in Emacs by typing =M-x shell=. Then, open a web browser within Emacs by typing =M-x eww= and navigate to OpenAI's playground or API documentation page to access the model. Alternatively, you can also use a package like =request= to make HTTP requests to the OpenAI API from within Emacs.
+#+begin_src emacs-lisp
+(use-package gptel)
+#+end_src
+** Configuring ollama
+taken from https://github.com/gregoryg/emacs-gregoryg?tab=readme-ov-file#functions-to-use-in-hooks
+discovered through this video: https://www.youtube.com/watch?v=yAL0cw1ePqw
+#+begin_src emacs-lisp
+(setq gjg/ollama-api-endpoint "http://localhost:11434")
+(defun gjg/get-ollama-models ()
+  "Return a list of Ollama models from the API, or nil if the API is not available."
+  (when-let*
+    ((url (url-generic-parse-url gjg/ollama-api-endpoint))
+     (host (url-host url))
+     (port (url-port url))
+     (maybe-ollama-models (s-split "\n"
+       (shell-command-to-string (concat "curl -s --connect-timeout 0.5 '"
+         gjg/ollama-api-endpoint "/api/tags' | jq -r '.models[].name'"))))
+     (my-ollama-models (seq-filter (lambda (s) (not (string= s "")))
+       maybe-ollama-models)))
+    (gptel-make-ollama
+      "Ollama"
+      :host (concat host ":" (number-to-string port))
+      :models my-ollama-models
+      :stream t)
+    my-ollama-models))
+
+;; set globally, as ollama-models is relevant to more than gptel
+(setq ollama-models (gjg/get-ollama-models))
+
+(unless ollama-models
+  (setq gptel--known-backends
+        (assoc-delete-all "Ollama" gptel--known-backends #'equal)))
+#+end_src
+* Fun
+** xkcd
+#+begin_src emacs-lisp
+(use-package xkcd
+  :ensure t
+  :bind (("C-c x" . xkcd)))
+#+end_src
+** mastodon
+#+begin_src emacs-lisp
+  (use-package mastodon
+   :ensure t
+   )
+  (setq mastodon-instance-url "https://mastodon.social")
+  (setq mastodon-active-user "bcollison")
+#+end_src
+** Jira
+#+begin_src emacs-lisp
+(use-package jira
+  :config
+  (setq jira-base-url "https://rakenapp.atlassian.net")
+  (setq jira-username "brian.collison@rakenapp.com")
+  (setq jira-api-version 3))
+#+end_src
+* Email
+#+BEGIN_SRC emacs-lisp
+           (use-package org-mime)
+                (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e/")
+                (use-package mu4e
+                  :load-path ("/home/brian/Personal/projects/third-party/mu/mu4e"
+            ;;                  "/usr/local/Cellar/mu/1.6.1/share/emacs/site-lisp/mu/mu4e"
+                              "/usr/local/share/emacs/site-lisp/mu4e/"))
+
+                (cond ((eq system-type 'gnu/linux)
+                     (setq mu4e-mu-binary "/usr/bin/mu"))
+                   ((eq system-type 'darwin)
+                     (setq mu4e-mu-binary "/usr/local/bin/mu")))
+      ;;               (setq mu4e-mu-binary "/opt/homebrew/bin/mu")))
+              ;  "mu4e no longer uses the mu4e-maildir and mu4e-user-mail-address-list variables; instead it uses the information it gets from mu (see the mu section above). If you have a non-default mu4e-mu-home, make sure to set it before mu4e starts."
+              ;; (setq mu4e-maildir (expand-file-name "/home/brian/Maildir"))
+
+                  ; get mail
+          ;; going to try to do this at the os scheduled level
+          ;;        (setq mu4e-get-mail-command "/usr/local/bin/mbsync -c ~/.mbsyncrc -a"
+          ;;          ;; mu4e-html2text-command "w3m -T text/html" ;;using the default mu4e-shr2text
+          ;;          mu4e-update-interval 600
+          ;;          mu4e-headers-auto-update t
+          ;;          mu4e-compose-signature-auto-include nil
+          ;;          mu4e-compose-format-flowed t)
+
+                  ;; to view selected message in the browser, no signin, just html mail
+                  (add-to-list 'mu4e-view-actions
+                    '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+
+                  ;; enable inline images
+                  (setq mu4e-view-show-images t)
+                  ;; use imagemagick, if available
+                  (when (fboundp 'imagemagick-register-types)
+                    (imagemagick-register-types))
+
+                  ;; every new email composition gets its own frame!
+                  (setq mu4e-compose-in-new-frame t)
+
+                  ;; don't save message to Sent Messages, IMAP takes care of this
+                  (setq mu4e-sent-messages-behavior 'delete)
+
+                  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
+
+                  ;; <tab> to navigate to links, <RET> to open them in browser
+                  (add-hook 'mu4e-view-mode-hook
+                    (lambda()
+                  ;; try to emulate some of the eww key-bindings
+                  (local-set-key (kbd "<RET>") 'mu4e~view-browse-url-from-binding)
+                  (local-set-key (kbd "<tab>") 'shr-next-link)
+                  (local-set-key (kbd "<backtab>") 'shr-previous-link)))
+
+                  ;; from https://www.reddit.com/r/emacs/comments/bfsck6/mu4e_for_dummies/elgoumx
+                  (add-hook 'mu4e-headers-mode-hook
+                        (defun my/mu4e-change-headers ()
+                           (interactive)
+                           (setq mu4e-headers-fields
+                              `((:human-date . 10)
+                               (:from . 22)
+                               (:subject)))))
+
+                  ;; if you use date instead of human-date in the above, use this setting
+                  ;; give me ISO(ish) format date-time stamps in the header list
+                  ;(setq mu4e-headers-date-format "%Y-%m-%d %H:%M")
+
+                  ;; spell check
+                  (add-hook 'mu4e-compose-mode-hook
+                      (defun my-do-compose-stuff ()
+                         "My settings for message composition."
+                         (visual-line-mode)
+                         (flyspell-mode)))
+
+                  (require 'smtpmail)
+
+                  ;;rename files when moving
+                  ;;NEEDED FOR MBSYNC
+                  (setq mu4e-change-filenames-when-moving t)
+
+                  ;;set up queue for offline email
+                  ;;use mu mkdir  ~/Maildir/acc/queue to set up first
+                  (setq smtpmail-queue-mail nil)  ;; start in normal mode
+
+                  ;;from the info manual
+                  (setq mu4e-attachment-dir  "~/Downloads")
+
+                  (setq message-kill-buffer-on-exit t)
+                  (setq mu4e-compose-dont-reply-to-self t)
+
+        ;;          (require 'org-mu4e)
+
+                  ;; convert org mode to HTML automatically
+                  (setq org-mu4e-convert-to-html t)
+
+                  ;;from vxlabs config
+                  ;; show full addresses in view message (instead of just names)
+                  ;; toggle per name with M-RET
+                  (setq mu4e-view-show-addresses 't)
+
+                  ;; don't ask when quitting
+                  (setq mu4e-confirm-quit nil)
+
+                  ;; from: https://www.reddit.com/r/emacs/comments/6ul9rz/email_html_rendering_mu4e_with_html2text_how_to/
+                  (require 'mu4e-contrib)
+
+                  (setq mu4e-html2text-command 'mu4e-shr2text)
+
+                  (setq shr-color-visible-luminance-min 80)
+
+                  (setq shr-color-visible-distance-min 5)
+
+                  ;; mu4e-context
+                  (setq mu4e-context-policy 'ask-if-none)
+                  (setq mu4e-compose-context-policy 'always-ask)
+                  (setq mu4e-contexts
+                    (list
+                     (make-mu4e-context
+                      :name "personal" ;;for bcollison-gmail
+                      :enter-func (lambda () (mu4e-message "Entering context personal"))
+                      :leave-func (lambda () (mu4e-message "Leaving context personal"))
+                      :match-func (lambda (msg)
+                        (when msg
+                      (mu4e-message-contact-field-matches
+                       msg '(:from :to :cc :bcc) "brian@briancollison.com")))
+                      :vars '((user-mail-address . "brian@briancollison.com")
+                        (user-full-name . "Brian Collison")
+                        (mu4e-sent-folder . "/bcollison-gmail/[bcollison].sent")
+                        (mu4e-drafts-folder . "/bcollison-gmail/[bcollison].drafts")
+                        (mu4e-trash-folder . "/bcollison-gmail/[bcollison].trash")
+                        (mu4e-refile-folder . "/bcollison-gmail/[bcollison].All Mail")
+                        (mu4e-compose-signature . (concat "Formal Signature\n" "Emacs 27, org-mode 9.4, mu4e 1.4\n"))
+                        (mu4e-compose-format-flowed . t)
+                        (smtpmail-queue-dir . "/home/brian/Maildir/bcollison-gmail/queue/cur")
+                        (message-send-mail-function . smtpmail-send-it)
+                        (smtpmail-smtp-user . "brian@briancollison.com")
+    ;;                    (smtpmail-starttls-credentials . (("smtp.gmail.com" 587 nil nil)))
+                        (smtpmail-starttls-credentials . (("smtp.office365.com" 587 nil nil)))
+  ;;                      (smtpmail-auth-credentials . (expand-file-name "~/.authinfo.gpg"))
+                        (smtpmail-default-smtp-server . "smtp.office365.com")
+                        (smtpmail-smtp-server . "smtp.office365.com")
+                        (smtpmail-local-domain . "briancollison.com")
+                        (smtpmail-servers-requiring-authorization .  ".*")
+                        (smtpmail-smtp-service . 587)
+                        (smtpmail-stream-type  . starttls)
+                        (smtpmail-debug-info . t)
+                        (smtpmail-debug-verbose . t)
+                         (smtpmail-debug-verb . t)
+                        (mu4e-maildir-shortcuts . ( ("/bcollison-gmail/INBOX"            . ?i)
+                            ("/bcollison-gmail/[bcollison].Raken" . ?r)
+                            ("/bcollison-gmail/[bcollison].sent" . ?s)
+                            ("/bcollison-gmail/[bcollison].trash"       . ?t)
+                            ("/bcollison-gmail/[bcollison].All Mail"       . ?l)
+                            ("/bcollison-gmail/[bcollison].actionable"  . ?a)
+                            ("/bcollison-gmail/[bcollison].wait"   . ?w)
+                            ("/bcollison-gmail/[bcollison].reference"   . ?F)
+                            ("/bcollison-gmail/[bcollison].receipts"   . ?R)
+                            ("/bcollison-gmail/[bcollison].inflight"   . ?f)
+                            ("/bcollison-gmail/[bcollison].to-read"   . ?T)
+                            ("/bcollison-gmail/[bcollison].School"   . ?S)
+                            ("/bcollison-gmail/[bcollison].CalvinSchool"   . ?C)
+                            ("/bcollison-gmail/[bcollison].OliviaSchool"   . ?O)
+                            ("/bcollison-gmail/[bcollison].OliviaDance"   . ?D)
+                            ("/bcollison-gmail/[bcollison].BoyScouts"   . ?B)
+                            ("/bcollison-gmail/[bcollison].Gymnastics"   . ?g)
+                            ("/bcollison-gmail/[bcollison].Health"   . ?H)
+                            ("/bcollison-gmail/[bcollison].drafts"    . ?d)
+                            ))))
+                  ))
+
+              (global-set-key (kbd "C-\"") 'mu4e)
+
+
+
+#+END_SRC
+
+** Enable mode-line alert display for work emails
+#+begin_src emacs-lisp
+(use-package mu4e-alert)
+(setq mu4e-alert-interesting-mail-query
+  (concat
+    "flag:unread"
+    " AND NOT flag:trashed"
+    " AND maildir:\"/raken-gmail/INBOX\""))
+(mu4e-alert-enable-mode-line-display)
+#+end_src
+
+** org-protocol?
+#+begin_src emacs-lisp
+;;   (server-start)
+  (require 'org-protocol)
+#+end_src
