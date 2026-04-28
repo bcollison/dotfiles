@@ -1796,8 +1796,9 @@ I'm usually actually in an org document.
                   (setq mu4e-context-policy 'ask-if-none)
                   (setq mu4e-compose-context-policy 'always-ask)
                   (setq mu4e-contexts
-                    (list
-                     (make-mu4e-context
+                    (append
+                     (when (string= (user-login-name) "briancollison")
+                       (list (make-mu4e-context
                       :name "personal" ;;for bcollison-gmail
                       :enter-func (lambda () (mu4e-message "Entering context personal"))
                       :leave-func (lambda () (mu4e-message "Leaving context personal"))
@@ -1844,9 +1845,10 @@ I'm usually actually in an org document.
                             ("/bcollison-gmail/[bcollison].OliviaDance"   . ?D)
                             ("/bcollison-gmail/[bcollison].BoyScouts"   . ?B)
                             ("/bcollison-gmail/[bcollison].drafts"    . ?d)
-                            ))))
+                            ))))))
 
-                    (make-mu4e-context
+                     (when (string= (user-login-name) "brian.collison")
+                       (list (make-mu4e-context
                       :name "work" ;;for raken-gmail
                       :enter-func (lambda () (mu4e-message "Entering context work"))
                       :leave-func (lambda () (mu4e-message "Leaving context work"))
@@ -1887,7 +1889,7 @@ I'm usually actually in an org document.
                             ("/raken-gmail/[raken].inflight"   . ?f)
                             ("/raken-gmail/[raken].drafts"    . ?d)
                             ))))
-                     )
+                     )))
                   )
 
               (global-set-key (kbd "C-\"") 'mu4e)
