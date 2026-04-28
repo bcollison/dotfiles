@@ -253,7 +253,8 @@ I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://f
     (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height efs/default-font-size)
 
     ;; Set the variable pitch face
-    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular))
+    (let ((vp-font (if (string= (user-login-name) "briancollison") "ETBembo" "Cantarell")))
+      (set-face-attribute 'variable-pitch nil :font vp-font :height efs/default-variable-font-size :weight 'regular)))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions
@@ -977,7 +978,8 @@ There's org-babel support, as well as a standalone mode
                         (org-level-6 . 1.1)
                         (org-level-7 . 1.1)
                         (org-level-8 . 1.1)))
-          (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
+          (let ((vp-font (if (string= (user-login-name) "briancollison") "ETBembo" "Cantarell")))
+            (set-face-attribute (car face) nil :font vp-font :weight 'regular :height (cdr face))))
 
         ;; Ensure that anything that should be fixed-pitch in Org files appears that way
         (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
