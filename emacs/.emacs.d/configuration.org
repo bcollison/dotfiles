@@ -254,7 +254,7 @@ I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://f
 
     ;; Set the variable pitch face
     (let ((vp-font (if (string= (user-login-name) "briancollison") "ETBembo" "Cantarell")))
-      (set-face-attribute 'variable-pitch nil :font vp-font :height efs/default-variable-font-size :weight 'regular)))
+      (set-face-attribute 'variable-pitch nil :font vp-font :height 1.0 :weight 'regular)))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions
@@ -963,7 +963,7 @@ There's org-babel support, as well as a standalone mode
 
  #+begin_src emacs-lisp
 
-      (defun efs/org-font-setup ()
+      (defun bmc/org-font-setup ()
         ;; Replace list hyphen with dot
    ;;     (font-lock-add-keywords 'org-mode
    ;;                             '(("^ *\\([-]\\) "
@@ -1118,7 +1118,7 @@ This section contains the basic configuration for =org-mode= plus the configurat
                 ((org-agenda-overriding-header "Cancelled Projects")
                  (org-agenda-files org-agenda-files)))))))
 
-      (efs/org-font-setup))
+      (bmc/org-font-setup))
 
 #+end_src
 
