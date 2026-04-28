@@ -1979,11 +1979,10 @@ Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I 
 ** Reddit thru Gnus?
 #+begin_src emacs-lisp
 ;; Applies to first-time Gnus users
-(custom-set-variables '(gnus-select-method (quote (nnreddit ""))))
-;; Applies to existing Gnus users
-;; (add-to-list 'gnus-secondary-select-methods '(nnreddit ""))
-;; set python command here?
-(setq nnreddit-python-command "python3")
+(when (string= (user-login-name) "briancollison")
+  (custom-set-variables '(gnus-select-method (quote (nnreddit ""))))
+  ;; nnreddit deps are installed under python3.8, not the system python3
+  (setq nnreddit-python-command "python3.8"))
 #+end_src
 
 ** RSS with =elfeed=

@@ -30,7 +30,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(epg-gpg-program "/usr/local/bin/gpg")
- '(gnus-select-method '(nnreddit ""))
  '(package-vc-selected-packages
    '((org-timeblock :url "https://github.com/bcollison/org-timeblock" :branch
                     "merge-gleek-show-done"))))
