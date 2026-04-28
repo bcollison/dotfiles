@@ -17,10 +17,14 @@
 
 (setq config-file (concat user-emacs-directory "configuration.org"))
 (org-babel-load-file config-file)
-(setq custom-file "~/.emacs.d/custom.el")
-(dolist (f (list "~/.emacs.d/custom-shared.el"
-                 (concat "~/.emacs.d/custom-" (user-login-name) ".el")
-                 custom-file))
+;; Custom file strategy:
+;;   custom-shared.el          — committed; settings common to all machines
+;;   custom-{user-login-name}.el — committed; per-machine settings; Emacs writes here
+;;
+;; Workflow: use M-x customize freely — changes land in the machine file.
+;; To share a setting across machines, move it to custom-shared.el manually.
+(setq custom-file (concat "~/.emacs.d/custom-" (user-login-name) ".el"))
+(dolist (f (list "~/.emacs.d/custom-shared.el" custom-file))
   (when (file-exists-p f)
     (load-file f)))
 (let ((sc "~/.emacs.d/my-productivity/shutdown-capture.el")
