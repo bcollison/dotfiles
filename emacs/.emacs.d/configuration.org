@@ -18,16 +18,14 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
      "/usr/local/bin" ":"
      "/opt/homebrew/bin" ":"
      "/Library/TeX/texbin" ":"
-     "/Users/brian.collison/.asdf/shims" ":"
-     "/Users/briancollison/.asdf/shims" ":"
+     (expand-file-name "~/.asdf/shims") ":"
      (getenv "PATH")
     )
   )
 
   (setq exec-path (append exec-path '("/usr/local/bin")))
   (setq exec-path (append exec-path '("/opt/homebrew/bin")))
-  (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
-  (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
+  (setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
   (setq exec-path (append exec-path '("/opt/homebrew/opt/mysql-client@8.4/bin")))
   (setq exec-path (append exec-path (list (expand-file-name "~/go/bin"))))
   (setq exec-path (append exec-path '("/opt/homebrew/opt/python@3.12/libexec/bin")))
@@ -1018,7 +1016,7 @@ This section contains the basic configuration for =org-mode= plus the configurat
       (variable-pitch-mode 1)
       (visual-line-mode 1))
 
-    (setq org-directory "/Users/brian.collison/Dropbox/Apps/MobileOrg")
+    (setq org-directory (expand-file-name "~/Dropbox/Apps/MobileOrg"))
 
   ;; does org-jira set this up for us?
     (setq org-link-abbrev-alist
@@ -1916,13 +1914,14 @@ I'm usually actually in an org document.
 
 ** Enable mode-line alert display for work emails
 #+begin_src emacs-lisp
-(use-package mu4e-alert)
-(setq mu4e-alert-interesting-mail-query
-  (concat
-    "flag:unread"
-    " AND NOT flag:trashed"
-    " AND maildir:\"/raken-gmail/INBOX\""))
-(mu4e-alert-enable-mode-line-display)
+(when (string= (user-login-name) "brian.collison")
+  (use-package mu4e-alert)
+  (setq mu4e-alert-interesting-mail-query
+    (concat
+      "flag:unread"
+      " AND NOT flag:trashed"
+      " AND maildir:\"/raken-gmail/INBOX\""))
+  (mu4e-alert-enable-mode-line-display))
 #+end_src
 
 ** Let's try and create a nice view in browser using xwdiget
@@ -1958,10 +1957,10 @@ Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I 
     (use-package org-gcal
             :ensure t
             :init
-            (setq org-gcal-dir "/Users/brian.collison/Dropbox/Apps/MobileOrg/.org-gcal/")
+            (setq org-gcal-dir (expand-file-name "~/Dropbox/Apps/MobileOrg/.org-gcal/"))
             (setq org-gcal-client-id "104759143706-1kj1r66cs5ij3ssfreasf5cqlavbrqjn.apps.googleusercontent.com"
       org-gcal-client-secret (get-authinfo "gcal.api" "9999")
-      org-gcal-fetch-file-alist '(("brian.collison@rakenapp.com" . "/Users/brian.collison/Documents/org/.org-gcal/raken.org")))
+      org-gcal-fetch-file-alist `(("brian.collison@rakenapp.com" . ,(expand-file-name "~/Documents/org/.org-gcal/raken.org"))))
           (setq org-gcal-remove-api-cancelled-events t))
 
     ;;        :config
@@ -2355,10 +2354,10 @@ You can start LSP server in a java project by using ~C-c l s s~. Once you type ~
 This is the package that handles server installation and session management.
 #+begin_src  emacs-lisp
     (use-package lsp-java :after lsp
-      :init (setq lsp-java-java-path "/Users/brian.collison/.jenv/versions/17.0/bin/java"
-                  lsp-java-import-gradle-java-home "/Users/brian.collison/.jenv/versions/17.0/bin/java"
-                  lsp-java-configuration-runtimes '[(:name "JavaSE-17"
-                                                           :path "/Users/brian.collison/.jenv/versions/17.0"
+      :init (setq lsp-java-java-path (expand-file-name "~/.jenv/versions/17.0/bin/java")
+                  lsp-java-import-gradle-java-home (expand-file-name "~/.jenv/versions/17.0/bin/java")
+                  lsp-java-configuration-runtimes `[(:name "JavaSE-17"
+                                                           :path ,(expand-file-name "~/.jenv/versions/17.0")
                                                            :default t)]
                   lsp-java-vmargs (list
                                    "-noverify"
