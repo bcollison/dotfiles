@@ -2,7 +2,11 @@
 
 alias dc="docker-compose"
 alias gg="git grep -n"
-alias git="hub"
+# alias git="hub"
+
+alias git-checkout-recent='BRANCH=$(git recent | gum filter ) && git co "$BRANCH"'
+alias gcr="git-checkout-recent"
+
 alias gpg="gpg2"
 alias less="less -R" # display colors correctly
 alias sbcl="rlwrap sbcl"

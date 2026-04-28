@@ -83,9 +83,9 @@ ZSH_THEME="mira"
 #plugins=(z git git-prompt jenv mvn zsh-autosuggestions)
 
 if [ "$(uname 2> /dev/null)" != "Linux" ]; then
-  plugins=(z git jenv mvn zsh-autosuggestions alias-finder gradle-completion)
+  plugins=(z git jenv mvn zsh-autosuggestions alias-finder gradle-completion brew docker docker-compose jira)
 else
-  plugins=(zsh-z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions alias-finder gradle-completion)
+  plugins=(zsh-z git git-prompt jenv docker docker-compose mvn golang gcloud zsh-autosuggestions alias-finder gradle-completion jira)
 fi
 
 source $ZSH/oh-my-zsh.sh
@@ -195,8 +195,14 @@ export PATH="/usr/local/opt/mysql-client/bin:$PATH"
 export PATH="/Users/brian.collison/bin:$PATH"
 
 export CHARLES_HOME="/Applications/Charles.app/Contents/MacOS"
-
 export PATH="$CHARLES_HOME:$PATH"
+
+export PR_HELPERS="/Users/brian.collison/projects/pr-helpers"
+export PATH="$PR_HELPERS:$PATH"
+#alias prr='get-all-prs-recent.sh'
+alias prr='prr.sh'
+alias prr2='prr2.sh'
+alias prp='get-pr-at-point.sh'
 
 alias ch="Charles -headless"
 
@@ -215,10 +221,10 @@ eval "$(fakedata --completion zsh)"
 #                                                                          #
 #     # Usage:                                                             #
 #dalias     daws <svc> <cmd> <opts> : aws cli in docker with <svc> <cmd> <opts>  #
-#dalias     dc             : docker-compose                                      #
-#dalias     dcu            : docker-compose up -d                                #
-#dalias     dcd            : docker-compose down                                 #
-#dalias     dcr            : docker-compose run                                  #
+#dalias     dc             : docker compose                                      #
+#dalias     dcu            : docker compose up -d                                #
+#dalias     dcd            : docker compose down                                 #
+#dalias     dcr            : docker compose run                                  #
 #dalias     dex <container>: execute a bash shell inside the RUNNING <container> #
 #dalias     di <container> : docker inspect <container>                          #
 #dalias     dim            : docker images                                       #
@@ -270,7 +276,7 @@ function drun-fn {
 }
 
 function dcr-fn {
-	docker-compose run $@
+	docker compose run $@
 }
 
 function dsr-fn {
@@ -292,7 +298,7 @@ function dlab {
 }
 
 function dc-fn {
-        docker-compose $*
+        docker compose $*
 }
 
 function d-aws-cli-fn {
@@ -311,33 +317,33 @@ function dstats-fn {
   docker stats --no-stream;
 }
 
-alias daws=d-aws-cli-fn
-alias dc=dc-fn
-alias dcu="docker-compose up -d"
-alias dcd="docker-compose down"
-alias dcl="docker-compose logs"
-alias dcr=dcr-fn
-alias dex=dex-fn
-alias di=di-fn
-alias dim="docker images"
-alias dip=dip-fn
-alias dl=dl-fn
-alias dnames=dnames-fn
-alias dps="docker ps"
-alias dpsa="docker ps -a"
-alias drmc=drmc-fn
-alias drmid=drmid-fn
-alias drun=drun-fn
-alias dsp="docker system --all"
-alias dsr=dsr-fn
-alias dtop=dtop-fn
-alias dstats=dstats-fn
-alias dsa="docker stop $(docker ps -a -q)"
-alias dser="docker service"
-alias dvol="docker volumne"
-alias dm="docker-machine"
-alias dmx="docker-machine ssh"
-alias daliases="grep dalias ~/.zshrc | grep -v '^alias' | sed s/dalias//g"
+#alias daws=d-aws-cli-fn
+#alias dc=dc-fn
+#alias dcu="docker compose up -d"
+#alias dcd="docker compose down"
+#alias dcl="docker compose logs"
+#alias dcr=dcr-fn
+#alias dex=dex-fn
+#alias di=di-fn
+#alias dim="docker images"
+#alias dip=dip-fn
+#alias dl=dl-fn
+#alias dnames=dnames-fn
+#alias dps="docker ps"
+#alias dpsa="docker ps -a"
+#alias drmc=drmc-fn
+#alias drmid=drmid-fn
+#alias drun=drun-fn
+#alias dsp="docker system --all"
+#alias dsr=dsr-fn
+#alias dtop=dtop-fn
+#alias dstats=dstats-fn
+#alias dsa="docker stop $(docker ps -a -q)"
+#alias dser="docker service"
+#alias dvol="docker volumne"
+#alias dm="docker-machine"
+#alias dmx="docker-machine ssh"
+#alias daliases="grep dalias ~/.zshrc | grep -v '^alias' | sed s/dalias//g"
 
 neofetch
 
@@ -356,4 +362,73 @@ export LESS="--RAW-CONTROL-CHARS"
 [[ -f ~/.LESS_TERMCAP ]] && . ~/.LESS_TERMCAP
 export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
 export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+
+fzf-git-branch() {
+    git rev-parse HEAD > /dev/null 2>&1 || return
+
+    git branch --color=always --all --sort=-committerdate |
+        grep -v HEAD |
+        fzf --height 50% --ansi --no-multi --preview-window right:65% \
+            --preview 'git log -n 50 --color=always --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed "s/.* //" <<< {})' |
+        sed "s/.* //"
+}
+
+fzf-git-checkout() {
+    git rev-parse HEAD > /dev/null 2>&1 || return
+
+    local branch
+
+    branch=$(fzf-git-branch)
+    if [[ "$branch" = "" ]]; then
+        echo "No branch selected."
+        return
+    fi
+
+    if [[ "$branch" = 'remotes/'* ]]; then
+        git checkout --track $branch
+    else
+        git checkout $branch;
+    fi
+}
+
+alias gb='fzf-git-branch'
+alias gco='fzf-git-checkout'
+export PATH="/opt/homebrew/opt/mysql-client@8.4/bin:$PATH"
+
+export ASDF_DATA_DIR="/Users/brian.collison/.asdf"
+export PATH="$ASDF_DATA_DIR/shims:$PATH"
+
+alias cl="fc -ln -1 | sed 's/^\s*//' | tr -d '\n' | pbcopy"
+
+export JIRA_URL=https://rakenapp.atlassian.net
+
+export PATH=$PATH:$HOME/.composer/vendor/bin
+
+alias urlencode='python3 -c "import sys; from urllib.parse import quote_plus; \
+    print (quote_plus(sys.argv[1]))"'
+
+alias urldecode='python3 -c "import sys; from urllib.parse import unquote_plus; \
+    print (unquote_plus(sys.argv[1]))"'
+
+alias git-checkout-recent='BRANCH=$(git recent | gum filter) && git co "$BRANCH"'
+alias gcr="git-checkout-recent"
+
+curl() {
+  local use_netrc=false
+  local args=()
+
+  for arg in "$@"; do
+    if [[ "$arg" == "-n" || "$arg" == "--netrc" ]]; then
+      use_netrc=true
+    else
+      args+=("$arg")
+    fi
+  done
+
+  if [ "$use_netrc" = true ]; then
+    command curl --netrc-file <(gpg --batch -q -d ~/.netrc.gpg) "${args[@]}"
+  else
+    command curl "$@"
+  fi
+}
 export PATH="$HOME/.local/bin:$PATH"

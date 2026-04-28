@@ -28,8 +28,11 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
   (setq exec-path (append exec-path '("/opt/homebrew/bin")))
   (setq exec-path (append exec-path '("/Users/brian.collison/.asdf/shims")))
   (setq exec-path (append exec-path '("/Users/briancollison/.asdf/shims")))
-  (setq exec-path (append exec-path '("/Users/briancollison/go/bin")))
+  (setq exec-path (append exec-path '("/opt/homebrew/opt/mysql-client@8.4/bin")))
+  (setq exec-path (append exec-path (list (expand-file-name "~/go/bin"))))
   (setq exec-path (append exec-path '("/opt/homebrew/opt/python@3.12/libexec/bin")))
+
+  (require 'org)
 #+end_src
 
 * Common functions
@@ -40,6 +43,54 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
     (when hostentry (netrc-get hostentry "password"))))
 
 #+end_src
+
+* Clean Barrier Clipboard Pastes
+Filters carriage returns from clipboard content before Emacs sees it, fixing
+~^M~ characters introduced when pasting across machines via Barrier.
+#+begin_src emacs-lisp
+(defun my/filter-clipboard-carriage-returns (orig-fun &rest args)
+  (let ((result (apply orig-fun args)))
+    (when (stringp result)
+      (replace-regexp-in-string "\r" "\n" result))))
+
+(advice-add 'gui-selection-value :around #'my/filter-clipboard-carriage-returns)
+#+end_src
+
+
+
+* Fix Barrier Clipboard Newlines
+
+Replace ~^M~ characters in the selected region with proper newlines,
+for use after pasting across machines via Barrier.
+
+#+begin_src emacs-lisp
+(defun my/fix-barrier-newlines (start end)
+  "Replace ^M characters in region with newlines."
+  (interactive "r")
+  (save-excursion
+    (goto-char start)
+    (while (search-forward "\r" end t)
+      (replace-match "\n"))))
+#+end_src
+
+* Save All Buffers Safely
+
+Wraps ~save-some-buffers~ to catch stale file-notify watcher errors and
+automatically retry, avoiding the need to manually invoke the command twice.
+
+#+begin_src emacs-lisp
+(defun my/save-some-buffers-safe ()
+  (interactive)
+  (condition-case err
+      (save-some-buffers t)
+    (void-function
+     (message "Caught file-notify error, retrying...")
+     (save-some-buffers t))))
+
+(global-set-key (kbd "C-x s") #'my/save-some-buffers-safe)
+#+end_src
+
+
 * Configure =use-package=
 
 I use =use-package= to install and configure my packages. My =init.el= includes the
@@ -870,6 +921,17 @@ Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=)
 #+end_src
 
 ** Jira
+
+*** jira.el
+#+begin_src emacs-lisp
+(use-package jira
+   :config
+  (setq jira-base-url "https://rakenapp.atlassian.net")
+  (setq jira-username "brian.collison@rakenapp.com")
+  (setq jira-api-version 3))
+#+end_src
+
+*** org-jira
 #+begin_src emacs-lisp
     (use-package org-jira
       :config
@@ -888,6 +950,12 @@ I'm in the spaces camp.
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
+#+end_src
+** Mermaid (diagrams)
+There's org-babel support, as well as a standalone mode
+#+begin_src emacs-lisp
+  (use-package mermaid-mode)
+  (use-package ob-mermaid)
 #+end_src
 * Publishing and task management with Org-mode
 
@@ -945,110 +1013,112 @@ This section contains the basic configuration for =org-mode= plus the configurat
 
 #+begin_src emacs-lisp
 
-  (defun efs/org-mode-setup ()
-    (org-indent-mode)
-    (variable-pitch-mode 1)
-    (visual-line-mode 1))
+    (defun efs/org-mode-setup ()
+      (org-indent-mode)
+      (variable-pitch-mode 1)
+      (visual-line-mode 1))
 
-  (setq org-directory "/Users/brian.collison/Dropbox/Apps/MobileOrg")
+    (setq org-directory "/Users/brian.collison/Dropbox/Apps/MobileOrg")
 
-;; does org-jira set this up for us?
-  (setq org-link-abbrev-alist
-      '(("JIRA"        . "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")))
+  ;; does org-jira set this up for us?
+    (setq org-link-abbrev-alist
+        '(("JIRA"        . "https://rakenapp.atlassian.net/secure/QuickSearch.jspa?searchString=%s")))
 
-  (defun org-file-path (filename)
-    "Return the absolute address of an org file, given its relative name."
-    (concat (file-name-as-directory org-directory) filename))
+    (defun org-file-path (filename)
+      "Return the absolute address of an org file, given its relative name."
+      (concat (file-name-as-directory org-directory) filename))
 
-  (use-package org
-    :pin org
-    :commands (org-capture org-agenda)
-    :hook (org-mode . efs/org-mode-setup)
-    :config
-    (setq org-ellipsis " ▾")
+    (use-package org
+;;      :ensure t
+;;      :pin org
+      :commands (org-capture org-agenda)
+      :hook (org-mode . efs/org-mode-setup)
+      :config
+      (setq org-ellipsis " ▾")
 
-    (setq org-agenda-start-with-log-mode t)
-    (setq org-log-done 'time)
-    (setq org-log-into-drawer t)
+      (setq org-agenda-start-with-log-mode t)
+      (setq org-log-done 'time)
+      (setq org-log-into-drawer t)
 
-    (require 'org-habit)
-    (add-to-list 'org-modules 'org-habit)
-    (setq org-habit-graph-column 60)
+      (require 'org-habit)
+      (add-to-list 'org-modules 'org-habit)
+      (setq org-habit-graph-column 60)
 
-    (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-        (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+      (setq org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+          (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
-    (setq org-refile-targets
-      '(("Archive.org" :maxlevel . 1)
-        ("home.org" :maxlevel . 2)))
+      (setq org-refile-targets
+        '(("Archive.org" :maxlevel . 1)
+          ("work-limbo.org" :maxlevel . 1)
+          ("home.org" :maxlevel . 2)))
 
-    ;; Save Org buffers after refiling!
-    (advice-add 'org-refile :after 'org-save-all-org-buffers)
+      ;; Save Org buffers after refiling!
+      (advice-add 'org-refile :after 'org-save-all-org-buffers)
 
-    (setq org-tag-alist
-      '((:startgroup)
-         ; Put mutually exclusive tags here
-         (:endgroup)
-         ("@errand" . ?E)
-         ("@home" . ?H)
-         ("@work" . ?W)
-         ("agenda" . ?a)
-         ("planning" . ?p)
-         ("publish" . ?P)
-         ("batch" . ?b)
-         ("note" . ?n)
-         ("idea" . ?i)))
+      (setq org-tag-alist
+        '((:startgroup)
+           ; Put mutually exclusive tags here
+           (:endgroup)
+           ("@errand" . ?E)
+           ("@home" . ?H)
+           ("@work" . ?W)
+           ("agenda" . ?a)
+           ("planning" . ?p)
+           ("publish" . ?P)
+           ("batch" . ?b)
+           ("note" . ?n)
+           ("idea" . ?i)))
 
-    ;; Configure custom agenda views
-    (setq org-agenda-custom-commands
-     '(("d" "Dashboard"
-       ((agenda "" ((org-deadline-warning-days 7)))
-        (todo "NEXT"
-          ((org-agenda-overriding-header "Next Tasks")))
-        (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+      ;; Configure custom agenda views
+      (setq org-agenda-custom-commands
+       '(("d" "Dashboard"
+         ((agenda "" ((org-deadline-warning-days 7)))
+          (todo "NEXT"
+            ((org-agenda-overriding-header "Next Tasks")))
+          (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
-      ("n" "Next Tasks"
-       ((todo "NEXT"
-          ((org-agenda-overriding-header "Next Tasks")))))
+        ("n" "Next Tasks"
+         ((todo "NEXT"
+            ((org-agenda-overriding-header "Next Tasks")))))
 
-      ("W" "Work Tasks" tags-todo "+work-email")
+        ("W" "Work Tasks" tags-todo "+WORK")
 
-      ;; Low-effort next actions
-      ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-       ((org-agenda-overriding-header "Low Effort Tasks")
-        (org-agenda-max-todos 20)
-        (org-agenda-files org-agenda-files)))
+        ;; Low-effort next actions
+        ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+         ((org-agenda-overriding-header "Low Effort Tasks")
+          (org-agenda-max-todos 20)
+          (org-agenda-files org-agenda-files)))
 
-      ("w" "Workflow Status"
-       ((todo "WAIT"
-              ((org-agenda-overriding-header "Waiting on External")
-               (org-agenda-files org-agenda-files)))
-        (todo "REVIEW"
-              ((org-agenda-overriding-header "In Review")
-               (org-agenda-files org-agenda-files)))
-        (todo "PLAN"
-              ((org-agenda-overriding-header "In Planning")
-               (org-agenda-todo-list-sublevels nil)
-               (org-agenda-files org-agenda-files)))
-        (todo "BACKLOG"
-              ((org-agenda-overriding-header "Project Backlog")
-               (org-agenda-todo-list-sublevels nil)
-               (org-agenda-files org-agenda-files)))
-        (todo "READY"
-              ((org-agenda-overriding-header "Ready for Work")
-               (org-agenda-files org-agenda-files)))
-        (todo "ACTIVE"
-              ((org-agenda-overriding-header "Active Projects")
-               (org-agenda-files org-agenda-files)))
-        (todo "COMPLETED"
-              ((org-agenda-overriding-header "Completed Projects")
-               (org-agenda-files org-agenda-files)))
-        (todo "CANC"
-              ((org-agenda-overriding-header "Cancelled Projects")
-               (org-agenda-files org-agenda-files)))))))
+        ("w" "Workflow Status"
+         ((todo "WAIT"
+                ((org-agenda-overriding-header "Waiting on External")
+                 (org-agenda-files org-agenda-files)))
+          (todo "REVIEW"
+                ((org-agenda-overriding-header "In Review")
+                 (org-agenda-files org-agenda-files)))
+          (todo "PLAN"
+                ((org-agenda-overriding-header "In Planning")
+                 (org-agenda-todo-list-sublevels nil)
+                 (org-agenda-files org-agenda-files)))
+          (todo "BACKLOG"
+                ((org-agenda-overriding-header "Project Backlog")
+                 (org-agenda-todo-list-sublevels nil)
+                 (org-agenda-files org-agenda-files)))
+          (todo "READY"
+                ((org-agenda-overriding-header "Ready for Work")
+                 (org-agenda-files org-agenda-files)))
+          (todo "ACTIVE"
+                ((org-agenda-overriding-header "Active Projects")
+                 (org-agenda-files org-agenda-files)))
+          (todo "COMPLETED"
+                ((org-agenda-overriding-header "Completed Projects")
+                 (org-agenda-files org-agenda-files)))
+          (todo "CANC"
+                ((org-agenda-overriding-header "Cancelled Projects")
+                 (org-agenda-files org-agenda-files)))))))
 
-    (efs/org-font-setup))
+      (efs/org-font-setup))
 
 #+end_src
 
@@ -1072,7 +1142,7 @@ We use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]
 #+begin_src emacs-lisp
 
   (defun efs/org-mode-visual-fill ()
-    (setq visual-fill-column-width 100
+    (setq visual-fill-column-width 220
           visual-fill-column-center-text t)
     (visual-fill-column-mode 1))
 
@@ -1209,6 +1279,7 @@ reasonably, a =recurring-events.org= file. Those are (mostly) structured as
                                (org-file-path "recurring-events.org")
                                (org-file-path "home.org")
                                (org-file-path "work.org")
+                               (org-file-path "work-limbo.org")
                                (org-file-path ".org-gcal/v-raken.org")))
 #+end_src
 
@@ -1247,12 +1318,18 @@ Define a few common tasks as capture templates. Specifically, I frequently:
 - Maintain a todo list in =~/documents/org/index.org=.
 - Convert emails into todos to maintain an empty inbox.
 
+Refiling according to the document's hierarchy.
+
 #+begin_src emacs-lisp
   (setq org-capture-templates
         `(("B" "Blog idea"
            entry
            (file ,(org-file-path  "notes/blog-ideas.org"))
            "* %?\n")
+
+;;          ("d" "Denote Journal"  entry
+;;            (file+headline ,(car (denote-journal-extras--entry-today)) "Notes")
+;;            "* %U %?\n%i\n%a" :prepend t :kill-buffer t :empty-lines 1)
 
           ("e" "Email" entry
            (file+headline org-index-file "Inbox")
@@ -1285,6 +1362,11 @@ Define a few common tasks as capture templates. Specifically, I frequently:
            (file+headline ,(org-file-path "index.org") "Inbox")
            "* TODO %?\n")
 
+          ("T" "org-protocol Todo"
+           entry
+           (file+headline ,(org-file-path "index.org") "Inbox")
+           "* TODO %:description\n")
+
           ("m" "Music"
            entry
            (file+headline ,(org-file-path "index.org") "Music")
@@ -1301,7 +1383,10 @@ Define a few common tasks as capture templates. Specifically, I frequently:
         ))
 #+end_src
 
-Refiling according to the document's hierarchy.
+#+RESULTS:
+| B | Blog idea | entry | (file /Users/brian.collison/Dropbox/Apps/MobileOrg/notes/blog-ideas.org) | * %?      |
+| e | Email     | entry | (file+headline org-index-file Inbox)                                     | * TODO %? |
+
 
 #+begin_src emacs-lisp
   (setq org-refile-use-outline-path t)
@@ -1482,6 +1567,24 @@ I'm usually actually in an org document.
 #+end_src
 
 * Knowledge Managment
+
+** Trying out denote...
+#+begin_src emacs-lisp
+  (use-package denote
+    :ensure t
+    :init
+    (require 'denote-org)
+    (require 'denote-journal)
+    (denote-rename-buffer-mode 1)
+    :custom
+    (denote-directory "~/Documents/org/notes")
+    :config
+    (setq denote-journal-title-format 'day-date-month-year)
+    :hook
+    (dired-mode . denote-dired-mode)
+    :custom-face
+    (denote-faces-link ((t (:slant italic)))))
+#+end_src
 ** Let's try to use org-roam for my PKM System?
 #+begin_src emacs-lisp
     ;;  (use-package org-roam
@@ -1518,6 +1621,16 @@ I'm usually actually in an org document.
 
         ;; If using org-roam-protocol
         (require 'org-roam-protocol))
+
+(defun my/org-roam-node-has-tag (node tag)
+  "Filter function to check if the given NODE has the specified TAG."
+  (member tag (org-roam-node-tags node)))
+
+(defun my/org-roam-node-find-by-tag ()
+  "Find and open an Org-roam node based on a specified tag."
+  (interactive)
+  (let ((tag (read-string "Enter tag: ")))
+    (org-roam-node-find nil nil (lambda (node) (my/org-roam-node-has-tag node tag)))))
 #+end_src
 
 ** let's add a server for visualization, capture
@@ -1733,7 +1846,7 @@ I'm usually actually in an org document.
                             ("/bcollison-gmail/[bcollison].drafts"    . ?d)
                             ))))
 
-                     (make-mu4e-context
+                    (make-mu4e-context
                       :name "work" ;;for raken-gmail
                       :enter-func (lambda () (mu4e-message "Entering context work"))
                       :leave-func (lambda () (mu4e-message "Leaving context work"))
@@ -1766,6 +1879,7 @@ I'm usually actually in an org document.
                             ("/raken-gmail/[raken].Raken" . ?r)
                             ("/raken-gmail/[raken].sent" . ?s)
                             ("/raken-gmail/[raken].trash"       . ?t)
+                            ("/raken-gmail/[raken].TestEmails"       . ?T)
                             ("/raken-gmail/[raken].All Mail"       . ?l)
                             ("/raken-gmail/[raken].actionable"  . ?a)
                             ("/raken-gmail/[raken].wait"   . ?w)
@@ -1799,6 +1913,17 @@ I'm usually actually in an org document.
            :key   ?M))
 
 #+END_SRC
+
+** Enable mode-line alert display for work emails
+#+begin_src emacs-lisp
+(use-package mu4e-alert)
+(setq mu4e-alert-interesting-mail-query
+  (concat
+    "flag:unread"
+    " AND NOT flag:trashed"
+    " AND maildir:\"/raken-gmail/INBOX\""))
+(mu4e-alert-enable-mode-line-display)
+#+end_src
 
 ** Let's try and create a nice view in browser using xwdiget
 #+begin_src emacs-lisp
@@ -1845,7 +1970,7 @@ Going to attempt to use org-gcal (I don't think I need bidirectional syncing, I 
   ;; https://www.reddit.com/r/emacs/comments/137r7j7/gnupg_241_encryption_issues_with_emacs_orgmode/
         (fset 'epg-wait-for-status 'ignore)
 
-        (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
+;;        (add-hook 'org-agenda-mode-hook (lambda () (org-gcal-sync) ))
 #+end_src
 * Reading things
 ** Reddit thru Gnus?
@@ -2093,8 +2218,9 @@ list of timezones.  Nice for working in a team with remote members.
 (set-register ?w (cons 'file (concat org-directory "/work.org")))
 (set-register ?h (cons 'file (concat org-directory "/health.org")))
 (set-register ?i (cons 'file (concat org-directory "/index.org")))
-(setq bc/current-sprint "2021.15")
+(setq bc/current-sprint "2024.14")
 (set-register ?s (cons 'file (concat org-directory (concat (concat "/sprints/" bc/current-sprint) ".org"))))
+(set-register ?S (cons 'file (concat org-directory "/standup-helper.org")))
 #+end_src
 ** Docker control within emacs
 #+begin_src emacs-lisp
@@ -2373,37 +2499,50 @@ How can I use chatGPT inside of emacs?
 
 To use chatGPT inside of Emacs, you can interact with the model by using the Emacs' built-in shell feature. You can launch a shell session in Emacs by typing =M-x shell=. Then, open a web browser within Emacs by typing =M-x eww= and navigate to OpenAI's playground or API documentation page to access the model. Alternatively, you can also use a package like =request= to make HTTP requests to the OpenAI API from within Emacs.
 #+begin_src emacs-lisp
-(use-package gptel)
+(use-package gptel
+  :config
+  (setq gptel-backend (gptel-make-ollama "Ollama"
+  :host "localhost:11434"
+  :stream t
+  :models '(mistral:latest))))
 #+end_src
 ** Configuring ollama
 taken from https://github.com/gregoryg/emacs-gregoryg?tab=readme-ov-file#functions-to-use-in-hooks
 discovered through this video: https://www.youtube.com/watch?v=yAL0cw1ePqw
 #+begin_src emacs-lisp
-(setq gjg/ollama-api-endpoint "http://localhost:11434")
-(defun gjg/get-ollama-models ()
-  "Return a list of Ollama models from the API, or nil if the API is not available."
-  (when-let*
-      ((url (url-generic-parse-url gjg/ollama-api-endpoint))
-       (host (url-host url))
-       (port (url-port url))
-       (maybe-ollama-models (s-split "\n"
-                                     (shell-command-to-string (concat "curl -s --connect-timeout 0.5 '"
-                                                                      gjg/ollama-api-endpoint "/api/tags' | jq -r '.models[].name'"))))
-       (my-ollama-models (seq-filter (lambda (s) (not (string= s "")))
-                                     maybe-ollama-models)))
-    (gptel-make-ollama
-     "Ollama"
-     :host (concat host ":" (number-to-string port))
-     :models my-ollama-models
-     :stream t)
-    my-ollama-models))
+  (setq gjg/ollama-api-endpoint "http://localhost:11434")
+  (defun gjg/get-ollama-models ()
+    "Return a list of Ollama models from the API, or nil if the API is not available."
+    (when-let*
+        ((url (url-generic-parse-url gjg/ollama-api-endpoint))
+         (host (url-host url))
+         (port (url-port url))
+         (maybe-ollama-models (s-split "\n"
+                                       (shell-command-to-string (concat "curl -s --connect-timeout 0.5 '"
+                                                                        gjg/ollama-api-endpoint "/api/tags' | jq -r '.models[].name'"))))
+         (my-ollama-models (seq-filter (lambda (s) (not (string= s "")))
+                                       maybe-ollama-models)))
+      (gptel-make-ollama
+       "Ollama"
+       :host (concat host ":" (number-to-string port))
+       :models my-ollama-models
+       :stream t)
+      my-ollama-models))
 
-;; set globally, as ollama-models is relevant to more than gptel
-(setq ollama-models (gjg/get-ollama-models))
+  ;; set globally, as ollama-models is relevant to more than gptel
+  (setq ollama-models (gjg/get-ollama-models))
 
-(unless ollama-models
-  (setq gptel--known-backends
-        (assoc-delete-all "Ollama" gptel--known-backends #'equal)))
+  (unless ollama-models
+    (setq gptel--known-backends
+          (assoc-delete-all "Ollama" gptel--known-backends #'equal)))
+
+;; OPTIONAL configuration
+(setq
+ gptel-model 'mistral:latest
+ gptel-backend (gptel-make-ollama "Ollama"
+                 :host "localhost:11434"
+                 :stream t
+                 :models '(mistral:latest)))
 #+end_src
 
 
@@ -2423,6 +2562,11 @@ discovered through this video: https://www.youtube.com/watch?v=yAL0cw1ePqw
 #+begin_src emacs-lisp
 (setq exec-path (append exec-path '("/opt/homebrew/opt/mysql-client/bin")))
 (load-library "~/.emacs.d/mysql-connections.el.gpg")
+;; does this give syntax hilighting?
+;;(defun my-font-lock-everything-in-sql-interactive-mode ()
+;;(unless (eq 'oracle sql-product)
+;;(sql-product-font-lock nil nil)))
+;;(add-hook 'sql-interactive-mode-hook 'my-font-lock-everything-in-sql-interactive-mode)
 #+end_src
 
 ** sql-mode setup
@@ -2430,11 +2574,7 @@ discovered through this video: https://www.youtube.com/watch?v=yAL0cw1ePqw
 (use-package sql
   :config
   (setq sql-product 'mysql)
-  (add-hook 'sql-mode-hook
-    (lambda ()
-      (electric-indent-mode -1)
-      (local-set-key (kbd "C-c l s c") #'lsp-sql-switch-connection)
-      (local-set-key (kbd "C-c l s d") #'lsp-sql-switch-database))))
+  (add-hook 'sql-mode-hook (lambda () (electric-indent-mode -1))))
 #+end_src
 
 ** sqlup — auto-uppercase SQL keywords
@@ -2474,7 +2614,6 @@ at rest alongside your =sql-connection-alist= entries.
 #+end_example
 
 Multiple connections are supported — add one alist per entry.
-
 * search integration
 #+begin_src emacs-lisp
 (use-package google-this
@@ -2484,9 +2623,13 @@ Multiple connections are supported — add one alist per entry.
 
 * time blocking finally here?
 #+begin_src emacs-lisp
-  (use-package org-ql)
-  (use-package org-timeblock)
-  (define-key global-map (kbd "C-c b") 'org-timeblock-list)
+      (use-package org-ql)
+
+      (use-package org-timeblock
+        :vc (:url "https://github.com/bcollison/org-timeblock" :branch "merge-gleek-show-done")
+        :config
+        (org-timeblock-keep-done t))
+      (define-key global-map (kbd "C-c b") 'org-timeblock-list)
 #+end_src
 
 * Move me to the right place
