@@ -18,8 +18,11 @@
 (setq config-file (concat user-emacs-directory "configuration.org"))
 (org-babel-load-file config-file)
 (setq custom-file "~/.emacs.d/custom.el")
-(when (file-exists-p custom-file)
-  (load-file custom-file))
+(dolist (f (list "~/.emacs.d/custom-shared.el"
+                 (concat "~/.emacs.d/custom-" (user-login-name) ".el")
+                 custom-file))
+  (when (file-exists-p f)
+    (load-file f)))
 (let ((sc "~/.emacs.d/my-productivity/shutdown-capture.el")
       (md "~/.emacs.d/my-productivity/morning-dashboard.el"))
   (when (file-exists-p sc) (load sc))

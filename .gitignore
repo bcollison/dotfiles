@@ -2,6 +2,9 @@ emacs/.emacs.d/*
 !emacs/.emacs.d/configuration.org
 !emacs/.emacs.d/rewrite-configuration-from-scratch.org
 !emacs/.emacs.d/init.el
+!emacs/.emacs.d/custom-shared.el
+!emacs/.emacs.d/custom-briancollison.el
+!emacs/.emacs.d/custom-brian.collison.el
 !emacs/.emacs.d/resources
 !emacs/.emacs.d/snippets
 .DS_Store
