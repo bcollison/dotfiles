@@ -18,9 +18,12 @@
 (setq config-file (concat user-emacs-directory "configuration.org"))
 (org-babel-load-file config-file)
 (setq custom-file "~/.emacs.d/custom.el")
-(load-file custom-file)
-(load "~/.emacs.d/my-productivity/shutdown-capture.el")
-(load "~/.emacs.d/my-productivity/morning-dashboard.el")
+(when (file-exists-p custom-file)
+  (load-file custom-file))
+(let ((sc "~/.emacs.d/my-productivity/shutdown-capture.el")
+      (md "~/.emacs.d/my-productivity/morning-dashboard.el"))
+  (when (file-exists-p sc) (load sc))
+  (when (file-exists-p md) (load md)))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
