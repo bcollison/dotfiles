@@ -1446,6 +1446,10 @@ Allow export to markdown and beamer (for presentations).
 
 #+begin_src emacs-lisp
   (require 'ox-md)
+  ;; Pre-declare before require so custom-declare-face in ox-beamer is a no-op.
+  ;; ox-beamer uses grey40 as an unquoted symbol which Emacs 29 rejects.
+  (defface org-beamer-tag '((t (:box (:line-width 1 :color "grey40"))))
+    "The special face for beamer tags." :group 'org-export-beamer)
   (require 'ox-beamer)
   (use-package ox-slack)
 #+end_src
