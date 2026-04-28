@@ -1894,25 +1894,23 @@ I'm usually actually in an org document.
 
               (global-set-key (kbd "C-\"") 'mu4e)
 
-          (add-to-list 'mu4e-bookmarks
-          '( :name  "Unread Inbox not Bitbucket"
-             :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket"
-             :key   ?I))
-
-          (add-to-list 'mu4e-bookmarks
-        '( :name  "Unread Inbox Bitbucket"
-           :query "maildir:/raken-gmail/INBOX and flag:unread and subject:Bitbucket"
-           :key   ?B))
-
+          (when (string= (user-login-name) "brian.collison")
             (add-to-list 'mu4e-bookmarks
-        '( :name  "Unread Inbox not Bitbucket or Jira"
-           :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket and not subject:JIRA"
-           :key   ?N))
-
-              (add-to-list 'mu4e-bookmarks
-        '( :name  "JIRA Mentions"
-           :query "maildir:/raken-gmail/INBOX and subject:JIRA and subject:mentioned"
-           :key   ?M))
+              '( :name  "Unread Inbox not Bitbucket"
+                 :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket"
+                 :key   ?I))
+            (add-to-list 'mu4e-bookmarks
+              '( :name  "Unread Inbox Bitbucket"
+                 :query "maildir:/raken-gmail/INBOX and flag:unread and subject:Bitbucket"
+                 :key   ?B))
+            (add-to-list 'mu4e-bookmarks
+              '( :name  "Unread Inbox not Bitbucket or Jira"
+                 :query "maildir:/raken-gmail/INBOX and flag:unread and not subject:Bitbucket and not subject:JIRA"
+                 :key   ?N))
+            (add-to-list 'mu4e-bookmarks
+              '( :name  "JIRA Mentions"
+                 :query "maildir:/raken-gmail/INBOX and subject:JIRA and subject:mentioned"
+                 :key   ?M)))
 
 #+END_SRC
 
