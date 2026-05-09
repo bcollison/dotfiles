@@ -1118,7 +1118,12 @@ This section contains the basic configuration for =org-mode= plus the configurat
                 ((org-agenda-overriding-header "Cancelled Projects")
                  (org-agenda-files org-agenda-files)))))))
 
-      (bmc/org-font-setup))
+      (if (daemonp)
+          (add-hook 'after-make-frame-functions
+                    (lambda (frame)
+                      (with-selected-frame frame
+                        (bmc/org-font-setup))))
+        (bmc/org-font-setup)))
 
 #+end_src
 
