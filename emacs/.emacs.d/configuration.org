@@ -1003,6 +1003,15 @@ There's org-babel support, as well as a standalone mode
 
  #+end_src
 
+#+begin_src emacs-lisp
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions
+                (lambda (frame)
+                  (with-selected-frame frame
+                    (bmc/org-font-setup))))
+    (bmc/org-font-setup))
+#+end_src
+
 ** Other org UI concerns
 org-appear will show the formatting text once you get inside the block
 #+begin_src emacs-lisp
@@ -1120,12 +1129,7 @@ This section contains the basic configuration for =org-mode= plus the configurat
                 ((org-agenda-overriding-header "Cancelled Projects")
                  (org-agenda-files org-agenda-files)))))))
 
-      (if (daemonp)
-          (add-hook 'after-make-frame-functions
-                    (lambda (frame)
-                      (with-selected-frame frame
-                        (bmc/org-font-setup))))
-        (bmc/org-font-setup)))
+      (bmc/org-font-setup))
 
 #+end_src
 
