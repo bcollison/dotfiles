@@ -341,7 +341,8 @@ frame is themed appropriately.
       (interactive)
       (load-theme 'zenburn t)
       ;;(transparency 100)
-      )
+      (when (fboundp 'bmc/org-font-setup)
+        (bmc/org-font-setup)))
 
      (if (daemonp)
 	  (add-hook 'after-make-frame-functions
@@ -1003,14 +1004,6 @@ There's org-babel support, as well as a standalone mode
 
  #+end_src
 
-#+begin_src emacs-lisp
-  (if (daemonp)
-      (add-hook 'after-make-frame-functions
-                (lambda (frame)
-                  (with-selected-frame frame
-                    (bmc/org-font-setup))))
-    (bmc/org-font-setup))
-#+end_src
 
 ** Other org UI concerns
 org-appear will show the formatting text once you get inside the block
