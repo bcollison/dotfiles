@@ -19,10 +19,12 @@ emacs needs to run some utilties like gpg, and mbsync. We need to make sure thes
      "/opt/homebrew/bin" ":"
      "/Library/TeX/texbin" ":"
      (expand-file-name "~/.asdf/shims") ":"
+     (expand-file-name "~/.local/bin") ":"
      (getenv "PATH")
     )
   )
 
+  (setq exec-path (append exec-path (list (expand-file-name "~/.local/bin"))))
   (setq exec-path (append exec-path '("/usr/local/bin")))
   (setq exec-path (append exec-path '("/opt/homebrew/bin")))
   (setq exec-path (append exec-path (list (expand-file-name "~/.asdf/shims"))))
@@ -2555,7 +2557,14 @@ discovered through this video: https://www.youtube.com/watch?v=yAL0cw1ePqw
                  :stream t
                  :models '(mistral:latest)))
 #+end_src
-
+** Using claude code
+#+begin_src emacs-lisp
+(use-package claude-code-ide
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+  :config
+  (claude-code-ide-emacs-tools-setup)) ; Optionally enable Emacs MCP tools
+#+end_src
 
 * bug-reference-mode
 #+begin_src emacs-lisp
