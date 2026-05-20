@@ -666,17 +666,18 @@ The =which-key= integration adds helpful descriptions of the various keys so you
 
 #+begin_src emacs-lisp
 
-  (defun efs/lsp-mode-setup ()
-    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-    (lsp-headerline-breadcrumb-mode))
+    (defun efs/lsp-mode-setup ()
+      (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+      (lsp-headerline-breadcrumb-mode))
 
-  (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    :hook (lsp-mode . efs/lsp-mode-setup)
-    :init
-    (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-    :config
-    (lsp-enable-which-key-integration t))
+    (use-package lsp-mode
+      :commands (lsp lsp-deferred)
+      :hook (lsp-mode . efs/lsp-mode-setup)
+      :init
+      (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+      :config
+      (lsp-enable-which-key-integration t)
+      (add-to-list 'lsp-disabled-clients '(lua-mode . t)))  ; use eglot for lua instead
 
 #+end_src
 
@@ -1222,32 +1223,6 @@ I like seeing a little downward-pointing arrow instead of the usual ellipsis
 Other interesting characters are ▼, ↴, ⬎, ⤷, ⤵ and ⋱. (via https://endlessparentheses.com/changing-the-org-mode-ellipsis.html )
 #+begin_src emacs-lisp
   (setq org-ellipsis "⬎")
-#+end_src
-
-Including =org-tempo= restores the =<s=-style easy-templates that were
-deprecated in Org 9.2.
-
-I'd like to open =file:= links in Org with the applications defined in my
-[[file:~/.dotfiles/email/.mailcap][mailcap]]. This clears the existing MIME mapping, parses my personal mailcap, and
-tells Org to open those links with the mailcap-defined applications.
-
-#+begin_src emacs-lisp
-;;  (use-package org
-;;    :ensure org-plus-contrib
-;;    :config
-;;    (require 'org-tempo)
-
-;;    (add-hook 'org-mode-hook
-;;              '(lambda ()
-;;                 (setq mailcap-mime-data '())
-;;                 (mailcap-parse-mailcap "~/.mailcap")
-;;                 (setq org-file-apps
-;;                       '((remote . emacs)
-;;                         ("mobi" . "fbreader %s")
-;;                         (system . mailcap)
-;;                         ("md" . emacs)
-;;                         ("org" . emacs)
-;;                         (t . mailcap))))))
 #+end_src
 
 I'd like the initial scratch buffer to be in Org:
@@ -2642,6 +2617,8 @@ Multiple connections are supported — add one alist per entry.
 #+begin_src emacs-lisp
       (use-package org-ql)
 
+      (use-package compat :ensure t)
+
       (use-package org-timeblock
         :vc (:url "https://github.com/bcollison/org-timeblock" :branch "merge-gleek-show-done")
         :config
@@ -2690,4 +2667,39 @@ Trying to find the right tool to easily switch from major contexts like: Emailin
 I prefer the zap-up-to-char (like vim's 'dt')
 #+begin_src emacs-lisp
 (global-set-key (kbd "M-z") 'zap-up-to-char)
+#+end_src
+
+* Lua/Roblox development
+
+** lua-mode
+#+begin_src emacs-lisp
+    (use-package lua-mode
+        :mode "\\.luau\\'")
+
+    (use-package eglot-luau
+      :ensure t
+      :after eglot
+      :custom
+      (eglot-luau-sync-fflags nil)
+      (eglot-luau-rojo-sourcemap-enabled t)
+      (eglot-luau-rojo-project-path "default.project.json")
+      :hook (lua-mode . (lambda () (eglot-luau-setup 'lua-mode))))
+
+#+end_src
+
+** trying eglot for easier integration
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure t)
+
+#+end_src
+
+** Need to figure out why project/vc is trying to read ~/Documents
+#+begin_src emacs-lisp
+(defun my/project-try-vc-safe (dir)
+  (let ((parent (file-name-directory (directory-file-name dir))))
+    (unless (string= parent (expand-file-name "~/Documents/"))
+      (project-try-vc dir))))
+
+(setq project-find-functions (list #'my/project-try-vc-safe))
 #+end_src
